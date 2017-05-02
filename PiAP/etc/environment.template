@@ -1,0 +1,47 @@
+# setup tools
+# some prefer VIM here
+EDITOR=${EDITOR:-"nano -L"}
+# assumes you have an alias or are on a darwin distro
+# for most debian distros use the alias open='xdg-open'
+# for most RHEL distros use the alias ...
+#VISUAL=${VISUAL:-"open"}
+
+#set up man
+# use something like 'sudo find -iname "*man*" -type d 2>/dev/null' to populate this VAR
+MANPATH=/usr/share/man:/usr/local/share/man
+
+# set up mailbox
+#MAIL="${HOME}/.mail/"
+#MBOX="${HOME}/.mail/mailbox"
+#REPLYTO="noreply@localhost"
+# set preferred pager
+PAGER="/usr/bin/less"
+MORE="less"
+#VISUAL=`which gedit`
+TMPDIR="${TMPDIR:-/tmp}"
+
+# setup fsck env
+# unset FSCK_FORCE_ALL_PARALLEL
+FSCK_MAX_INST=2
+# This environment variable will limit the maximum number of filesystem checkers that can be running at one time. N CPU CORE - 1
+# see PATH
+#PATH=${PATH}
+FSTAB_FILE=/etc/fstab
+
+#DEBUG
+#fsck debug
+#LIBBLKID_DEBUG=all
+#LIBMOUNT_DEBUG=all
+
+# TAR OPTIONS
+#TAR_LONGLINK_100
+#PRISTINE_TAR_COMPAT
+#SIMPLE_BACKUP_SUFFIX='.old'
+#TAR_OPTIONS=''
+#TAPE
+
+#nmap
+#NMAPDIR
+#NMAPDATADIR
+#NMAP_DEFAULT_SCRIPTS=address-info,afp-ls,afp-serverinfo,afpshowmount,backorifice-info,banner,asn-query,bjnp-discover,broadcast-bjnp-discover,broadcast-dhcp-discover,broadcast-dhcp6-discover,broadcast-dns-service-discovery,broadcast-dropbox-listener,broadcast-eigrp-discovery,broadcast-igmp-discovery,broadcast-listener,broadcast-*-discovery,broadcast-ping,broadcast-rip-discover,broadcast-ripng-discover,broadcast-upnp-info,broadcast-versant-locate,broadcast-wake-on-lan,citrix-enum-*,
+

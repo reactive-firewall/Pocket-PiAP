@@ -1,0 +1,6 @@
+[submodule "units/PiAP-python-tools"]
+	path = units/PiAP-python-tools
+	url = https://github.com/reactive-firewall/PiAP-python-tools.git
+[submodule "units/PiAP-Webroot"]
+	path = units/PiAP-Webroot
+	url = https://github.com/reactive-firewall/PiAP-Webroot.git

@@ -1,0 +1,4 @@
+# template for hostapd default/hostapd config
+DAEMON_CONF="/etc/hostapd/hostapd.conf"
+# BETA TESTING
+DAEMON_OPTS="-d"

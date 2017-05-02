@@ -1,0 +1,39 @@
+language: generic
+sudo: false
+
+branches:
+  only:
+    - stable
+    - master
+
+matrix:
+  include:
+  - os: linux
+    dist: trusty
+  - os: linux
+    dist: precice
+  - os: osx
+    osx_image: xcode6.4
+    language: generic
+  - os: osx
+    osx_image: xcode7.3
+    language: generic
+  - os: osx
+    osx_image: xcode8
+    language: generic
+  - os: osx
+    osx_image: xcode8.3
+    language: generic
+
+addons:
+  hosts:
+  - pocket.PiAP.local
+
+before_install:
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install php7 python2.7 python3.5 python 3.4 $INSTALL || true ; fi
+
+install: "true"
+# command to run tests
+script:
+  - make test
