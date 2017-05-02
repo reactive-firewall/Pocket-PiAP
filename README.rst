@@ -43,14 +43,32 @@ copies or substantial portions of the Software.
 Known Issues
 ------------
 
-- PS-0 - .. image: https://img.shields.io/badge/PCWE-655-red.svg - User on-boarding MUST be easyer
-- PS-1 - .. image: https://img.shields.io/badge/PCWE-779-red.svg - logs cause data leak
-- PS-2 - .. image: https://img.shields.io/badge/PCWE-16-red.svg - Configuration hardening
-- PS-3 - .. image: https://img.shields.io/badge/PCWE-100-red.svg & .. image: https://img.shields.io/badge/PCWE-149-red.svg - passwords with special charterers are courupted by input form
-- PS-4 - .. image: https://img.shields.io/badge/PCWE-654-red.svg - need MFA
-- PS-5 - .. image: https://img.shields.io/badge/PCWE-565-red.svg - need to harden cookies for surviving hostile environments
-- PS-6 - .. image: https://img.shields.io/badge/PCWE-310-red.svg - Need to enable proper TLS and encryption everywhere
-- PS-7 - .. image: https://img.shields.io/badge/PCWE-770-red.svg - need anti-brute force logic
+- PS-0 -
+.. image: https://img.shields.io/badge/PCWE-655-red.svg
+	- User on-boarding MUST be easyer
+- PS-1 -
+.. image: https://img.shields.io/badge/PCWE-779-red.svg
+	- logs cause data leak
+- PS-2 -
+.. image: https://img.shields.io/badge/PCWE-16-red.svg
+	- Configuration hardening
+- PS-3 -
+.. image: https://img.shields.io/badge/PCWE-100-red.svg
+	&
+.. image: https://img.shields.io/badge/PCWE-149-red.svg
+	- passwords with special charterers are courupted by input form
+- PS-4 -
+.. image: https://img.shields.io/badge/PCWE-654-red.svg
+	- need MFA
+- PS-5 -
+.. image: https://img.shields.io/badge/PCWE-565-red.svg
+	- need to harden cookies for surviving hostile environments
+- PS-6 -
+.. image: https://img.shields.io/badge/PCWE-310-red.svg
+	- Need to enable proper TLS and encryption everywhere
+- PS-7 -
+.. image: https://img.shields.io/badge/PCWE-770-red.svg
+	- need anti-brute force logic
 
 CWE-657 - see above
 
