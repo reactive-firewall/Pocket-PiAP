@@ -40,9 +40,16 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	echo "Upgrading FAILED. DO NOT INTURUPT OR POWER OFF."
 	echo "Rolling back from backup. DO NOT INTURUPT OR POWER OFF."
 	echo "... cleaning up mess from failed upgrade"
-	sudo rm -vfR /srv/PiAP || true ;
 	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || echo "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/PiAP-Webroot/issues\" (include as much detail as posible) and reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
 fi
+echo "checking SSL Beta cert dates."
+if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c OK ) -le 0 ) ]] ; then
+	echo "Applying HOTFIX - SSL Cert rotation for Beta"
+	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions usr_cert -CA /etc/ssl/PiAP_CA/PiAP_CA.pem -CAkey /etc/ssl/private/ssl-cert-CA-nginx.key -CAcreateserial | fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
+else
+	echo "Cert seems fine."
+fi
+
 echo "restarting web-server."
 sudo service php5-fpm start || ROLL_BACK=1 ;
 sudo service nginx start || ROLL_BACK=1 ;
