@@ -132,7 +132,6 @@ _(Security should be used)_
   - need to harden php namespace
 ##### PS-9 - CWE-653
   - need to enumerate users and groups for least privileged
-  - need to harden php namespace
 ##### PS-10 - CWE-657
   - see above
 
@@ -141,8 +140,4 @@ Possible Improvements:
 ---------------------
 - always more
 - I mean lots more
-- fix CVE-2007-6750 false positive
-- fix normilization error
-- harden ntp
-- add encryption and file signing
-- add more examples to docs
+- fix normalization error
