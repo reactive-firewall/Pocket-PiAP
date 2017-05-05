@@ -14,7 +14,6 @@ matrix:
   - os: linux
     dist: precice
     language: generic
-    sudo: true
   - os: osx
     osx_image: xcode6.4
     language: generic
@@ -31,12 +30,13 @@ matrix:
 addons:
   hosts:
   - pocket.PiAP.local
+  apt:
+    packages:
+      - php
 
 before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install php7 python2.7 python3.5 python3.4 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME != osx ] ; then sudo apt-get update || true ; fi
-  - if [ $TRAVIS_OS_NAME != osx ] ; then sudo apt-get install php || true ; fi
   - if [ $TRAVIS_OS_NAME != osx ] ; then curl -s -o archive.tar.bz2 https://s3.amazonaws.com/travis-php-archives/binaries/ubuntu/12.04/x86_64/php-7.1.tar.bz2 && tar xjf archive.tar.bz2 --directory / || true ; fi
 
 install: "true"
