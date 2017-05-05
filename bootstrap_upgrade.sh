@@ -7,7 +7,7 @@ sudo apt-get clean || ROLL_BACK=1 ;
 sudo apt-get autoclean || ROLL_BACK=1 ;
 sudo apt-get update || ROLL_BACK=1 ;
 sudo apt-key update || ROLL_BACK=1 ;
-sudo apt-get --only-upgrade dist-upgrade || ROLL_BACK=1 ;
+sudo apt-get --only-upgrade --assume-yes dist-upgrade || ROLL_BACK=1 ;
 sudo apt-get autoremove || ROLL_BACK=1 ;
 
 cd /tmp ;
@@ -49,7 +49,6 @@ if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/
 else
 	echo "Cert seems fine."
 fi
-
 echo "restarting web-server."
 sudo service php5-fpm start || ROLL_BACK=1 ;
 sudo service nginx start || ROLL_BACK=1 ;
