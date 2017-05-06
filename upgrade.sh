@@ -17,7 +17,8 @@ sudo chown 0:0 /var/opt/PiAP/backups/ || true ;
 sudo chown 750 /var/opt/PiAP/backups/ || true ;
 sudo chown 0:0 /var/opt/PiAP/ || true ;
 sudo chown 755 /var/opt/PiAP/ || true ;
-sudo mv -f /var/opt/PiAP/backups/PiAP /var/opt/PiAP/backups/PiAP_OLD
+sudo rm -Rvf /var/opt/PiAP/backups/PiAP_OLD/ 2>/dev/null || true ;
+sudo mv -f /var/opt/PiAP/backups/PiAP /var/opt/PiAP/backups/PiAP_OLD || true
 echo "Backing up pre-upgrade version"
 sudo cp -vfRpub /srv/PiAP /var/opt/PiAP/backups/PiAP || exit 3 ;
 echo "disabling web-server to prevent inconsistent state. All sessions will be logged out."
@@ -41,6 +42,8 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	echo "Upgrading FAILED. DO NOT INTURUPT OR POWER OFF."
 	echo "Rolling back from backup. DO NOT INTURUPT OR POWER OFF."
 	echo "... cleaning up mess from failed upgrade"
+	sudo mv -vfR /srv/PiAP /srv/PiAP_Failed || true ;
+	sudo rm -vfR /srv/PiAP_Failed || true ;
 	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || echo "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/PiAP-Webroot/issues\" (include as much detail as posible) and reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
 fi
 echo "checking SSL Beta cert dates."
