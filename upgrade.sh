@@ -30,6 +30,7 @@ echo "Fetching upgrade files... [FIX ME]"
 git clone -b ${PIAP_UI_BRANCH:-master} https://github.com/reactive-firewall/PiAP-Webroot.git || true ;
 cd ./PiAP-Webroot || ROLL_BACK=2 ;
 git fetch || ROLL_BACK=2 ;
+git pull || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-master} || ROLL_BACK=2 ;
 echo "SKIPPING TRUST CHECK. [BETA TEST] [FIX ME]"
 #checkout stable version
