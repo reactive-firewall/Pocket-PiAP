@@ -2,6 +2,8 @@
 
 ROLL_BACK=0
 
+PIAP_UI_BRANCH="master"
+
 echo "updating system to latest."
 sudo apt-get update || ROLL_BACK=1 ;
 sudo apt-key update || ROLL_BACK=1 ;
@@ -25,10 +27,10 @@ echo "disabling web-server to prevent inconsistent state. All sessions will be l
 sudo service nginx stop ;
 sudo service php5-fpm stop ;
 echo "Fetching upgrade files... [FIX ME]"
-git clone -b master https://github.com/reactive-firewall/PiAP-Webroot.git || true ;
+git clone -b ${PIAP_UI_BRANCH:-master} https://github.com/reactive-firewall/PiAP-Webroot.git || true ;
 cd ./PiAP-Webroot || ROLL_BACK=2 ;
 git fetch || ROLL_BACK=2 ;
-git rebase || ROLL_BACK=2 ;
+git checkout --force ${PIAP_UI_BRANCH:-master} || ROLL_BACK=2 ;
 echo "SKIPPING TRUST CHECK. [BETA TEST] [FIX ME]"
 #checkout stable version
 #verify stable version
