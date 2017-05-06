@@ -24,7 +24,7 @@ echo "disabling web-server to prevent inconsistent state. All sessions will be l
 sudo service nginx stop ;
 sudo service php5-fpm stop ;
 echo "Fetching upgrade files... [FIX ME]"
-git clone -b master https://github.com/reactive-firewall/PiAP-Webroot.git || ROLL_BACK=2 ;
+git clone -b master https://github.com/reactive-firewall/PiAP-Webroot.git || true ;
 cd ./PiAP-Webroot || ROLL_BACK=2 ;
 git fetch || ROLL_BACK=2 ;
 git rebase || ROLL_BACK=2 ;
