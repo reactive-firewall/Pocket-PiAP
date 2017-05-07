@@ -26,7 +26,7 @@ echo "disabling web-server to prevent inconsistent state. All sessions will be l
 sudo service nginx stop ;
 sudo service php5-fpm stop ;
 echo "Fetching upgrade files... [FIX ME]"
-git clone -b master https://github.com/reactive-firewall/PiAP-Webroot.git
+git clone -b stable https://github.com/reactive-firewall/PiAP-Webroot.git
 cd ./PiAP-Webroot || ROLL_BACK=2 ;
 echo "SKIPPING TRUST CHECK. [BETA TEST] [FIX ME]"
 #checkout stable version
