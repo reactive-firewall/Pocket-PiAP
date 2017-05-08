@@ -111,29 +111,8 @@ _(Security should be used)_
 
 #### Known Issues
 
-##### PS-0 - CWE-655
-  - User on-boarding MUST be easier
-##### PS-1 - CWE-779
-  - logs cause data leak
-##### PS-2 - CWE-16
-  - Configuration hardening
-##### PS-3 - CWE-100 & CWE-149
-  - passwords with special charterers are corrupted by input form
-##### PS-4 - CWE-654
-  - need MFA (xkcd - 936)
-##### PS-5 - CWE-565
-  - need to harden cookies for surviving hostile environments
-##### PS-6 - CWE-310
-  - Need to enable proper TLS and encryption everywhere
-##### PS-7 - CWE-770
-  - need anti-brute force logic
-##### PS-8 - CWE-647
-  - need to harden login flow more
-  - need to harden php namespace
-##### PS-9 - CWE-653
-  - need to enumerate users and groups for least privileged
-##### PS-10 - CWE-657
-  - see above
+see [Issues](https://github.com/reactive-firewall/Pocket-PiAP/issues)
+
 
 
 Possible Improvements:
