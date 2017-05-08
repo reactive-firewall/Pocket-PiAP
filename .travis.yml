@@ -4,6 +4,7 @@ sudo: false
 branches:
   only:
     - stable
+    - staging
     - master
 
 matrix:
