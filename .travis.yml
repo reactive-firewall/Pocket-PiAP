@@ -58,4 +58,4 @@ before_install:
 install: "true"
 # command to run tests
 script:
-  - time make test-tox
+  - time make test

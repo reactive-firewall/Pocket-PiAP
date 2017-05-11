@@ -84,14 +84,11 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test-tox
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-tox: cleanup
-	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test-tox
-	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test-tox
-	$(QUIET)tox --
+test-tox: cleanup test
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
