@@ -33,14 +33,14 @@ echo "SKIPPING TRUST CHECK. [BETA TEST] [FIX ME]"
 #verify stable version
 #git tag -v [tag-name]
 echo "Attempting upgrading. [BETA TEST]"
-echo "DO NOT INTURUPT OR POWER OFF. [BETA TEST]"
+echo "DO NOT INTERRUPT OR POWER OFF. [BETA TEST]"
 sudo make install || ROLL_BACK=2 ;
 make clean
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
-	echo "Upgrading FAILED. DO NOT INTURUPT OR POWER OFF."
-	echo "Rolling back from backup. DO NOT INTURUPT OR POWER OFF."
+	echo "Upgrading FAILED. DO NOT INTERRUPT OR POWER OFF."
+	echo "Rolling back from backup. DO NOT INTERRUPT OR POWER OFF."
 	echo "... cleaning up mess from failed upgrade"
-	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || echo "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/PiAP-Webroot/issues\" (include as much detail as posible) and reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
+	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || echo "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/PiAP-Webroot/issues\" (include as much detail as possible) and reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
 fi
 echo "checking SSL Beta cert dates."
 if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c OK ) -le 0 ) ]] ; then
@@ -62,7 +62,7 @@ else
 echo "Status: Upgrade seemed to work."
 fi
 echo ""
-echo "restart to compleate"
+echo "restart to complete"
 
 sudo -k
 exit ${ROLL_BACK:-3} ;

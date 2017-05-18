@@ -40,13 +40,27 @@ ifeq "$(WAIT)" ""
 	WAIT=wait
 endif
 
+ifeq "$(RM)" ""
+	RM=rm -f
+endif
+
+ifeq "$(RMDIR)" ""
+	RMDIR=$(RM)R
+endif
+
 ifeq "$(INSTALL)" ""
 	INSTALL=`which install`
 	ifeq "$(INST_OWN)" ""
-		INST_OWN=-o root -g staff
+		INST_OWN=-C -o pocket-admin -g pocket
 	endif
 	ifeq "$(INST_OPTS)" ""
-		INST_OPTS=-m 755
+		INST_OPTS=-m 750
+	endif
+	ifeq "$(INST_FILE_OPTS)" ""
+		INST_FILE_OPS=-m 640
+	endif
+	ifeq "$(INST_DIR_OPTS)" ""
+		INST_DIR_OPTS=-m 750 -d
 	endif
 endif
 
@@ -66,10 +80,33 @@ build:
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: /opt/PiAP must_be_root
+install: install-optroot install-optbin must_be_root
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile install
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile install
 	$(QUITE)$(WAIT)
+	$(QUIET)$(ECHO) "$@: Done."
+
+install-optroot: ./PiAP must_be_root
+	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket-admin 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /srv/PiAP/ --force-badname --no-create-home --group pocket-www 2>/dev/null || true
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/
+	$(QUIET)$(ECHO) "$@: Done."
+
+uninstall-optroot: /opt/PiAP/ uninstall-optbin must_be_root
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/
+	$(QUIET)$(ECHO) "$@: Done."
+
+install-optbin: install-optroot must_be_root
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/bin
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/bin/blink_LED.bash /opt/PiAP/bin/blink_LED.bash
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/bin/virus_scan.bash /opt/PiAP/bin/virus_scan.bash
+	$(QUIET)$(ECHO) "$@: Done."
+
+uninstall-optbin: must_be_root
+	$(QUIET)$(RM) /opt/PiAP/bin/blink_LED.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/virus_scan.bash 2>/dev/null || true
+	$(QUIET)$(RMDIR) /opt/PiAP/bin 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
@@ -79,6 +116,11 @@ uninstall:
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
+	$(QUIET)deluser --system pocket 2>/dev/null || true
+	$(QUIET)deluser --system pocket-www 2>/dev/null || true
+	$(QUIET)deluser --system pocket-dns 2>/dev/null || true
+	$(QUIET)deluser --system pocket-bot 2>/dev/null || true
+	$(QUIET)deluser --system pocket-admin 2>/dev/null || true
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile purge
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile purge
 	$(QUIET)$(ECHO) "$@: Done."
@@ -97,6 +139,10 @@ cleanup:
 	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
 	$(QUIET)rm -Rf tests/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -f PiAP/*.pyc 2>/dev/null || true
+	$(QUIET)rm -f PiAP/*/*.pyc 2>/dev/null || true
+	$(QUIET)rm -f PiAP/*/*~ 2>/dev/null || true
+	$(QUIET)rm -f PiAP/*/*/*.pyc 2>/dev/null || true
+	$(QUIET)rm -f PiAP/*/*/*~ 2>/dev/null || true
 	$(QUIET)rm -Rf PiAP/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -Rf PiAP/*/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -f PiAP/*~ 2>/dev/null || true
