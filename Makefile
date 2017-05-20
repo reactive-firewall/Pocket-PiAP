@@ -80,7 +80,7 @@ build:
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: install-optroot install-optbin must_be_root
+install: install-optroot install-wpa-actions install-hostapd-actions install-optsbin install-optbin must_be_root
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile install
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile install
 	$(QUITE)$(WAIT)
@@ -93,7 +93,7 @@ install-optroot: ./PiAP must_be_root
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/
 	$(QUIET)$(ECHO) "$@: Done."
 
-uninstall-optroot: /opt/PiAP/ uninstall-optbin must_be_root
+uninstall-optroot: /opt/PiAP/ uninstall-wpa-actions uninstall-hostapd-actions uninstall-optbin uninstall-optsbin must_be_root
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -109,7 +109,37 @@ uninstall-optbin: must_be_root
 	$(QUIET)$(RMDIR) /opt/PiAP/bin 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-uninstall:
+install-optsbin: install-optroot must_be_root
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/sbin
+	$(QUIET)$(ECHO) "$@: Done."
+
+uninstall-optsbin: must_be_root
+	$(QUIET)$(RMDIR) /opt/PiAP/sbin 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+	
+install-wpa-actions: install-optroot must_be_root
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/wpa_actions
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/list_networks /opt/PiAP/wpa_actions/list_networks
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/status
+	$(QUIET)$(ECHO) "$@: Done."
+
+uninstall-wpa-actions: must_be_root
+	$(QUIET)$(RM) /opt/PiAP/wpa_actions/list_networks 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/wpa_actions/status 2>/dev/null || true
+	$(QUIET)$(RMDIR) /opt/PiAP/wpa_actions 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+install-hostapd-actions: install-optroot must_be_root
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/hostapd_actions
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/hostapd_actions/clients /opt/PiAP/hostapd_actions/clients
+	$(QUIET)$(ECHO) "$@: Done."
+
+uninstall-hostapd-actions: must_be_root
+	$(QUIET)$(RM) /opt/PiAP/hostapd_actions/clients 2>/dev/null || true
+	$(QUIET)$(RMDIR) /opt/PiAP/hostapd_actions 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+uninstall: uninstall-optroot
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile uninstall
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile uninstall
 	$(QUITE)$(WAIT)
