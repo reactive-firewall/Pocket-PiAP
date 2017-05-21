@@ -80,9 +80,8 @@ build:
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: install-optroot install-wpa-actions install-hostapd-actions install-optsbin install-optbin must_be_root
+install: install-dsauth install-optroot install-wpa-actions install-hostapd-actions install-optsbin install-optbin must_be_root
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile install
-	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile install
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -90,6 +89,7 @@ install-optroot: ./PiAP must_be_root
 	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket 2>/dev/null || true
 	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket-admin 2>/dev/null || true
 	$(QUIET)adduser --system --disabled-password --home /srv/PiAP/ --force-badname --no-create-home --group pocket-www 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --force-badname --no-create-home --group pocket-www 2>/dev/null || true
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -139,10 +139,26 @@ uninstall-hostapd-actions: must_be_root
 	$(QUIET)$(RMDIR) /opt/PiAP/hostapd_actions 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-uninstall: uninstall-optroot
+install-dsauth: install-optroot must_be_root
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/srv/dsauth.py /srv/PiAP/dsauth.py
+	$(QUIET)$(ECHO) "$@: Done."
+
+uninstall-dsauth: uninstall-webroot must_be_root
+	$(QUIET)$(RM) /srv/PiAP/dsauth.py 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+uninstall: uninstall-optroot uninstall-dsauth
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile uninstall
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile uninstall
 	$(QUITE)$(WAIT)
+	$(QUIET)$(ECHO) "$@: Done."
+
+install-webroot:
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile install
+	$(QUIET)$(ECHO) "$@: Done."
+
+uninstall-webroot:
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
@@ -193,7 +209,7 @@ clean: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_be_root:
-	runner=`whoami` ; \
+	$(QUIET)runner=`whoami` ; \
 	if test $$runner != "root" ; then echo "You are not root." ; exit 1 ; fi
 
 %:
