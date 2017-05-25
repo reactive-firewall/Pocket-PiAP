@@ -12,7 +12,7 @@
 
 [![Build Status](https://travis-ci.org/reactive-firewall/PiAP-Webroot.svg?branch=master)](https://travis-ci.org/reactive-firewall/PiAP-Webroot)
 
-# This is still in private beta. FOSS under heavy development, No production support at this time. USE AT OWN RISK.
+# Pocket PiAP is still in private beta. FOSS under heavy development, No production support at this time. USE AT OWN RISK.
 
 ### License
 
