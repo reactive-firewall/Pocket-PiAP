@@ -12,7 +12,7 @@
 
 [![Build Status](https://travis-ci.org/reactive-firewall/PiAP-Webroot.svg?branch=master)](https://travis-ci.org/reactive-firewall/PiAP-Webroot)
 
-# This is still in private beta. FOSS, No production support. USE AT OWN RISK.
+# Pocket PiAP is still in private beta. FOSS under heavy development, No production support at this time. USE AT OWN RISK.
 
 ### License
 
@@ -104,19 +104,35 @@ _(Security should be used)_
  - exposure of data in transit (data leak)
  - exposure of data at rest (data theft)
  - loss of data at rest (data loss)
- - loss of data at transit (data loss)
+ - loss of data in transit (data loss)
 
-## ...and the list goes on (TODO: update this)
+##### and by _Meta_ ...
 
+###### ...by threats to meta-data
+ - exposure of meta-Data (Connecting the dots)
+ - persistent creation of meta-data (data mining)
+ - exposure of data in protected form (meta-analysis)
+ - loss of control of data (data mining)
+ 
+###### ...by threats to assumptions
+ - incorrect design for a given assumption (just covering all bases here?)
+ - any external points of trust that are untrustworthy (no good options)
+ - still in use after becoming obsolete (hardware failure)
+ - any successful social engineering of clients (user failure)
+ - the unenumerated unknown (that which is not known to be unknown)
 
-#### Known Issues
+#### 3. `Pocket PiAP` Risk assessment:
 
-see [Issues](https://github.com/reactive-firewall/Pocket-PiAP/issues)
+##### ... TO DO ...
 
+#### Known Issues and Possible Improvements
 
+- see [Issues](https://github.com/reactive-firewall/Pocket-PiAP/issues)
 
-Possible Improvements:
----------------------
-- always more
-- I mean lots more
-- fix normalization error
+#### Reporting Issues
+
+Please open an [Issue](https://github.com/reactive-firewall/Pocket-PiAP/issues) if one does not
+exist.
+
+# STILL IN BETA
+
