@@ -1,6 +1,8 @@
 #! /bin/bash
 
 ROLL_BACK=0
+PIAP_BRANCH="${PIAP_BRANCH:-stable}"
+
 
 echo "updating system to latest."
 sudo apt-get clean || ROLL_BACK=1 ;
@@ -26,7 +28,7 @@ echo "disabling web-server to prevent inconsistent state. All sessions will be l
 sudo service nginx stop ;
 sudo service php5-fpm stop ;
 echo "Fetching upgrade files... [FIX ME]"
-git clone -b stable https://github.com/reactive-firewall/PiAP-Webroot.git
+git clone -b ${PIAP_BRANCH} https://github.com/reactive-firewall/PiAP-Webroot.git
 cd ./PiAP-Webroot || ROLL_BACK=2 ;
 echo "SKIPPING TRUST CHECK. [BETA TEST] [FIX ME]"
 #checkout stable version
