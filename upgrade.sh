@@ -4,6 +4,9 @@ ROLL_BACK=0
 
 PIAP_UI_BRANCH="${PIAP_UI_BRANCH:-stable}"
 
+PIAP_USER=${PIAP_USER:-0}
+PIAP_GROUP=${PIAP_GROUP:-0}
+
 function message() {
 	local PIAP_MESSAGE = ${@}
 	echo ""
@@ -23,9 +26,9 @@ test -d /var/opt/ || mkdir -m 755 /var/opt/ && sudo chown 0:0 /var/opt/ || exit 
 sudo rm -Rvf /var/opt/PiAP/backups/PiAP_OLD/ 2>/dev/null || true ;
 test -d /var/opt/PiAP/ || mkdir -m 755 /var/opt/PiAP/ || exit 2 ;
 test -d /var/opt/PiAP/backups/ || mkdir -m 755 /var/opt/PiAP/backups/ || exit 2 ;
-sudo chown 0:0 /var/opt/PiAP/backups/ || true ;
+sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/backups/ || true ;
 sudo chown 750 /var/opt/PiAP/backups/ || true ;
-sudo chown 0:0 /var/opt/PiAP/ || true ;
+sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/ || true ;
 sudo chown 755 /var/opt/PiAP/ || true ;
 message "Making space for new backup up pre-upgrade version"
 sudo rm -Rvf /var/opt/PiAP/backups/PiAP_OLD/ 2>/dev/null || true ;
