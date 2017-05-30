@@ -47,7 +47,7 @@ git pull || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
 # keys
 GIT_GPG_CMD=$(git config --get gpg.program)
-GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg)}
+GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
 	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
 
