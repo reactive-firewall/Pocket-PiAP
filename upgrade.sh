@@ -8,7 +8,7 @@ PIAP_USER=${PIAP_USER:-0}
 PIAP_GROUP=${PIAP_GROUP:-0}
 
 function message() {
-	local PIAP_MESSAGE = ${@}
+	local PIAP_MESSAGE="${@}"
 	echo ""
 	echo "${PIAP_MESSAGE}"
 	echo ""
@@ -97,7 +97,7 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "Upgrading FAILED. DO NOT INTERRUPT OR POWER OFF."
 	message "Rolling back from backup. DO NOT INTERRUPT OR POWER OFF."
 	message "... cleaning up mess from failed upgrade"
-	sudo mv -vfR /srv/PiAP /srv/PiAP_Failed || true ;
+	sudo mv -vf /srv/PiAP /srv/PiAP_Failed || true ;
 	sudo rm -vfR /srv/PiAP_Failed || true ;
 	wait ;
 	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || message "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/PiAP-Webroot/issues\" (include as much detail as possible) and might need to reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
