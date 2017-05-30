@@ -52,10 +52,10 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
 	message "Use gpg command: \"${GIT_GPG_CMD}\""
 
-	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys CF76FC3B8CD0B15F 2>/dev/null || ROLL_BACK=2 ;
- 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 2FDAFC993A61112D 2>/dev/null || ROLL_BACK=2 ;
- 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys F55A399B1FE18BCB 2>/dev/null || ROLL_BACK=2 ;
- 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys B1E8C92F446CBB1B 2>/dev/null || ROLL_BACK=2 ;
+	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xCF76FC3B8CD0B15F 2>/dev/null || ROLL_BACK=2 ;
+ 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0x2FDAFC993A61112D 2>/dev/null || ROLL_BACK=2 ;
+ 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xF55A399B1FE18BCB 2>/dev/null || ROLL_BACK=2 ;
+ 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xB1E8C92F446CBB1B 2>/dev/null || ROLL_BACK=2 ;
 
 # to verify the above code is unmodified the signed version is
 # commented (prefixed by "# " 'number-sign & space') below for
@@ -72,13 +72,13 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 #  	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys B1E8C92F446CBB1B 2>/dev/null || ROLL_BACK=2 ;
 # 
 # -----BEGIN PGP SIGNATURE-----
-
-iJ4EARMKAAYFAlktDeQACgkQsejJL0Rsuxte4QH/RtrBDo08hXOToKT9chrJufPY
-VdR/0LttFsV7hqhtsJPVTrzpjgg1DJwwX459Eiim6Nmo+Psigkf5d7gDV595TQH+
-Oal4/l7dHJj8Sv0ox5kg4ey6wP+IshHCF7oCag/hvEnkrvTeBi/xcd0+BI2mdafd
-VOwILcw0zQlJHtd63G7jgw==
-=anoj
------END PGP SIGNATURE-----
+# 
+# iJ4EARMKAAYFAlktDeQACgkQsejJL0Rsuxte4QH/RtrBDo08hXOToKT9chrJufPY
+# VdR/0LttFsV7hqhtsJPVTrzpjgg1DJwwX459Eiim6Nmo+Psigkf5d7gDV595TQH+
+# Oal4/l7dHJj8Sv0ox5kg4ey6wP+IshHCF7oCag/hvEnkrvTeBi/xcd0+BI2mdafd
+# VOwILcw0zQlJHtd63G7jgw==
+# =anoj
+# -----END PGP SIGNATURE-----
 	
 else
 	ROLL_BACK=3 ;
