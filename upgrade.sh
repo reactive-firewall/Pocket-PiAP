@@ -10,7 +10,7 @@ PIAP_GROUP=${PIAP_GROUP:-0}
 function message() {
 	local PIAP_MESSAGE = ${@}
 	echo ""
-	echo "${PIAP_MESSSAGE}"
+	echo "${PIAP_MESSAGE}"
 	echo ""
 	return 0
 }
@@ -39,15 +39,48 @@ message "disabling web-server to prevent inconsistent state. All sessions will b
 sudo service nginx stop ;
 sudo service php5-fpm stop ;
 message "Fetching upgrade files..."
-# keys
-
 # data
-git clone -b ${PIAP_UI_BRANCH:-master} https://github.com/reactive-firewall/Pocket-PiAP.git || true ;
+git clone -b ${PIAP_UI_BRANCH:-stable} https://github.com/reactive-firewall/Pocket-PiAP.git || true ;
 cd ./Pocket-PiAP || ROLL_BACK=2 ;
 git fetch || ROLL_BACK=2 ;
 git pull || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
-message "SKIPPING TRUST CHECK. [BETA TEST]"
+# keys
+GIT_GPG_CMD=$(git config --get gpg.program)
+GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg)}
+if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
+	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
+
+	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys CF76FC3B8CD0B15F
+ 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 2FDAFC993A61112D
+ 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys F55A399B1FE18BCB
+ 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys B1E8C92F446CBB1B
+
+# to verify the above code is unmodified the signed version is
+# commented (prefixed by "# " 'number-sign & space') below for
+# verification:
+# 
+
+# -----BEGIN PGP SIGNED MESSAGE-----
+# Hash: SHA512
+# 
+# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys CF76FC3B8CD0B15F
+# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 2FDAFC993A61112D
+# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys F55A399B1FE18BCB
+# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys B1E8C92F446CBB1B
+# -----BEGIN PGP SIGNATURE-----
+# 
+# iJ4EARMKAAYFAlks34kACgkQsejJL0RsuxsbHQH+KJJrCu9tPNky0+lGTObwR8a9
+# hWduHwE84cbv3AGvtLS1YV3Tuvm4PkExAlV+yvrfFj9udsse1Zul7IYpJ0xPZwIA
+# jM8JDH4i0pmQjue6QE3jbInePtOUHUdwDkIYBD0jvnUfDpr95rtTKXHMo3xJcKgv
+# uriY9N8IJog+tg3QRhulqw==
+# =XUPH
+# -----END PGP SIGNATURE-----
+	
+else
+	ROLL_BACK=3 ;
+	message "DISABLED TRUST CHECK. [BETA TEST]"
+fi
 git show --show-signature | fgrep gpg | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
