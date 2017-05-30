@@ -50,11 +50,12 @@ GIT_GPG_CMD=$(git config --get gpg.program)
 GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
 	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
+	message "Use gpg command: \"${GIT_GPG_CMD}\""
 
-	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys CF76FC3B8CD0B15F
- 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 2FDAFC993A61112D
- 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys F55A399B1FE18BCB
- 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys B1E8C92F446CBB1B
+	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys CF76FC3B8CD0B15F 2>/dev/null || ROLL_BACK=2 ;
+ 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 2FDAFC993A61112D 2>/dev/null || ROLL_BACK=2 ;
+ 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys F55A399B1FE18BCB 2>/dev/null || ROLL_BACK=2 ;
+ 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys B1E8C92F446CBB1B 2>/dev/null || ROLL_BACK=2 ;
 
 # to verify the above code is unmodified the signed version is
 # commented (prefixed by "# " 'number-sign & space') below for
@@ -64,18 +65,20 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 # -----BEGIN PGP SIGNED MESSAGE-----
 # Hash: SHA512
 # 
-# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys CF76FC3B8CD0B15F
-# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 2FDAFC993A61112D
-# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys F55A399B1FE18BCB
-# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys B1E8C92F446CBB1B
-# -----BEGIN PGP SIGNATURE-----
 # 
-# iJ4EARMKAAYFAlks34kACgkQsejJL0RsuxsbHQH+KJJrCu9tPNky0+lGTObwR8a9
-# hWduHwE84cbv3AGvtLS1YV3Tuvm4PkExAlV+yvrfFj9udsse1Zul7IYpJ0xPZwIA
-# jM8JDH4i0pmQjue6QE3jbInePtOUHUdwDkIYBD0jvnUfDpr95rtTKXHMo3xJcKgv
-# uriY9N8IJog+tg3QRhulqw==
-# =XUPH
-# -----END PGP SIGNATURE-----
+# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys CF76FC3B8CD0B15F 2>/dev/null || ROLL_BACK=2 ;
+#  	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 2FDAFC993A61112D 2>/dev/null || ROLL_BACK=2 ;
+# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys F55A399B1FE18BCB 2>/dev/null || ROLL_BACK=2 ;
+#  	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys B1E8C92F446CBB1B 2>/dev/null || ROLL_BACK=2 ;
+# 
+# -----BEGIN PGP SIGNATURE-----
+
+iJ4EARMKAAYFAlktDeQACgkQsejJL0Rsuxte4QH/RtrBDo08hXOToKT9chrJufPY
+VdR/0LttFsV7hqhtsJPVTrzpjgg1DJwwX459Eiim6Nmo+Psigkf5d7gDV595TQH+
+Oal4/l7dHJj8Sv0ox5kg4ey6wP+IshHCF7oCag/hvEnkrvTeBi/xcd0+BI2mdafd
+VOwILcw0zQlJHtd63G7jgw==
+=anoj
+-----END PGP SIGNATURE-----
 	
 else
 	ROLL_BACK=3 ;
