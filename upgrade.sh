@@ -4,10 +4,13 @@ ROLL_BACK=0
 
 PIAP_UI_BRANCH="${PIAP_UI_BRANCH:-stable}"
 
+PIAP_USER=${PIAP_USER:-0}
+PIAP_GROUP=${PIAP_GROUP:-0}
+
 function message() {
-	local PIAP_MESSAGE = ${@}
+	local PIAP_MESSAGE="${@}"
 	echo ""
-	echo "${PIAP_MESSSAGE}"
+	echo "${PIAP_MESSAGE}"
 	echo ""
 	return 0
 }
@@ -23,9 +26,9 @@ test -d /var/opt/ || mkdir -m 755 /var/opt/ && sudo chown 0:0 /var/opt/ || exit 
 sudo rm -Rvf /var/opt/PiAP/backups/PiAP_OLD/ 2>/dev/null || true ;
 test -d /var/opt/PiAP/ || mkdir -m 755 /var/opt/PiAP/ || exit 2 ;
 test -d /var/opt/PiAP/backups/ || mkdir -m 755 /var/opt/PiAP/backups/ || exit 2 ;
-sudo chown 0:0 /var/opt/PiAP/backups/ || true ;
+sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/backups/ || true ;
 sudo chown 750 /var/opt/PiAP/backups/ || true ;
-sudo chown 0:0 /var/opt/PiAP/ || true ;
+sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/ || true ;
 sudo chown 755 /var/opt/PiAP/ || true ;
 message "Making space for new backup up pre-upgrade version"
 sudo rm -Rvf /var/opt/PiAP/backups/PiAP_OLD/ 2>/dev/null || true ;
@@ -36,15 +39,50 @@ message "disabling web-server to prevent inconsistent state. All sessions will b
 sudo service nginx stop ;
 sudo service php5-fpm stop ;
 message "Fetching upgrade files..."
-# keys
-
 # data
-git clone -b ${PIAP_UI_BRANCH:-master} https://github.com/reactive-firewall/Pocket-PiAP.git || true ;
+git clone -b ${PIAP_UI_BRANCH:-stable} https://github.com/reactive-firewall/Pocket-PiAP.git || true ;
 cd ./Pocket-PiAP || ROLL_BACK=2 ;
 git fetch || ROLL_BACK=2 ;
 git pull || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
-message "SKIPPING TRUST CHECK. [BETA TEST]"
+# keys
+GIT_GPG_CMD=$(git config --get gpg.program)
+GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
+if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
+	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
+	message "Use gpg command: \"${GIT_GPG_CMD}\""
+
+	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xCF76FC3B8CD0B15F 2>/dev/null || ROLL_BACK=2 ;
+	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0x2FDAFC993A61112D 2>/dev/null || ROLL_BACK=2 ;
+	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xF55A399B1FE18BCB 2>/dev/null || ROLL_BACK=2 ;
+	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xB1E8C92F446CBB1B 2>/dev/null || ROLL_BACK=2 ;
+
+# to verify the above code is unmodified the signed version is
+# commented (prefixed by "# " 'number-sign & space') below for
+# verification:
+# 
+
+# -----BEGIN PGP SIGNED MESSAGE-----
+# Hash: SHA512
+# 
+# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xCF76FC3B8CD0B15F 2>/dev/null || ROLL_BACK=2 ;
+#  	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0x2FDAFC993A61112D 2>/dev/null || ROLL_BACK=2 ;
+#  	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xF55A399B1FE18BCB 2>/dev/null || ROLL_BACK=2 ;
+#  	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xB1E8C92F446CBB1B 2>/dev/null || ROLL_BACK=2 ;
+# 
+# -----BEGIN PGP SIGNATURE-----
+# 
+# iJ4EARMKAAYFAlktFAcACgkQsejJL0RsuxsaGgH/YFNSUC1FldZJmFkTN8FPXlHa
+# 2GWdheW02Yi8h5x74kiMGQLbu1QRxWl2NSpRxq1XCCFNf1HLwV1e6ZwHsFORnAH/
+# SbbnvRrFPMRIHGxE0YiZtTVkEWoXAQTlJ0zSQMC2zxDXENpVOZ9CtZXSlDMWWODy
+# WEEPBHrmiEtnajuMqeYScw==
+# =1ghI
+# -----END PGP SIGNATURE-----
+	
+else
+	ROLL_BACK=3 ;
+	message "DISABLED TRUST CHECK. [BETA TEST]"
+fi
 git show --show-signature | fgrep gpg | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
@@ -61,7 +99,7 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "Upgrading FAILED. DO NOT INTERRUPT OR POWER OFF."
 	message "Rolling back from backup. DO NOT INTERRUPT OR POWER OFF."
 	message "... cleaning up mess from failed upgrade"
-	sudo mv -vfR /srv/PiAP /srv/PiAP_Failed || true ;
+	sudo mv -vf /srv/PiAP /srv/PiAP_Failed || true ;
 	sudo rm -vfR /srv/PiAP_Failed || true ;
 	wait ;
 	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || message "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/PiAP-Webroot/issues\" (include as much detail as possible) and might need to reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
