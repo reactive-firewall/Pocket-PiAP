@@ -79,14 +79,15 @@ git show --show-signature | fgrep gpg | fgrep "Pocket PiAP Codesign CA" | fgrep 
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
 	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
-	message "NOT Attempting upgrading..."
-else
+fi # temp roll back [CAUTION for BETA]
+#	message "NOT Attempting upgrading..."
+#else
 message "Attempting upgrading..."
 message "DO NOT INTERRUPT OR POWER OFF. [CAUTION for BETA]"
 sudo make uninstall || ROLL_BACK=2 ;
 sudo make install || ROLL_BACK=2 ;
 make clean
-fi
+#fi
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "Upgrading FAILED. DO NOT INTERRUPT OR POWER OFF."
 	message "Rolling back from backup. DO NOT INTERRUPT OR POWER OFF."
