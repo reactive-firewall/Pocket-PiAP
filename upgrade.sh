@@ -52,10 +52,12 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
 	message "Use gpg command: \"${GIT_GPG_CMD}\""
 
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+
+	# BUG WHERE ELIPTIC CURVE keys are unusable ?!?! wtf is this weak sauce ?
 
 # to verify the above code is unmodified the signed version is
 # commented (prefixed by "# " 'number-sign & space') below for
@@ -65,7 +67,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 # will add after beta when changes are less often and thus less sensitive to differential analysis
 
 	if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
-		message "FAILED TO VERIFY A CODESIGN TRUST ANCHORS"
+		message "FAILED TO VERIFY CODESIGN TRUST ANCHORS"
 		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
 		message "NOT Attempting upgrading..."
 	fi
