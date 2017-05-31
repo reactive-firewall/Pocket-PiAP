@@ -52,33 +52,23 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
 	message "Use gpg command: \"${GIT_GPG_CMD}\""
 
-	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xCF76FC3B8CD0B15F 2>/dev/null || ROLL_BACK=2 ;
-	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0x2FDAFC993A61112D 2>/dev/null || ROLL_BACK=2 ;
-	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xF55A399B1FE18BCB 2>/dev/null || ROLL_BACK=2 ;
-	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xB1E8C92F446CBB1B 2>/dev/null || ROLL_BACK=2 ;
+	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xCF76FC3B8CD0B15F 2>/dev/null || curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0x2FDAFC993A61112D 2>/dev/null || curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xF55A399B1FE18BCB 2>/dev/null || curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xB1E8C92F446CBB1B 2>/dev/null || curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ; ROLL_BACK=2 ;
 
 # to verify the above code is unmodified the signed version is
 # commented (prefixed by "# " 'number-sign & space') below for
 # verification:
 # 
 
-# -----BEGIN PGP SIGNED MESSAGE-----
-# Hash: SHA512
-# 
-# 	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xCF76FC3B8CD0B15F 2>/dev/null || ROLL_BACK=2 ;
-#  	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0x2FDAFC993A61112D 2>/dev/null || ROLL_BACK=2 ;
-#  	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xF55A399B1FE18BCB 2>/dev/null || ROLL_BACK=2 ;
-#  	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xB1E8C92F446CBB1B 2>/dev/null || ROLL_BACK=2 ;
-# 
-# -----BEGIN PGP SIGNATURE-----
-# 
-# iJ4EARMKAAYFAlktFAcACgkQsejJL0RsuxsaGgH/YFNSUC1FldZJmFkTN8FPXlHa
-# 2GWdheW02Yi8h5x74kiMGQLbu1QRxWl2NSpRxq1XCCFNf1HLwV1e6ZwHsFORnAH/
-# SbbnvRrFPMRIHGxE0YiZtTVkEWoXAQTlJ0zSQMC2zxDXENpVOZ9CtZXSlDMWWODy
-# WEEPBHrmiEtnajuMqeYScw==
-# =1ghI
-# -----END PGP SIGNATURE-----
-	
+# will add after beta when changes are less often and thus less sensitive to differential analysis
+
+	if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
+		message "FAILED TO VERIFY A CODESIGN TRUST ANCHORS"
+		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
+		message "NOT Attempting upgrading..."
+	fi
 else
 	ROLL_BACK=3 ;
 	message "DISABLED TRUST CHECK. [BETA TEST]"
