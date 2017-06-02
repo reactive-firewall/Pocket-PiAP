@@ -45,17 +45,24 @@ cd ./Pocket-PiAP || ROLL_BACK=2 ;
 git fetch || ROLL_BACK=2 ;
 git pull || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
+sudo git submodule init || ROLL_BACK=2 ;
+sudo git submodule update --remote --checkout || ROLL_BACK=2 ;
+sudo git config --local fetch.recursesubmodules true
+git fetch || ROLL_BACK=2 ;
+git pull || ROLL_BACK=2 ;
+git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
 # keys
 GIT_GPG_CMD=$(git config --get gpg.program)
 GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
 	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
-	message "Use gpg command: \"${GIT_GPG_CMD}\""
 
-	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xCF76FC3B8CD0B15F 2>/dev/null || curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0x2FDAFC993A61112D 2>/dev/null || curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xF55A399B1FE18BCB 2>/dev/null || curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	${GIT_GPG_CMD} --keyserver hkps://hkps.pool.sks-keyservers.net --recv-keys 0xB1E8C92F446CBB1B 2>/dev/null || curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ; ROLL_BACK=2 ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+
+	# BUG WHERE ELIPTIC CURVE keys are unusable ?!?! wtf is this weak sauce ?
 
 # to verify the above code is unmodified the signed version is
 # commented (prefixed by "# " 'number-sign & space') below for
@@ -65,7 +72,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 # will add after beta when changes are less often and thus less sensitive to differential analysis
 
 	if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
-		message "FAILED TO VERIFY A CODESIGN TRUST ANCHORS"
+		message "FAILED TO VERIFY CODESIGN TRUST ANCHORS"
 		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
 		message "NOT Attempting upgrading..."
 	fi
@@ -77,14 +84,15 @@ git show --show-signature | fgrep gpg | fgrep "Pocket PiAP Codesign CA" | fgrep 
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
 	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
-	message "NOT Attempting upgrading..."
-else
+fi # temp roll back [CAUTION for BETA]
+#	message "NOT Attempting upgrading..."
+#else
 message "Attempting upgrading..."
 message "DO NOT INTERRUPT OR POWER OFF. [CAUTION for BETA]"
 sudo make uninstall || ROLL_BACK=2 ;
 sudo make install || ROLL_BACK=2 ;
 make clean
-fi
+#fi
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "Upgrading FAILED. DO NOT INTERRUPT OR POWER OFF."
 	message "Rolling back from backup. DO NOT INTERRUPT OR POWER OFF."
@@ -92,7 +100,7 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	sudo mv -vf /srv/PiAP /srv/PiAP_Failed || true ;
 	sudo rm -vfR /srv/PiAP_Failed || true ;
 	wait ;
-	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || message "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/PiAP-Webroot/issues\" (include as much detail as possible) and might need to reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
+	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || message "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/Pocket-PiAP/issues\" (include as much detail as possible) and might need to reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
 fi
 message "checking TLS Beta cert dates."
 if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c OK ) -le 0 ) ]] ; then

@@ -80,7 +80,7 @@ build:
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: install-dsauth install-optroot install-wpa-actions install-hostapd-actions install-optsbin install-optbin must_be_root
+install: install-dsauth install-webroot install-optroot install-wpa-actions install-hostapd-actions install-optsbin install-optbin must_be_root
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile install
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
@@ -149,15 +149,14 @@ uninstall-dsauth: uninstall-webroot must_be_root
 
 uninstall: uninstall-optroot uninstall-dsauth
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile uninstall
-	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile uninstall
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-webroot:
+install-webroot: install-dsauth
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile install
 	$(QUIET)$(ECHO) "$@: Done."
 
-uninstall-webroot:
+uninstall-webroot: uninstall-wpa-actions
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -205,6 +204,8 @@ cleanup:
 	$(QUIET)rm -f ./the_test_file.txt 2>/dev/null || true
 
 clean: cleanup
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile clean 2>/dev/null || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
