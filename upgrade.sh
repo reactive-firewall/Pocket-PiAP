@@ -56,7 +56,6 @@ GIT_GPG_CMD=$(git config --get gpg.program)
 GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
 	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
-	message "Use gpg command: \"${GIT_GPG_CMD}\""
 
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
@@ -101,7 +100,7 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	sudo mv -vf /srv/PiAP /srv/PiAP_Failed || true ;
 	sudo rm -vfR /srv/PiAP_Failed || true ;
 	wait ;
-	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || message "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/PiAP-Webroot/issues\" (include as much detail as possible) and might need to reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
+	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || message "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/Pocket-PiAP/issues\" (include as much detail as possible) and might need to reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
 fi
 message "checking TLS Beta cert dates."
 if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c OK ) -le 0 ) ]] ; then
