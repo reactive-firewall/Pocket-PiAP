@@ -134,5 +134,5 @@ _(Security should be used)_
 Please open an [Issue](https://github.com/reactive-firewall/Pocket-PiAP/issues) if one does not
 exist.
 
-# STILL IN PRIVATE BETA
+# STILL IN PRIVATE BETA.
 
