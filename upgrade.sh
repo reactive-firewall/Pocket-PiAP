@@ -52,15 +52,20 @@ git fetch || ROLL_BACK=2 ;
 git pull || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
 # keys
-GIT_GPG_CMD=$(git config --get gpg.program)
+GIT_GPG_CMD=$(sudo git config --get gpg.program)
 GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
+sudo git config --local gpg.program ${GIT_GPG_CMD}
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
 	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
 
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	printf "trust 1\n3\nsave\n" | gpg2 --command-fd 0 --edit-key CF76FC3B8CD0B15F 2>/dev/null || true ; wait ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	printf "trust 1\n3\nsave\n" | gpg2 --command-fd 0 --edit-key 2FDAFC993A61112D 2>/dev/null || true ; wait ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key F55A399B1FE18BCB 2>/dev/null || ROLL_BACK=2 ; wait ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	${GIT_GPG_CMD} --check-trustdb 2>/dev/null || ROLL_BACK=2 ;
 
 	# BUG WHERE ELIPTIC CURVE keys are unusable ?!?! wtf is this weak sauce ?
 
@@ -73,26 +78,26 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 
 	if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 		message "FAILED TO VERIFY CODESIGN TRUST ANCHORS"
-		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
+		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably ED43994C3F45B85F... [FIX ME]"
 		message "NOT Attempting upgrading..."
 	fi
 else
 	ROLL_BACK=3 ;
 	message "DISABLED TRUST CHECK. [BETA TEST]"
 fi
-git show --show-signature | fgrep gpg | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || ROLL_BACK=1 ;
+git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
-	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
-fi # temp roll back [CAUTION for BETA]
+	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably ED43994C3F45B85F... [FIX ME]"
+#fi # temp roll back [CAUTION for BETA]
 #	message "NOT Attempting upgrading..."
-#else
+else
 message "Attempting upgrading..."
 message "DO NOT INTERRUPT OR POWER OFF. [CAUTION for BETA]"
 sudo make uninstall || ROLL_BACK=2 ;
 sudo make install || ROLL_BACK=2 ;
 make clean
-#fi
+fi
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "Upgrading FAILED. DO NOT INTERRUPT OR POWER OFF."
 	message "Rolling back from backup. DO NOT INTERRUPT OR POWER OFF."
