@@ -41,21 +41,48 @@ addons:
   - pocket.PiAP.local
 
 before_install:
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew tap homebrew/versions || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew upgrade || brew upgrade || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install php7 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install pip $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install tox $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python27 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.2 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python26 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.3 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python34 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.4 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python35 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.5 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py2.7 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.7 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install coverage $INSTALL || true ; fi
+  - travis_retry pip install tox || pip install tox || true ;
+  - travis_retry python3 -m pip install tox || python3 -m pip install tox || true ;
+  - travis_retry python -m pip install tox || python -m pip install tox || true ;
   - if [ $TRAVIS_OS_NAME != osx ] ; then curl --tlsv1.2 -s -o archive.tar.bz2 https://s3.amazonaws.com/travis-php-archives/binaries/ubuntu/12.04/x86_64/php-7.1.tar.bz2 && tar xjf archive.tar.bz2 --directory / || true ; fi
-  - pip install tox || pip install --upgrade tox || true
+  - pip install tox || pip install --upgrade tox || true ;
+  - travis_retry python3 -m pip install coverage || python3 -m pip install coverage || true ;
+  - travis_retry python3 -m pip install codecov || python3 -m pip install codecov || true ;
+  - travis_retry pip install codecov || true ;
 
 install: "true"
 # command to run tests
 script:
-  - time make test
+  - make clean ;
+  - make test || exit $? ;
+  - codecov || true
+  - make clean || exit $? ; 
+  - make test-tox || exit $? ;
+  - make clean ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib ; fi ; wait ;
+
+after_success:
+  - codecov || true
