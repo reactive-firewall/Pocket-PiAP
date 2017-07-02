@@ -1,0 +1,16 @@
+coverage:
+  status:
+    project:
+      default: off
+      piaplib:
+        target: 45%
+        flags: piaplib
+
+flags:
+  piaplib:
+    paths:
+      - units/PiAP-python-tools/piaplib/
+      - units/PiAP-python-tools/piaplib/lint
+      - units/PiAP-python-tools/piaplib/pku
+      - units/PiAP-python-tools/piaplib/keyring
+
