@@ -171,7 +171,7 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test || true
 	$(QUIET)cp -vf ./units/PiAP-python-tools/.coverage* ./ || true
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test
 	$(QUIET)$(ECHO) "$@: Done."
