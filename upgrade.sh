@@ -19,7 +19,7 @@ message "updating system to latest."
 sudo apt-get update || ROLL_BACK=1 ;
 sudo apt-key update || ROLL_BACK=1 ;
 sudo apt-get --only-upgrade --assume-yes dist-upgrade || ROLL_BACK=1 ;
-sudo apt-get autoremove || ROLL_BACK=1 ;
+sudo apt-get --assume-yes autoremove || ROLL_BACK=1 ;
 cd /tmp ;
 test -d /var/ || exit 2 ;
 test -d /var/opt/ || mkdir -m 755 /var/opt/ && sudo chown 0:0 /var/opt/ || exit 2 ;
@@ -78,7 +78,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 
 	if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 		message "FAILED TO VERIFY CODESIGN TRUST ANCHORS"
-		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably ED43994C3F45B85F... [FIX ME]"
+		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
 		message "NOT Attempting upgrading..."
 	fi
 else
@@ -88,7 +88,7 @@ fi
 git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
-	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably ED43994C3F45B85F... [FIX ME]"
+	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
 #fi # temp roll back [CAUTION for BETA]
 #	message "NOT Attempting upgrading..."
 else
