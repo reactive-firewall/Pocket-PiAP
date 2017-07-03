@@ -93,7 +93,7 @@ else
 	ROLL_BACK=3 ;
 	message "DISABLED TRUST CHECK. [BETA TEST]"
 fi
-sudo git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || (sudo git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Signature made" && sudo git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Invalid public key algorithm" ) || ROLL_BACK=1 ;
+sudo git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || (sudo git show --show-signature | fgrep ": " | fgrep "Signature made" && sudo git show --show-signature | fgrep ": " | fgrep "Invalid public key algorithm" ) || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
 	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
