@@ -5,6 +5,9 @@ coverage:
       piaplib:
         target: 45%
         flags: piaplib
+      tests:
+        target: 50%
+        flags: tests
 
 flags:
   piaplib:
@@ -13,4 +16,8 @@ flags:
       - units/PiAP-python-tools/piaplib/lint
       - units/PiAP-python-tools/piaplib/pku
       - units/PiAP-python-tools/piaplib/keyring
+      - units/PiAP-python-tools/piaplib/book
+  tests:
+    paths:
+      - units/PiAP-python-tools/tests
 
