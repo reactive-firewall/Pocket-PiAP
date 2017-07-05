@@ -10,10 +10,12 @@ PIAP_GROUP=${PIAP_GROUP:-0}
 function message() {
 	local PIAP_MESSAGE="${@}"
 	echo ""
-	echo "${PIAP_MESSAGE}"
+	echo "${PIAP_MESSAGE}" | tee -a "/tmp/${LOG_PATH:-PiAP_update_log.log}" 2>/dev/null
 	echo ""
 	return 0
 }
+
+message "Date:"$(date)
 
 if [[ ( -n $(which apt-get ) ) ]] ; then
 	message "updating system to latest."
@@ -23,7 +25,7 @@ if [[ ( -n $(which apt-get ) ) ]] ; then
 	sudo apt-get --assume-yes autoremove || ROLL_BACK=1 ;
 	sudo apt-key update || ROLL_BACK=1 ;
 else
-	message "WARNING: enviroment seems off."
+	message "WARNING: enviroment seems wrong."
 	message "WARNING: NOT updating system to latest."
 fi ;
 
@@ -115,10 +117,18 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	wait ;
 	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || message "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/Pocket-PiAP/issues\" (include as much detail as possible) and might need to reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
 fi
-message "checking TLS Beta cert dates."
+message "Checking TLS Beta cert dates."
 if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c OK ) -le 0 ) ]] ; then
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
 	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions usr_cert -CA /etc/ssl/PiAP_CA/PiAP_CA.pem -CAkey /etc/ssl/private/ssl-cert-CA-nginx.key -CAcreateserial | fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
+	message "DONE"
+elif [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c 'certificate has expired' ) -gt 0 ) ]] ; then
+	message "Applying HOTFIX - TLS Cert rotation for Beta"
+	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions usr_cert -CA /etc/ssl/PiAP_CA/PiAP_CA.pem -CAkey /etc/ssl/private/ssl-cert-CA-nginx.key -CAcreateserial | fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
+	message "DONE"
+	message "Cert should be fine now."
+	message "You will probably have a browser warning about the new certificate, the next time you visit the web interface."
+	openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null || true ; wait ;
 else
 	message "Cert seems fine."
 fi
@@ -126,13 +136,14 @@ if [[ ( $( find /etc/ssh -iname *.pub -ctime +30 -print0 2>/dev/null | wc -l ) -
 	message "Applying HOTFIX - SSH key rotation for Beta"
 	find /etc/ssh -iname *.pub -ctime +30 -print0 2>/dev/null | xargs -0 -L1 rm -vf ; wait ;
 	sudo ssh-keygen -A ; wait ;
+	message "DONE"
 	message "AFTER LOGGING OUT of this ssh session YOU MUST REMOVE TRUST OF THE OLD KEY by running: ssh-keygen -R ${HOSTNAME:-pocket.piap.local}"
 	message "The NEW keys you will need to verify are:"
 	find /etc/ssh -iname *.pub -print0 2>/dev/null | xargs -0 -L1 sudo ssh-keygen -l -v -f ;
 else
-	message "ssh keys seem fine."
+	message "SSH keys seem fine."
 fi
-message "restarting web-server."
+message "Restarting web-server."
 sudo service php5-fpm start || ROLL_BACK=1 ;
 sudo service nginx start || ROLL_BACK=1 ;
 sudo service php5-fpm restart || ROLL_BACK=1 ;
@@ -140,10 +151,14 @@ message "DONE"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 message "Status: Upgrade failed."
 message "Please report this issue at https://github.com/reactive-firewall/Pocket-PiAP/issues"
+message "[BETA] Please include the contents of this log \"/tmp/${LOG_PATH:-PiAP_update_log.log}\""
 else
-message "Status: Upgrade seemed to work."
+message "Status: Upgrade seemed to work. (check by logging in to the Web interface)"
+message "--------------------[LOG]----------------------"
+head -n 9999999 "/tmp/${LOG_PATH:-PiAP_update_log.log}" || true ; wait ;
 fi
-message "restart to complete"
+message "[DONE] SCRIPT IS NOW DONE. SAFE TO MOVE TO NEXT STEP"
+message "[NEXT] Restart Pocket to complete the upgrades."
 sudo -k
 exit ${ROLL_BACK:-3} ;
 
