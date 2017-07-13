@@ -15,6 +15,17 @@ function message() {
 	return 0
 }
 
+function check_depends() {
+	local THEDEPENDS=$"${1:-python3}"
+	local DID_WORK=0
+	if [[ ( $(dpkg --list | grep -E "^ii\s" | tr -s '\s' ' ' | cut -d \  -f 2 | fgrep -c "${THEDEPENDS}" ) -le 0 ) ]] ; then
+		message "Installing new dependencies. [\"${THEDEPENDS}\"]"
+		sudo apt-get install -y ${THEDEPENDS} 2>/dev/null || DID_WORK=1 ;
+		message "DONE"
+	fi
+	return $DID_WORK
+}
+
 message "Date:"$(date)
 
 if [[ ( -n $(which apt-get ) ) ]] ; then
@@ -87,7 +98,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 
 	if [[ ( ${WARN_VAR:-2} -gt 0 ) ]] ; then
 		message "FAILED TO VERIFY CODESIGN TRUST ANCHORS"
-		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
+		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably DE175595F735CA8E... [FIX ME]"
 		# FIX THIS
 		message "BETA: Attempting upgrading..."
 	fi
@@ -98,7 +109,7 @@ fi
 sudo git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || (sudo git show --show-signature | fgrep ": " | fgrep "Signature made" && sudo git show --show-signature | fgrep ": " | fgrep "Invalid public key algorithm" ) || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
-	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably B1E8C92F446CBB1B... [FIX ME]"
+	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably DE175595F735CA8E... [FIX ME]"
 #fi # temp roll back [CAUTION for BETA]
 #	message "NOT Attempting upgrading..."
 else
