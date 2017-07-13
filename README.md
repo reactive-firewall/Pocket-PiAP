@@ -5,12 +5,20 @@
 ![Pocket-PiAP](https://img.shields.io/badge/Pocket-PiAP-fc22be.svg)
 
 [![Build Status](https://travis-ci.org/reactive-firewall/Pocket-PiAP.svg?branch=master)](https://travis-ci.org/reactive-firewall/Pocket-PiAP)
+[![Code Coverage](https://codecov.io/gh/reactive-firewall/Pocket-PiAP/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/Pocket-PiAP)
+
 
 ### Dependencies:
 
-[![Build Status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=master)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
+#### Python Tools
 
-[![Build Status](https://travis-ci.org/reactive-firewall/PiAP-Webroot.svg?branch=master)](https://travis-ci.org/reactive-firewall/PiAP-Webroot)
+[![Build Status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
+[![Dependency Status](https://www.versioneye.com/user/projects/5961fc36368b08002a056e48/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/5961fc36368b08002a056e48)
+[![Code Coverage](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/stable/)
+
+#### Web UI
+
+[![Build Status](https://travis-ci.org/reactive-firewall/PiAP-Webroot.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-Webroot)
 
 # Pocket PiAP is still in private beta. FOSS under heavy development, No production support at this time. USE AT OWN RISK.
 
