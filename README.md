@@ -5,6 +5,8 @@
 ![Pocket-PiAP](https://img.shields.io/badge/Pocket-PiAP-fc22be.svg)
 
 [![Build Status](https://travis-ci.org/reactive-firewall/Pocket-PiAP.svg?branch=master)](https://travis-ci.org/reactive-firewall/Pocket-PiAP)
+[![Code Coverage](https://codecov.io/gh/reactive-firewall/Pocket-PiAP/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/Pocket-PiAP)
+
 
 ### Dependencies:
 
