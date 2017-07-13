@@ -1195,7 +1195,7 @@ wpa_gmk_rekey=3600
 
 # Maximum lifetime for PTK in seconds. This can be used to enforce rekeying of
 # PTK to mitigate some attacks against TKIP deficiencies.
-#wpa_ptk_rekey=600
+wpa_ptk_rekey=600
 
 # Enable IEEE 802.11i/RSN/WPA2 pre-authentication. This is used to speed up
 # roaming be pre-authenticating IEEE 802.1X/EAP part of the full RSN
