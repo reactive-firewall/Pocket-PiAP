@@ -17,7 +17,7 @@ MANPATH=/usr/share/man:/usr/local/share/man
 # set preferred pager
 PAGER="/usr/bin/less"
 MORE="less"
-#VISUAL=`which gedit`
+VISUAL=${VISUAL:-${EDITOR:-`which gedit`}}
 TMPDIR="${TMPDIR:-/tmp}"
 
 # setup fsck env
@@ -44,4 +44,8 @@ FSTAB_FILE=/etc/fstab
 #NMAPDIR
 #NMAPDATADIR
 #NMAP_DEFAULT_SCRIPTS=address-info,afp-ls,afp-serverinfo,afpshowmount,backorifice-info,banner,asn-query,bjnp-discover,broadcast-bjnp-discover,broadcast-dhcp-discover,broadcast-dhcp6-discover,broadcast-dns-service-discovery,broadcast-dropbox-listener,broadcast-eigrp-discovery,broadcast-igmp-discovery,broadcast-listener,broadcast-*-discovery,broadcast-ping,broadcast-rip-discover,broadcast-ripng-discover,broadcast-upnp-info,broadcast-versant-locate,broadcast-wake-on-lan,citrix-enum-*,
+
+
+# CI
+unset CI
 
