@@ -200,8 +200,8 @@ cleanup:
 	$(QUIET)rm -f *.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f ./.coverage 2>/dev/null || true
 	$(QUIET)coverage erase 2>/dev/null || true
-	$(QUIET)rm -f piaplib/*.DS_Store 2>/dev/null || true
-	$(QUIET)rm -f piaplib/*/*.DS_Store 2>/dev/null || true
+	$(QUIET)rm -f PiAP/*.DS_Store 2>/dev/null || true
+	$(QUIET)rm -f PiAP/*/*.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f ./*/*~ 2>/dev/null || true
 	$(QUIET)rm -f ./*~ 2>/dev/null || true
 	$(QUIET)rm -f ./.travis.yml~ 2>/dev/null || true
