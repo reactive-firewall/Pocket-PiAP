@@ -82,7 +82,7 @@ script:
   - make test || exit $? ;
   - codecov || true
   - make clean || exit $? ; 
-  - make test-tox || exit $? ;
+  - travis_wait make test-tox || exit $? ;
   - make clean ;
 
 after_success:
