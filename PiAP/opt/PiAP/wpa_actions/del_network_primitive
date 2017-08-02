@@ -1,0 +1,2 @@
+#! /sbin/wpa_cli remove_network ${1}
+quit
