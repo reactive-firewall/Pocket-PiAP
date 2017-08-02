@@ -79,10 +79,12 @@ install: "true"
 # command to run tests
 script:
   - make clean ;
+  - echo "travis_fold:start:piap-test" 2>/dev/null || true
   - make test || exit $? ;
+  - echo "travis_fold:end:piap-test" 2>/dev/null || true
   - codecov || true
-  - make clean || exit $? ; 
-  - travis_wait make test-tox || exit $? ;
+  - make clean || exit $? ;
+  - travis_wait 30 make test-tox || exit $? ;
   - make clean ;
 
 after_success:

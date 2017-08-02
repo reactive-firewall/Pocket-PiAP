@@ -173,6 +173,7 @@ purge: clean uninstall
 test: cleanup
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test || true
 	$(QUIET)cp -vf ./units/PiAP-python-tools/.coverage ./ || true
+	$(QUIET)cp -vf ./units/PiAP-python-tools/.coverage.xml ./ 2>/dev/null || true
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -199,6 +200,7 @@ cleanup:
 	$(QUIET)rm -f PiAP/*/*~ 2>/dev/null || true
 	$(QUIET)rm -f *.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f ./.coverage 2>/dev/null || true
+	$(QUIET)rm -f ./.coverage.xml 2>/dev/null || true
 	$(QUIET)coverage erase 2>/dev/null || true
 	$(QUIET)rm -f PiAP/*.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f PiAP/*/*.DS_Store 2>/dev/null || true
