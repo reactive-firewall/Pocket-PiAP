@@ -1,0 +1,2 @@
+#! /sbin/wpa_cli blacklist ${1}
+quit

@@ -79,11 +79,13 @@ install: "true"
 # command to run tests
 script:
   - make clean ;
+  - echo "travis_fold:start:piap-test" 2>/dev/null || true
   - make test || exit $? ;
+  - echo "travis_fold:end:piap-test" 2>/dev/null || true
   - codecov || true
-  - make clean || exit $? ; 
-  - make test-tox || exit $? ;
-  - make clean ;
+  - make clean || exit $? ;
+  - if [ $TRAVIS_OS_NAME != osx ] ; then travis_retry make test-tox ; fi
+  - make clean 2>/dev/null || true ;
 
 after_success:
-  - codecov || true
+  - codecov 2>/dev/null || true

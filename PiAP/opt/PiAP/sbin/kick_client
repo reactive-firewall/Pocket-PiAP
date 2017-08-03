@@ -1,0 +1,4 @@
+#! /bin/bash
+/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
+/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
+exit 0;

@@ -1,0 +1,2 @@
+#! /usr/sbin/hostapd_cli disassociate ${1}
+quit

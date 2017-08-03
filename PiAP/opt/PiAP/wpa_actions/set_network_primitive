@@ -1,0 +1,2 @@
+#! /sbin/wpa_cli set_network ${1} ${2} "${3}"
+quit
