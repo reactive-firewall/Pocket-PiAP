@@ -6,11 +6,13 @@ PIAP_UI_BRANCH="${PIAP_UI_BRANCH:-stable}"
 
 PIAP_USER=${PIAP_USER:-0}
 PIAP_GROUP=${PIAP_GROUP:-0}
+PIAP_LOG_NAME=${PIAP_LOG_NAME:-PiAP_update_log.log}
+PIAP_LOG_PATH=${PIAP_LOG_PATH:-"/tmp/${PIAP_LOG_NAME:-PiAP_update_log.log}"}
 
 function message() {
 	local PIAP_MESSAGE="${@}"
 	echo ""
-	echo "${PIAP_MESSAGE}" | tee -a "/tmp/${LOG_PATH:-PiAP_update_log.log}" 2>/dev/null
+	echo "${PIAP_MESSAGE}" | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 	echo ""
 	return 0
 }
@@ -115,8 +117,8 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 else
 message "Attempting upgrading..."
 message "DO NOT INTERRUPT OR POWER OFF. [CAUTION for BETA]"
-sudo make uninstall || ROLL_BACK=2 ;
-sudo make install || ROLL_BACK=2 ;
+( sudo make uninstall || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
+( sudo make install || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 make clean
 fi
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
@@ -160,14 +162,19 @@ sudo service nginx start || ROLL_BACK=1 ;
 sudo service php5-fpm restart || ROLL_BACK=1 ;
 message "DONE"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
+SSH_PORT=$(echo ${SSH_CONNECTION} | cut -d\  -f 4 )
+SSH_SERVER=$(echo ${SSH_CONNECTION} | cut -d\  -f 3 )
 message "Status: Upgrade failed."
 message "Please report this issue at https://github.com/reactive-firewall/Pocket-PiAP/issues"
-message "[BETA] Please include the contents of this log \"/tmp/${LOG_PATH:-PiAP_update_log.log}\""
+message "[BETA] Please include the contents of this log \"${PIAP_LOG_PATH}\""
+echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
+echo "     scp -2 -P ${SSH_PORT} -r ${LOGNAME:-youruser}@${SSH_SERVER}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
 else
 message "Status: Upgrade seemed to work. (check by logging in to the Web interface)"
-message "--------------------[LOG]----------------------"
-head -n 9999999 "/tmp/${LOG_PATH:-PiAP_update_log.log}" || true ; wait ;
 fi
+message "--------------------[LOG]----------------------"
+head -n 9999999 "${PIAP_LOG_PATH}" || true ; wait ;
+
 message "[DONE] SCRIPT IS NOW DONE. SAFE TO MOVE TO NEXT STEP"
 message "[NEXT] Restart Pocket to complete the upgrades."
 sudo -k
