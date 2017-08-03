@@ -84,8 +84,8 @@ script:
   - echo "travis_fold:end:piap-test" 2>/dev/null || true
   - codecov || true
   - make clean || exit $? ;
-  - travis_wait 30 make test-tox || exit $? ;
-  - make clean ;
+  - if [ $TRAVIS_OS_NAME != osx ] ; then travis_retry make test-tox ; fi
+  - make clean 2>/dev/null || true ;
 
 after_success:
-  - codecov || true
+  - codecov 2>/dev/null || true
