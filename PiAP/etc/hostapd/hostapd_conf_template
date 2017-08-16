@@ -18,7 +18,7 @@ interface=wlan1
 # added to the bridge automatically (brctl may refuse to do this before hostapd
 # has been started to change the interface mode). If needed, the bridge
 # interface is also created.
-#bridge=br0
+bridge=lan0
 
 # Driver interface type (hostap/wired/none/nl80211/bsd);
 # default: hostap). nl80211 is used with all Linux mac80211 drivers.
@@ -1631,6 +1631,7 @@ model_description=Pocket WiFi Access Point
 # 14 = Test or experimental
 # 15 = Wildcard
 #access_network_type=0
+#access_network_type=4
 
 # Whether the network provides connectivity to the Internet
 # 0 = Unspecified
