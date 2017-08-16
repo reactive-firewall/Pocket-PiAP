@@ -1,12 +1,19 @@
 #!/usr/bin/python
 
 
-import argparse
-import hashlib
-import hmac
+try:
+	import argparse
+	import hashlib
+	import hmac
+	import os
+	for depends in [os, hashlib, hmac, argparse]:
+		if depends.__name__ is None:
+			raise ImportError("Failed to import dependency.")
+except Exception:
+	raise ImportError("Failed to import dependency.")
 
 
-def parseArgs():
+def parseArgs(arguments=None):
 	parser = argparse.ArgumentParser(description='Dangerously Simple Authentication')
 	parser.add_argument(
 		'-S', '--salt', default=None,
@@ -45,11 +52,10 @@ def parseArgs():
 		'-D', '--del', default=False,
 		action='store_true', help='delete a user.'
 	)
-	return parser.parse_args()
+	return parser.parse_args(arguments)
 
 
 def readFile(somefile):
-	import os
 	try:
 		read_data = None
 		theReadPath = str(somefile)
@@ -62,11 +68,10 @@ def readFile(somefile):
 
 
 def writeFile(somefile, somedata):
-	import os
 	theWritePath = str(somefile)
 	try:
 		with open(theWritePath, 'r+') as f:
-			read_data = f.write(somedata)
+			f.write(somedata)
 		f.close()
 	except Exception:
 		try:
@@ -159,8 +164,8 @@ def compactList(list, intern_func=None):
 	return result
 
 
-def main():
-	args = parseArgs()
+def main(argv=None):
+	args = parseArgs(argv)
 	database_file = args.file
 	if args.check:
 		if args.user_id is not None and args.pepper is None:
@@ -170,7 +175,7 @@ def main():
 			except Exception as err:
 				print(str(err))
 				print(str((err.args)))
-				exit(1)
+				return 1
 		elif args.user_id is not None and args.pepper is not None:
 			user_id = args.user_id
 			pepper = args.pepper
@@ -179,7 +184,7 @@ def main():
 			except Exception as err:
 				print(str(err))
 				print(str((err.args)))
-				exit(1)
+				return 1
 		elif args.pepper is not None and args.username is not None:
 			username = args.username
 			pepper = args.pepper
@@ -188,7 +193,7 @@ def main():
 			except Exception as err:
 				print(str(err))
 				print(str((err.args)))
-				exit(1)
+				return 1
 	elif args.add:
 		check_input_a = ((args.username is not None) and (args.pepper is not None))
 		check_input_b = ((args.salt is not None) and (args.password is not None))
@@ -200,7 +205,7 @@ def main():
 			except Exception as err:
 				print(str(err))
 				print(str((err.args)))
-				exit(1)
+				return 1
 		else:
 			try:
 				print(str("ALL FIELDS ARE REQUIRED TO ADD USER"))
@@ -209,18 +214,23 @@ def main():
 			except Exception as err:
 				print(str(err))
 				print(str((err.args)))
-				exit(2)
+				return 2
 	else:
 		try:
 			print(str("NOT IMPLEMENTED"))
 		except Exception as err:
 			print(str(err))
 			print(str((err.args)))
-			exit(2)
-	exit(0)
+			return 2
+	return 0
 
 
-if __name__ in '__main__':
-	main()
-else:
-	exit(255)
+if __name__ == u'__main__':
+	exitcode = 255
+	try:
+		import sys
+		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+			exitcode = main(sys.argv[1:])
+	except Exception:
+		exit(3)
+	exit(exitcode)
