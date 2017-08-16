@@ -139,14 +139,14 @@ def extractUserID(username, pepper, theInputStr):
 				return target_id
 		continue
 	return None
-	
+
 
 def extractLine(theInputStr):
-	return extractRegexPattern(theInputStr, "(?:(?P<user_id>(?:[0-9a-fA-F]+){1})(?:[\s]{1}){1}(?P<password>(?:[0-9a-fA-F]+){1})(?:[\s]{1}){1}(?P<salt>(?:[-0-9a-zA-Z_#=\/.+]+){1})+)") # noqa
+	return extractRegexPattern(theInputStr, "(?:(?P<user_id>(?:[0-9a-fA-F]+){1})(?:[\s]{1}){1}(?P<password>(?:[0-9a-fA-F]+){1})(?:[\s]{1}){1}(?P<salt>(?:[-0-9a-zA-Z_#=\/.+]+){1})+)")  # noqa
 
 
 def extractRawLine(theInputStr):
-	return extractRegexPattern(theInputStr, "(?P<line>(?:(?:[0-9a-fA-F]+){1})(?:[\s]{1}){1}(?:(?:[0-9a-fA-F]+){1})(?:[\s]{1}){1}(?:(?:[-0-9a-zA-Z_#=\/.+]+){1})+)") # noqa
+	return extractRegexPattern(theInputStr, "(?P<line>(?:(?:[0-9a-fA-F]+){1})(?:[\s]{1}){1}(?:(?:[0-9a-fA-F]+){1})(?:[\s]{1}){1}(?:(?:[-0-9a-zA-Z_#=\/.+]+){1})+)")  # noqa
 
 
 def compactList(list, intern_func=None):
@@ -164,57 +164,83 @@ def compactList(list, intern_func=None):
 	return result
 
 
+def checkPassword(user_id, database_file):
+	try:
+		print(extractPassword(str(user_id), str(readFile(database_file))))
+	except Exception as err:
+		print(str(err))
+		print(str((err.args)))
+		return 1
+	return 0
+
+
+def checkSalt(user_id, database_file):
+	try:
+		print(extractSalt(str(user_id), str(readFile(database_file))))
+	except Exception as err:
+		print(str(err))
+		print(str((err.args)))
+		return 1
+	return 0
+
+
+def checkUserID(username, pepper, database_file):
+	try:
+		print(extractUserID(str(username), str(pepper), str(readFile(database_file))))
+	except Exception as err:
+		print(str(err))
+		print(str((err.args)))
+		return 1
+	return 0
+
+
+def addNewUser(username, pepper, salt, password, database_file):
+	check_input_a = ((username is not None) and (pepper is not None))
+	check_input_b = ((salt is not None) and (password is not None))
+	if check_input_a and check_input_b:
+		try:
+			user_id = saltify(username, pepper)
+			password = saltify(saltify(password, salt), pepper)
+			print(str(u'{} {} {}').format(user_id, password, salt))
+		except Exception as err:
+			print(str(err))
+			print(str((err.args)))
+			return 1
+	else:
+		try:
+			print(str("ALL FIELDS ARE REQUIRED TO ADD USER"))
+			if username is None:
+				print(str("username is REQUIRED TO ADD USER"))
+		except Exception as err:
+			print(str(err))
+			print(str((err.args)))
+			return 2
+	return 0
+
+
 def main(argv=None):
 	args = parseArgs(argv)
 	database_file = args.file
 	if args.check:
-		if args.user_id is not None and args.pepper is None:
+		if args.user_id is not None:
 			user_id = args.user_id
-			try:
-				print(extractPassword(str(user_id), str(readFile(database_file))))
-			except Exception as err:
-				print(str(err))
-				print(str((err.args)))
-				return 1
-		elif args.user_id is not None and args.pepper is not None:
-			user_id = args.user_id
-			pepper = args.pepper
-			try:
-				print(extractSalt(str(user_id), str(readFile(database_file))))
-			except Exception as err:
-				print(str(err))
-				print(str((err.args)))
-				return 1
+			if args.pepper is None:
+				return checkPassword(user_id, database_file)
+			elif args.pepper is not None:
+				# pepper = args.pepper
+				return checkSalt(user_id, database_file)
 		elif args.pepper is not None and args.username is not None:
 			username = args.username
 			pepper = args.pepper
-			try:
-				print(extractUserID(str(username), str(pepper), str(readFile(database_file))))
-			except Exception as err:
-				print(str(err))
-				print(str((err.args)))
-				return 1
+			return checkUserID(username, pepper, database_file)
 	elif args.add:
-		check_input_a = ((args.username is not None) and (args.pepper is not None))
-		check_input_b = ((args.salt is not None) and (args.password is not None))
-		if check_input_a and check_input_b:
-			try:
-				user_id = saltify(args.username, args.pepper)
-				password = saltify(saltify(args.password, args.salt), args.pepper)
-				print(str(u'{} {} {}').format(user_id, password, args.salt))
-			except Exception as err:
-				print(str(err))
-				print(str((err.args)))
-				return 1
-		else:
-			try:
-				print(str("ALL FIELDS ARE REQUIRED TO ADD USER"))
-				if args.username is None:
-					print(str("username is REQUIRED TO ADD USER"))
-			except Exception as err:
-				print(str(err))
-				print(str((err.args)))
-				return 2
+		return addNewUser(
+			args.username,
+			args.pepper,
+			args.salt,
+			args.password,
+			database_file
+		)
 	else:
 		try:
 			print(str("NOT IMPLEMENTED"))
