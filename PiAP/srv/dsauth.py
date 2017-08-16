@@ -62,19 +62,19 @@ def readFile(somefile):
 
 
 def writeFile(somefile, somedata):
-        import os
-        theWritePath = str(somefile)
-        try:
-                with open(theWritePath, 'r+') as f:
-                        read_data = f.write(somedata)
-                f.close()
-        except Exception:
-                try:
-                        f.close()
-                except Exception:
-                        return False
-                return False
-        return True
+	import os
+	theWritePath = str(somefile)
+	try:
+		with open(theWritePath, 'r+') as f:
+			read_data = f.write(somedata)
+		f.close()
+	except Exception:
+		try:
+			f.close()
+		except Exception:
+			return False
+		return False
+	return True
 
 
 def extractRegexPattern(theInput_Str, theInputPattern):
@@ -145,16 +145,18 @@ def extractRawLine(theInputStr):
 
 
 def compactList(list, intern_func=None):
-   if intern_func is None:
-       def intern_func(x): return x
-   seen = {}
-   result = []
-   for item in list:
-       marker = intern_func(item)
-       if marker in seen: continue
-       seen[marker] = 1
-       result.append(item)
-   return result
+	if intern_func is None:
+		def intern_func(x):
+			return x
+	seen = {}
+	result = []
+	for item in list:
+		marker = intern_func(item)
+		if marker in seen:
+			continue
+		seen[marker] = 1
+		result.append(item)
+	return result
 
 
 def main():
