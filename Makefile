@@ -100,7 +100,7 @@ build:
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: install-dsauth install-webroot install-optroot install-wpa-actions install-hostapd-actions install-optsbin configure-PiAP-keyring install-optbin must_be_root configure-PiAP-sudoers configure-PiAP-dnsmasq
+install: install-dsauth install-webroot install-optroot install-wpa-actions install-hostapd-actions install-optsbin configure-PiAP-keyring install-optbin configure-PiAP-sudoers configure-PiAP-dnsmasq install-pifi must_be_root
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile install
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
@@ -201,24 +201,35 @@ install-dsauth: install-optroot must_be_root
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/srv/dsauth.py /srv/PiAP/dsauth.py
 	$(QUIET)$(ECHO) "$@: Done."
 
-uninstall-dsauth: uninstall-webroot must_be_root
+uninstall-dsauth: must_be_root
 	$(QUIET)$(RM) /srv/PiAP/dsauth.py 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+install-pifi: must_be_root
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/init.d/wirelessWiFi /etc/init.d/wirelessWiFi
+	$(QUIET)update-rc.d wirelessWiFi enable 2>/dev/null || update-rc.d start 30 2345 . stop 0 1 6 wirelessWiFi 2>/dev/null ; wait ;
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/init.d/wirelessPiAP /etc/init.d/wirelessPiAP
+	$(QUIET)update-rc.d wirelessPiAP enable 2>/dev/null || update-rc.d start 30 2345 . stop 0 1 6 wirelessPiAP 2>/dev/null ; wait ;
+	$(QUIET)$(ECHO) "$@: Done."
+
+uninstall-pifi: must_be_root
+	$(QUIET)$(RM) /etc/init.d/wirelessPiAP 2>/dev/null || true
+	$(QUIET)$(RM) /etc/init.d/wirelessWiFi 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 /etc/ssl/PiAPCA/private/PiAP_CA.key: configure-PiAP-keyring must_be_root
 	$(QUIET)dd if=/dev/hwrng bs=1024 count=4096 of=/tmp/.rand_seed.data 2>/dev/null || true
-	$(QUIET)openssl genrsa -rand /tmp/.rand_seed.data -out /etc/ssl/PiAPCA/private/PiAP_CA.key 4096 2>/dev/null
+	$(QUIET)openssl genrsa -rand /tmp/.rand_seed.data -out /etc/ssl/PiAPCA/private/PiAP_CA.key 4096 2>/dev/null || openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_CA.key 4096 2>/dev/null
 	$(QUITE)$(WAIT)
+	$(QUIET)rm -f /tmp/.rand_seed.data 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 /etc/ssl/PiAPCA/private/PiAP_CA.csr: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
-	$(QUIET)dd if=/dev/hwrng bs=1024 count=4096 of=/tmp/.rand_seed.data 2>/dev/null || true
 	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_CA.csr -key /etc/ssl/PiAPCA/private/PiAP_CA.key -subj "/CN=PiAP\ CA/OU=PiAP/O=PiAP\ Root/" 2>/dev/null
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 /etc/ssl/PiAPCA/PiAP_CA.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_CA.csr must_be_root
-	$(QUIET)rm -f /tmp/.rand_seed.data 2>/dev/null || true
 	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_CA.csr -out /etc/ssl/PiAPCA/PiAP_CA.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_CA_cert 2>/dev/null
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
@@ -292,15 +303,36 @@ remove-PiAP-dnsmasq: must_be_root
 	$(QUIET)$(RM) /etc/dnsmasq.conf 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-webroot: install-dsauth
+configure-PiAP-hostapd: /etc/hostapd must_be_root
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/hostapd/hostapd.conf.backup /etc/hostapd/hostapd.conf.backup
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/hostapd/hostapd.conf.failsafe /etc/hostapd/hostapd.conf.failsafe
+	$(QUIET)$(ECHO) "$@: Done."
+
+remove-PiAP-hostapd: must_be_root
+	$(QUIET)$(RM) /etc/hostapd/hostapd.conf.backup 2>/dev/null || true
+	$(QUIET)$(RM) /etc/hostapd/hostapd.conf.failsafe 2>/dev/null || true
+	$(QUIET)$(RM) /etc/hostapd/hostapd.conf.bad 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+configure-PiAP-interfaces: /etc/network must_be_root
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/network/interfaces /etc/network/interfaces
+		$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/cron.hourly/clear_zeroconf_ip.sh /etc/cron.hourly/clear_zeroconf_ip.sh
+	$(QUIET)$(ECHO) "$@: Done."
+
+remove-PiAP-interfaces: must_be_root
+	$(QUIET)$(RM) /etc/network/interfaces 2>/dev/null || true
+	$(QUIET)$(RM) /etc/cron.hourly/clear_zeroconf_ip.sh 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+install-webroot: install-dsauth configure-httpd
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile install
 	$(QUIET)$(ECHO) "$@: Done."
 
-uninstall-webroot: uninstall-wpa-actions
+uninstall-webroot: remove-httpd uninstall-wpa-actions
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
-uninstall: uninstall-optroot uninstall-dsauth remove-PiAP-keyring remove-PiAP-sudoers remove-PiAP-dnsmasq
+uninstall: uninstall-optroot uninstall-dsauth remove-PiAP-keyring remove-PiAP-sudoers remove-PiAP-dnsmasq uninstall-pifi
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile uninstall
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."

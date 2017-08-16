@@ -133,11 +133,15 @@ fi
 message "Checking TLS Beta cert dates."
 if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c OK ) -le 0 ) ]] ; then
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
-	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions usr_cert -CA /etc/ssl/PiAP_CA/PiAP_CA.pem -CAkey /etc/ssl/private/ssl-cert-CA-nginx.key -CAcreateserial | fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
+	sudo openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null ; wait ;
+	sudo openssl req -new -outform PEM -out /root/ssl-cert-nginx.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.PiAP.local/OU=PiAP.local/O=Pocket\ PiAP/" 2>/dev/null
+	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions server_cert -CA /etc/ssl/PiAPCA/PiAP_CA.pem -CAkey /etc/ssl/PiAPCA/private/PiAP_CA.key -CAcreateserial | fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
 	message "DONE"
 elif [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c 'certificate has expired' ) -gt 0 ) ]] ; then
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
-	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions usr_cert -CA /etc/ssl/PiAP_CA/PiAP_CA.pem -CAkey /etc/ssl/private/ssl-cert-CA-nginx.key -CAcreateserial | fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
+	sudo openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null ; wait ;
+	sudo openssl req -new -outform PEM -out /root/ssl-cert-nginx.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.PiAP.local/OU=PiAP.local/O=Pocket\ PiAP/" 2>/dev/null
+	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions server_cert -CA /etc/ssl/PiAPCA/PiAP_CA.pem -CAkey /etc/ssl/PiAPCA/private/PiAP_CA.key -CAcreateserial | fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
 	message "DONE"
 	message "Cert should be fine now."
 	message "You will probably have a browser warning about the new certificate, the next time you visit the web interface."
@@ -152,7 +156,7 @@ if [[ ( $( find /etc/ssh -iname *.pub -ctime +30 -print0 2>/dev/null | wc -l ) -
 	message "DONE"
 	message "AFTER LOGGING OUT of this ssh session YOU MUST REMOVE TRUST OF THE OLD KEY by running: ssh-keygen -R ${HOSTNAME:-pocket.piap.local}"
 	message "The NEW keys you will need to verify are:"
-	find /etc/ssh -iname *.pub -print0 2>/dev/null | xargs -0 -L1 sudo ssh-keygen -l -v -f ;
+	find /etc/ssh -iname *.pub -print0 2>/dev/null | xargs -0 -L1 sudo ssh-keygen -l -v -f | tee -a "${PIAP_LOG_PATH}" 2>/dev/null;
 else
 	message "SSH keys seem fine."
 fi
