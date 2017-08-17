@@ -1,0 +1,109 @@
+# interfaces(5) file used by ifup(8) and ifdown(8)
+
+# Please note that this file is written to be used with dhcpcd
+# For static IP, consult /etc/dhcpcd.conf and 'man dhcpcd.conf'
+
+# Include files from /etc/network/interfaces.d:
+source-directory /etc/network/interfaces.d
+
+iface lo inet loopback
+
+# bridge mode
+allow-hotplug lan0
+
+iface lan0 inet static
+	address 10.0.40.1
+	netmask	255.255.255.0
+	network 10.0.40.0/24
+	broadcast 10.0.40.255
+	bridge_hello 3
+        bridge_maxwait 0
+	bridge_stp off
+        bridge_fd 5
+        bridge_ports wlan1 usb0 eth0
+	pre-up sysctl -w net.ipv6.conf.lan0.disable_ipv6=1 2>/dev/null || true ; wait ; brctl addbr ${IFACE:-lan0} up ; sysctl -w net.ipv4.conf.lan0.forwarding=1 2>/dev/null || true ;
+	post-up ip addr del $(ip addr show ${IFACE:-lan0} | fgrep 169.254 | grepCIDR | grepCIDR -m1) dev ${IFACE:-lan0} 2>/dev/null || true
+	post-down sysctl -w net.ipv4.conf.lan0.forwarding=0 2>/dev/null || true ; wait ; ip route del default via 10.0.40.1 dev ${IFACE:-lan0} src 10.0.40.1 ; wait ; brctl delbr ${IFACE:-lan0} ; wait ;
+	dns-nameservers 10.0.40.1
+	metric 1
+#	mtu 1500
+#	scope host
+
+allow-hotplug eth0
+iface eth0 inet manual
+#	hwaddess b8:27:eb:*:*:*
+	pre-up sysctl -w net.ipv6.conf.eth0.disable_ipv6=1 2>/dev/null ; wait ; ip link set ${IFACE} up ; brctl addif lan0 eth0 || true ;
+	post-up ip addr del $(ip addr show ${IFACE:-eth0} | fgrep 169.254 | grepCIDR | grepCIDR -m1) dev ${IFACE} 2>/dev/null || true
+	post-down ip route del default via 10.0.40.1 dev ${IFACE:-eth0} src 10.0.40.1 ; wait ; brctl delif lan0 eth0 || true ; ip link set ${IFACE} down ; wait ;
+#	metric 5
+	mtu 1472
+#	scope link
+
+auto lo
+
+allow-hotplug wlan0
+iface wlan0 inet dhcp
+	wireless-ap any
+	wireless-rate 150M auto
+	wireless-txpower auto
+	wireless-power on
+	wireless-channel auto
+	wireless-frag auto
+	wireless-mode Auto
+	wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+	pre-up sysctl -w net.ipv6.conf.${IFACE:-wlan0}.disable_ipv6=1 2>/dev/null > /dev/null ; wait ; ip link set ${IFACE:-wlan0} up 2>/dev/null ; wait ; nice -n -12 wpa_supplicant -D wext -B -i ${IFACE:-wlan0} -c /etc/wpa_supplicant/wpa_supplicant.conf 2>/dev/null >>/dev/null || true ; wait ;
+	dns-nameservers 8.8.8.8, 8.8.4.4, 80.80.80.80
+	post-up ping -I ${IFACE:-wlan0} -nc 2 8.8.8.8 2>/dev/null || true ; wait ; sync ; wait ;
+	post-down pkill -9 wpa_supplicant 2>/dev/null ; wait ; rm -f /var/run/wpa_supplicant/${IFACE:-wlan0} 2>/dev/null || true ; ip link set ${IFACE} down ;
+	scope link
+	hostname PocketPi
+	metric 2
+
+allow-hotplug wlan1
+iface wlan1 inet manual
+	wireless-rate 150M
+	wireless-txpower auto
+	wireless-frag auto
+	#wireless-mode Master
+	hostapd /etc/hostapd/hostapd.conf
+	pre-up sysctl -w net.ipv6.conf.wlan1.disable_ipv6=1 2>/dev/null >>/dev/null ; wait ; ip link set ${IFACE:-wlan1} up ; wait ; sysctl -w net.ipv4.conf.${IFACE:-wlan1}.forwarding=1 2>/dev/null >>/dev/null || true ;
+	post-up brctl addif lan0 ${IFACE:-wlan1} 2>/dev/null || true ; ip addr del $(ip addr show ${IFACE:-wlan1} | fgrep 169.254 | grepCIDR | grepCIDR -m1) dev ${IFACE:-wlan1} 2>/dev/null || true
+	post-down sysctl -w net.ipv4.conf.${IFACE:-wlan1}.forwarding=0 2>/dev/null || true ; wait ; brctl delif lan0 ${IFACE:-wlan1} 2>/dev/null || true ; ip link set ${IFACE:-wlan1} down 2>/dev/null >>/dev/null || true
+	metric 1
+	scope link
+
+allow-hotplug usb0
+iface usb0 inet manual
+	pre-up sysctl -w net.ipv6.conf.usb0.disable_ipv6=1 2>/dev/null ; wait ; ip link set ${IFACE} up ; 
+	post-up brctl addif lan0 ${IFACE:-usb0} 2>/dev/null || true ; wait ; ip addr del $(ip addr show ${IFACE:-usb0} | fgrep 169.254 | grepCIDR | grepCIDR -m1) dev ${IFACE} 2>/dev/null || true
+	post-down sysctl -w net.ipv4.conf.${IFACE:-usb0}.forwarding=0 2>/dev/null || true ; wait ; ip route del default via 10.0.40.1 dev ${IFACE:-usb0} src 10.0.40.1 ; wait ; brctl delif lan0 ${IFACE:-usb0} 2>/dev/null || true ; ip link set ${IFACE} down ; wait ;
+	metric 5
+	mtu 1500
+	scope link
+
+
+allow-hotplug mon0
+iface mon0 inet dhcp
+	wireless-ap any
+	wireless-rate auto
+	wireless-txpower auto
+	wireless-channel auto
+	wireless-frag off
+	wireless-mode Monitor
+	wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+	pre-up ip link set ${IFACE:-mon0} up ; wait ; sudo iwlist ${IFACE:-mon0} scan ; wait ; 
+	#nice -n -12 wpa_supplicant -D wext -B -i ${IFACE:-mon0} -c /etc/wpa_supplicant/wpa_${IFACE:-mon0}.conf 2>/dev/null >>/dev/null || true ; wait ;
+	dns-nameservers 127.0.0.1 10.0.40.1
+	post-up ping -I ${IFACE:-mon0} -nc 2 8.8.8.8 || true ; wait ; sync ; wait ;
+	post-down rm -f /var/run/wpa_supplicant/mon0 2>/dev/null || true ; ip link set ${IFACE} down ;
+	scope link
+	hostname "probe"
+	metric 40
+
+
+auto wlan0
+auto lan0
+auto eth0
+auto usb0
+auto wlan1
+

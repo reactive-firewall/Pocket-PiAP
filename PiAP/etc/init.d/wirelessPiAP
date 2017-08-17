@@ -1,0 +1,129 @@
+#! /bin/bash
+### BEGIN INIT INFO
+# Provides:          PiAP
+# Required-Start:    $local_fs $networking $time $firewall
+# Required-Stop:     $local_fs
+# Default-Start:     5
+# Default-Stop:      0 6
+# Short-Description: start the WiFi AP between restarts.
+# Description:       This script reboots the wifi AP between restarts.
+#                    It is called from the boot, halt and reboot scripts.
+### END INIT INFO
+
+SOME_IFACE=wlan1
+
+case "$1" in
+  start|"")
+	if [[ ( -f /etc/hostapd/hostapd.conf.new ) ]] && [[ ( $(openssl dgst -sha512 /etc/hostapd/hostapd.conf.new | cut -d \  -f 2 ) != $(openssl dgst -sha512 /etc/hostapd/hostapd.conf.backup | cut -d \  -f 2 ) ) ]] ; then
+		echo "Testing new profile"
+		ifdown --force ${SOME_IFACE} >&2 2>/dev/null || true ;
+		wait ;
+		/srv/PiAP/bin/interface_AP_heal.bash ${SOME_IFACE} || true ;
+		if [[ ( $(ip addr show ${SOME_IFACE} | grep -oE '\s[s]{1}[tae]{4}\s[A-Z]+\s' | cut -d \  -f 3 ) != "UP" ) ]] ; then
+			echo "Test FAILED"
+			echo "Restoring LGV profile"
+			cp -pf /etc/hostapd/hostapd.conf.backup /etc/hostapd/hostapd.conf
+		else
+			echo "Test PASSED"
+			rm -f /etc/hostapd/hostapd.conf.new ; wait ;
+			echo "use 'cp -pf /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.backup' to keep"
+			systemctl daemon-reload 2>/dev/null || true
+			exit 0 ;
+		fi ;
+	elif [[ ( $(openssl dgst -sha512 /etc/hostapd/hostapd.conf | cut -d \  -f 2 ) != $(openssl dgst -sha512 /etc/hostapd/hostapd.conf.backup | cut -d \  -f 2 ) ) ]] ; then
+		echo "Restoring LGV profile"
+		cp -pf /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.new
+		cp -pf /etc/hostapd/hostapd.conf.backup /etc/hostapd/hostapd.conf
+	fi
+	/srv/PiAP/bin/interface_AP_heal.bash ${SOME_IFACE} || true ;
+	if [[ ( $(ip addr show ${SOME_IFACE} | grep -oE '\s[s]{1}[tae]{4}\s[A-Z]+\s' | cut -d \  -f 3 ) != "UP" ) ]] ; then exit 1 ; fi
+	systemctl daemon-reload 2>/dev/null || true
+	exit 0 ;
+	;;
+  stop)
+	if [[ ( $(ip addr show ${SOME_IFACE} | grep -oE '\s[s]{1}[tae]{4}\s[A-Z]+\s' | cut -d \  -f 3 ) != "UP" ) ]] ; then exit 0 ; fi ;
+	if [[ ( $(openssl dgst -sha512 /etc/hostapd/hostapd.conf.new | cut -d \  -f 2 ) != $(openssl dgst -sha512 /etc/hostapd/hostapd.conf | cut -d \  -f 2 ) ) ]] ; then
+		if [[ ( $(openssl dgst -sha512 /etc/hostapd/hostapd.conf.backup | cut -d \  -f 2 ) != $(openssl dgst -sha512 /etc/hostapd/hostapd.conf | cut -d \  -f 2 ) ) ]] ; then
+			echo "LGV profile is not active. Can't double load new." ;
+			exit 0 ;
+		else
+			echo "Ready for new profile." ;
+			cp -pf /etc/hostapd/hostapd.conf.new /etc/hostapd/hostapd.conf ;
+			systemctl daemon-reload 2>/dev/null || true
+		fi ;
+	fi ;
+	exit 0 ;
+	;;
+  status)
+	systemctl daemon-reload 2>/dev/null || true
+	if [[ ( $(ip addr show ${SOME_IFACE} | grep -oE '\s[s]{1}[tae]{4}\s[A-Z]+\s' | cut -d \  -f 3 ) != "UP" ) ]] ; then echo "ERROR" ; exit 1 ; fi
+	echo "OK"
+	exit 0 ;
+	;;
+  backup)
+	cp -pf /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.backup ;
+	exit 0 ;
+	;;
+  force-stop)
+	ifdown --force ${SOME_IFACE} >&2 2>/dev/null || true ;
+	if [[ ( $(openssl dgst -sha512 /etc/hostapd/hostapd.conf.new | cut -d \  -f 2 ) != $(openssl dgst -sha512 /etc/hostapd/hostapd.conf | cut -d \  -f 2 ) ) ]] ; then
+		if [[ ( $(openssl dgst -sha512 /etc/hostapd/hostapd.conf.backup | cut -d \  -f 2 ) != $(openssl dgst -sha512 /etc/hostapd/hostapd.conf | cut -d \  -f 2 ) ) ]] ; then
+			echo "LGV profile is not active. Can't double load new." ;
+			exit 0 ;
+		else
+			echo "Ready for new profile." ;
+			cp -pf /etc/hostapd/hostapd.conf.new /etc/hostapd/hostapd.conf 2>/dev/null || true ;
+		fi ;
+	fi ;
+	exit 0 ;
+	;;
+  delayed-restart)
+	sleep 5s ;
+	$0 force-restart ; wait ;
+	sleep 3s ; wait ;
+	if [[ !( -f /etc/hostapd/hostapd.conf.new ) ]] && [[ ( $(openssl dgst -sha512 /etc/hostapd/hostapd.conf | cut -d \  -f 2 ) != $(openssl dgst -sha512 /etc/hostapd/hostapd.conf.backup | cut -d \  -f 2 ) ) ]] ; then
+		echo "Auto-mode: Looks like delayed restart passed. probably was remote. Backing up."
+		$0 backup ;
+		systemctl daemon-reload 2>/dev/null || true
+		exit 0 ;
+	elif [[ ( -f /etc/hostapd/hostapd.conf.new ) ]] ; then
+		echo "Auto-mode: Looks like delayed restart failed. probably was remote. Cleaning up."
+		rm -f /etc/hostapd/hostapd.conf.new ; wait ;
+		systemctl daemon-reload 2>/dev/null || true
+		exit 4 ;
+	fi
+	exit 0;
+	;;
+  restart|reload)
+	$0 stop ; wait ;
+	$0 start ; wait ;
+	exit $? ;
+	;;
+  force-restart)
+	$0 force-stop ; wait ;
+	$0 start ; wait ;
+	exit $? ;
+	;;
+  force-reload)
+	$0 force-stop || true
+	if [[ ( $(openssl dgst -sha512 /etc/hostapd/hostapd.conf | cut -d \  -f 2 ) != $(openssl dgst -sha512 /etc/hostapd/hostapd.conf.backup | cut -d \  -f 2 ) ) ]] ; then
+		cp -pf /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.bad 2>/dev/null || true ;
+	        cp -pf /etc/hostapd/hostapd.conf.backup /etc/hostapd/hostapd.conf 2>/dev/null || true ;
+	fi
+        /srv/PiAP/bin/interface_AP_heal.bash ${SOME_IFACE} || true ;
+	sleep 2 ; wait ;
+	if [[ ( $(ip addr show ${SOME_IFACE} | grep -oE '\s[s]{1}[tae]{4}\s[A-Z]+\s' | cut -d \  -f 3 ) != "UP" ) ]] ; then
+	        cp -pf /etc/hostapd/hostapd.conf.failsafe /etc/hostapd/hostapd.conf.backup 2>/dev/null || true ;
+	        cp -pf /etc/hostapd/hostapd.conf.failsafe /etc/hostapd/hostapd.conf 2>/dev/null || true ;
+		$0 restart ;
+		exit $? ;
+	fi
+	systemctl daemon-reload 2>/dev/null || true
+        exit 0 ;
+	;;
+  *)
+	echo "Usage: WirelessPiAP start|stop|reload|restart|status" >&2
+	exit 3
+	;;
+esac
+

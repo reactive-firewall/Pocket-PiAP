@@ -48,6 +48,520 @@ DoD_oid					= ${iso_oid}.2
 # "Amazon unique identification scheme" registered OID
 Amazon_oid				= ${iso_oid}.187
 
+#--------------------------
+# ANSI - see ISO/IEC 9834-3
+ANSI_oid				= 2
+
+
+# Presentation (JTC 1.21.17.01;21.17.02, Q 26/VII)
+JTC_oid				= ${ANSI_oid}.0
+
+# ASN.1 Abstract Syntax Notation
+ANSI_oid				= ${ANSI_oid}.1
+
+# ACSE Association Control
+ACSE_oid				= ${ANSI_oid}.2
+
+# RTSE Reliable Transfer
+RTSE_oid				= ${ANSI_oid}.3
+
+# ROSE Remote Operations
+RTSE_oid				= ${ANSI_oid}.4
+
+# X.500 Directory Services
+Directory_Services		= ${ANSI_oid}.5
+
+# X.400 Messageing Services
+MHS_oid					= ${ANSI_oid}.6
+
+#...
+
+# ANSI Country ISO/IEC 9834-1 (OID 2.16)
+ANSI_country			= ${ANSI_oid}.16
+
+# ANSI Country AALAND ISLANDS
+ANSI_country_AX			= ${ANSI_country}.248
+# ANSI Country AFGHANISTAN
+ANSI_country_AF			= ${ANSI_country}.004
+# ANSI Country ALBANIA
+ANSI_country_AL			= ${ANSI_country}.008
+# ANSI Country ALGERIA
+ANSI_country_DZ			= ${ANSI_country}.012
+# ANSI Country AMERICAN SAMOA
+ANSI_country_AS			= ${ANSI_country}.016
+# ANSI Country ANDORRA
+ANSI_country_AD			= ${ANSI_country}.020
+# ANSI Country ANGOLA
+ANSI_country_AO			= ${ANSI_country}.024
+# ANSI Country ANGUILLA
+ANSI_country_AI			= ${ANSI_country}.660
+# ANSI Country ANTARCTICA
+ANSI_country_AQ			= ${ANSI_country}.010
+# ANSI Country ANTIGUA AND BARBUDA
+ANSI_country_AG			= ${ANSI_country}.028
+# ANSI Country ARGENTINA
+ANSI_country_AR			= ${ANSI_country}.032
+# ANSI Country ARMENIA
+ANSI_country_AM			= ${ANSI_country}.051
+# ANSI Country ARUBA
+ANSI_country_AW			= ${ANSI_country}.533
+# ANSI Country AUSTRALIA
+ANSI_country_AU			= ${ANSI_country}.036
+# ANSI Country AUSTRIA
+ANSI_country_AT			= ${ANSI_country}.040
+# ANSI Country AZERBAIJAN
+ANSI_country_AZ			= ${ANSI_country}.031
+# ANSI Country BAHAMAS
+ANSI_country_BS			= ${ANSI_country}.044
+# ANSI Country BAHRAIN
+ANSI_country_BH			= ${ANSI_country}.048
+# ANSI Country BANGLADESH
+ANSI_country_BD			= ${ANSI_country}.050
+# ANSI Country BARBADOS
+ANSI_country_BB			= ${ANSI_country}.052
+# ANSI Country BELARUS
+ANSI_country_BY			= ${ANSI_country}.112
+# ANSI Country BELGIUM
+ANSI_country_BE			= ${ANSI_country}.056
+# ANSI Country BELIZE
+ANSI_country_BZ			= ${ANSI_country}.084
+# ANSI Country BENIN
+ANSI_country_BJ			= ${ANSI_country}.204
+# ANSI Country BERMUDA
+ANSI_country_BM			= ${ANSI_country}.060
+# ANSI Country BHUTAN
+ANSI_country_BT			= ${ANSI_country}.064
+# ANSI Country BOLIVIA
+ANSI_country_BO			= ${ANSI_country}.068
+# ANSI Country BOSNIA AND HERZEGOWINA
+ANSI_country_BA			= ${ANSI_country}.070
+# ANSI Country BOTSWANA
+ANSI_country_BW			= ${ANSI_country}.072
+# ANSI Country BOUVET ISLAND
+ANSI_country_BV			= ${ANSI_country}.074
+# ANSI Country BRAZIL
+ANSI_country_BR			= ${ANSI_country}.076
+# ANSI Country BRITISH INDIAN OCEAN TERRITORY
+ANSI_country_IO			= ${ANSI_country}.086
+# ANSI Country BRUNEI DARUSSALAM
+ANSI_country_BN			= ${ANSI_country}.096
+# ANSI Country BULGARIA
+ANSI_country_BG			= ${ANSI_country}.100
+# ANSI Country BURKINA FASO
+ANSI_country_BF			= ${ANSI_country}.854
+# ANSI Country BURUNDI
+ANSI_country_BI			= ${ANSI_country}.108
+# ANSI Country CAMBODIA
+ANSI_country_KH			= ${ANSI_country}.116
+# ANSI Country CAMEROON
+ANSI_country_CM			= ${ANSI_country}.120
+# ANSI Country CANADA
+ANSI_country_CA			= ${ANSI_country}.124
+# ANSI Country CAPE VERDE
+ANSI_country_CV			= ${ANSI_country}.132
+# ANSI Country CAYMAN ISLANDS
+ANSI_country_KY			= ${ANSI_country}.136
+# ANSI Country CENTRAL AFRICAN REPUBLIC
+ANSI_country_CF			= ${ANSI_country}.140
+# ANSI Country CHAD
+ANSI_country_TD			= ${ANSI_country}.148
+# ANSI Country CHILE
+ANSI_country_CL			= ${ANSI_country}.152
+# ANSI Country CHINA
+ANSI_country_CN			= ${ANSI_country}.156
+# ANSI Country CHRISTMAS ISLAND
+ANSI_country_CX			= ${ANSI_country}.162
+# ANSI Country COCOS (KEELING) ISLANDS
+ANSI_country_CC			= ${ANSI_country}.166
+# ANSI Country COLOMBIA
+ANSI_country_CO			= ${ANSI_country}.170
+# ANSI Country COMOROS
+ANSI_country_KM			= ${ANSI_country}.174
+# ANSI Country CONGO, Democratic Republic of (was Zaire)
+ANSI_country_CD			= ${ANSI_country}.180
+# ANSI Country CONGO, Republic of
+ANSI_country_CG			= ${ANSI_country}.178
+# ANSI Country COOK ISLANDS
+ANSI_country_CK			= ${ANSI_country}.184
+# ANSI Country COSTA RICA
+ANSI_country_CR			= ${ANSI_country}.188
+# ANSI Country COTE D'IVOIRE
+ANSI_country_CI			= ${ANSI_country}.384
+CROATIA (local name: Hrvatska):HRV
+# ANSI Country CUBA
+ANSI_country_CU			= ${ANSI_country}.192
+# ANSI Country CYPRUS
+ANSI_country_CY			= ${ANSI_country}.196
+# ANSI Country CZECH REPUBLIC
+ANSI_country_CZ			= ${ANSI_country}.203
+# ANSI Country DENMARK
+ANSI_country_DK			= ${ANSI_country}.208
+# ANSI Country DJIBOUTI
+ANSI_country_DJ			= ${ANSI_country}.262
+# ANSI Country DOMINICA
+ANSI_country_DM			= ${ANSI_country}.212
+# ANSI Country DOMINICAN REPUBLIC
+ANSI_country_DO			= ${ANSI_country}.214
+# ANSI Country ECUADOR
+ANSI_country_EC			= ${ANSI_country}.218
+# ANSI Country EGYPT
+ANSI_country_EG			= ${ANSI_country}.818
+# ANSI Country EL SALVADOR
+ANSI_country_SV			= ${ANSI_country}.222
+# ANSI Country EQUATORIAL GUINEA
+ANSI_country_GQ			= ${ANSI_country}.226
+# ANSI Country ERITREA
+ANSI_country_ER			= ${ANSI_country}.232
+# ANSI Country ESTONIA
+ANSI_country_EE			= ${ANSI_country}.233
+# ANSI Country ETHIOPIA
+ANSI_country_ET			= ${ANSI_country}.231
+# ANSI Country FALKLAND ISLANDS (MALVINAS)
+ANSI_country_FK			= ${ANSI_country}.238
+# ANSI Country FAROE ISLANDS
+ANSI_country_FO			= ${ANSI_country}.234
+# ANSI Country FIJI
+ANSI_country_FJ			= ${ANSI_country}.242
+# ANSI Country FINLAND
+ANSI_country_FI			= ${ANSI_country}.246
+# ANSI Country FRANCE
+ANSI_country_FR			= ${ANSI_country}.250
+# ANSI Country FRENCH GUIANA
+ANSI_country_GF			= ${ANSI_country}.254
+# ANSI Country FRENCH POLYNESIA
+ANSI_country_PF			= ${ANSI_country}.258
+# ANSI Country FRENCH SOUTHERN TERRITORIES
+ANSI_country_TF			= ${ANSI_country}.260
+# ANSI Country GABON
+ANSI_country_GA			= ${ANSI_country}.266
+# ANSI Country GAMBIA
+ANSI_country_GM			= ${ANSI_country}.270
+# ANSI Country GEORGIA
+ANSI_country_GE			= ${ANSI_country}.268
+# ANSI Country GERMANY
+ANSI_country_DE			= ${ANSI_country}.276
+# ANSI Country GHANA
+ANSI_country_GH			= ${ANSI_country}.288
+# ANSI Country GIBRALTAR
+ANSI_country_GI			= ${ANSI_country}.292
+# ANSI Country GREECE
+ANSI_country_GR			= ${ANSI_country}.300
+# ANSI Country GREENLAND
+ANSI_country_GL			= ${ANSI_country}.304
+# ANSI Country GRENADA
+ANSI_country_GD			= ${ANSI_country}.308
+# ANSI Country GUADELOUPE
+ANSI_country_GP			= ${ANSI_country}.312
+# ANSI Country GUAM
+ANSI_country_GU			= ${ANSI_country}.316
+# ANSI Country GUATEMALA
+ANSI_country_GT			= ${ANSI_country}.320
+# ANSI Country GUINEA
+ANSI_country_GN			= ${ANSI_country}.324
+# ANSI Country GUINEA-BISSAU
+ANSI_country_GW			= ${ANSI_country}.624
+# ANSI Country GUYANA
+ANSI_country_GY			= ${ANSI_country}.328
+# ANSI Country HAITI
+ANSI_country_HT			= ${ANSI_country}.332
+# ANSI Country HEARD AND MC DONALD ISLANDS
+ANSI_country_HM			= ${ANSI_country}.334
+# ANSI Country HONDURAS
+ANSI_country_HN			= ${ANSI_country}.340
+# ANSI Country HONG KONG
+ANSI_country_HK			= ${ANSI_country}.344
+# ANSI Country HUNGARY
+ANSI_country_HU			= ${ANSI_country}.348
+# ANSI Country ICELAND
+ANSI_country_IS			= ${ANSI_country}.352
+# ANSI Country INDIA
+ANSI_country_IN			= ${ANSI_country}.356
+# ANSI Country INDONESIA
+ANSI_country_ID			= ${ANSI_country}.360
+# ANSI Country IRAN (ISLAMIC REPUBLIC OF)
+ANSI_country_IR			= ${ANSI_country}.364
+# ANSI Country IRAQ
+ANSI_country_IQ			= ${ANSI_country}.368
+# ANSI Country IRELAND
+ANSI_country_IE			= ${ANSI_country}.372
+# ANSI Country ISRAEL
+ANSI_country_IL			= ${ANSI_country}.376
+# ANSI Country ITALY
+ANSI_country_IT			= ${ANSI_country}.380
+# ANSI Country JAMAICA
+ANSI_country_JM			= ${ANSI_country}.388
+# ANSI Country JAPAN
+ANSI_country_JP			= ${ANSI_country}.392
+# ANSI Country JORDAN
+ANSI_country_JO			= ${ANSI_country}.400
+# ANSI Country KAZAKHSTAN
+ANSI_country_KZ			= ${ANSI_country}.398
+# ANSI Country KENYA
+ANSI_country_KE			= ${ANSI_country}.404
+# ANSI Country KIRIBATI
+ANSI_country_KI			= ${ANSI_country}.296
+# ANSI Country KOREA, DEMOCRATIC PEOPLE'S REPUBLIC OF
+ANSI_country_KP			= ${ANSI_country}.408
+# ANSI Country KOREA, REPUBLIC OF
+ANSI_country_KR			= ${ANSI_country}.410
+# ANSI Country KUWAIT
+ANSI_country_KW			= ${ANSI_country}.414
+# ANSI Country KYRGYZSTAN
+ANSI_country_KG			= ${ANSI_country}.417
+# ANSI Country LAO PEOPLE'S DEMOCRATIC REPUBLIC
+ANSI_country_LA			= ${ANSI_country}.418
+# ANSI Country LATVIA
+ANSI_country_LV			= ${ANSI_country}.428
+# ANSI Country LEBANON
+ANSI_country_LB			= ${ANSI_country}.422
+# ANSI Country LESOTHO
+ANSI_country_LS			= ${ANSI_country}.426
+# ANSI Country LIBERIA
+ANSI_country_LR			= ${ANSI_country}.430
+# ANSI Country LIBYAN ARAB JAMAHIRIYA
+ANSI_country_LY			= ${ANSI_country}.434
+# ANSI Country LIECHTENSTEIN
+ANSI_country_LI			= ${ANSI_country}.438
+# ANSI Country LITHUANIA
+ANSI_country_LT			= ${ANSI_country}.440
+# ANSI Country LUXEMBOURG
+ANSI_country_LU			= ${ANSI_country}.442
+# ANSI Country MACAU
+ANSI_country_MO			= ${ANSI_country}.446
+# ANSI Country MACEDONIA, THE FORMER YUGOSLAV REPUBLIC OF
+ANSI_country_MK			= ${ANSI_country}.807
+# ANSI Country MADAGASCAR
+ANSI_country_MG			= ${ANSI_country}.450
+# ANSI Country MALAWI
+ANSI_country_MW			= ${ANSI_country}.454
+# ANSI Country MALAYSIA
+ANSI_country_MY			= ${ANSI_country}.458
+# ANSI Country MALDIVES
+ANSI_country_MV			= ${ANSI_country}.462
+# ANSI Country MALI
+ANSI_country_ML			= ${ANSI_country}.466
+# ANSI Country MALTA
+ANSI_country_MT			= ${ANSI_country}.470
+# ANSI Country MARSHALL ISLANDS
+ANSI_country_MH			= ${ANSI_country}.584
+# ANSI Country MARTINIQUE
+ANSI_country_MQ			= ${ANSI_country}.474
+# ANSI Country MAURITANIA
+ANSI_country_MR			= ${ANSI_country}.478
+# ANSI Country MAURITIUS
+ANSI_country_MU			= ${ANSI_country}.480
+# ANSI Country MAYOTTE
+ANSI_country_YT			= ${ANSI_country}.175
+# ANSI Country MEXICO
+ANSI_country_MX			= ${ANSI_country}.484
+# ANSI Country MICRONESIA, FEDERATED STATES OF
+ANSI_country_FM			= ${ANSI_country}.583
+# ANSI Country MOLDOVA, REPUBLIC OF
+ANSI_country_MD			= ${ANSI_country}.498
+# ANSI Country MONACO
+ANSI_country_MC			= ${ANSI_country}.492
+# ANSI Country MONGOLIA
+ANSI_country_MN			= ${ANSI_country}.496
+# ANSI Country MONTSERRAT
+ANSI_country_MS			= ${ANSI_country}.500
+# ANSI Country MOROCCO
+ANSI_country_MA			= ${ANSI_country}.504
+# ANSI Country MOZAMBIQUE
+ANSI_country_MZ			= ${ANSI_country}.508
+# ANSI Country MYANMAR
+ANSI_country_MM			= ${ANSI_country}.104
+# ANSI Country NAMIBIA
+ANSI_country_NA			= ${ANSI_country}.516
+# ANSI Country NAURU
+ANSI_country_NR			= ${ANSI_country}.520
+# ANSI Country NEPAL
+ANSI_country_NP			= ${ANSI_country}.524
+# ANSI Country NETHERLANDS
+ANSI_country_NL			= ${ANSI_country}.528
+# ANSI Country NETHERLANDS ANTILLES
+ANSI_country_AN			= ${ANSI_country}.530
+# ANSI Country NEW CALEDONIA
+ANSI_country_NC			= ${ANSI_country}.540
+# ANSI Country NEW ZEALAND
+ANSI_country_NZ			= ${ANSI_country}.554
+# ANSI Country NICARAGUA
+ANSI_country_NI			= ${ANSI_country}.558
+# ANSI Country NIGER
+ANSI_country_NE			= ${ANSI_country}.562
+# ANSI Country NIGERIA
+ANSI_country_NG			= ${ANSI_country}.566
+# ANSI Country NIUE
+ANSI_country_NU			= ${ANSI_country}.570
+# ANSI Country NORFOLK ISLAND
+ANSI_country_NF			= ${ANSI_country}.574
+# ANSI Country NORTHERN MARIANA ISLANDS
+ANSI_country_MP			= ${ANSI_country}.580
+# ANSI Country NORWAY
+ANSI_country_NO			= ${ANSI_country}.578
+# ANSI Country OMAN
+ANSI_country_OM			= ${ANSI_country}.512
+# ANSI Country PAKISTAN
+ANSI_country_PK			= ${ANSI_country}.586
+# ANSI Country PALAU
+ANSI_country_PW			= ${ANSI_country}.585
+# ANSI Country PALESTINIAN TERRITORY, Occupied
+ANSI_country_PS			= ${ANSI_country}.275
+# ANSI Country PANAMA
+ANSI_country_PA			= ${ANSI_country}.591
+# ANSI Country PAPUA NEW GUINEA
+ANSI_country_PG			= ${ANSI_country}.598
+# ANSI Country PARAGUAY
+ANSI_country_PY			= ${ANSI_country}.600
+# ANSI Country PERU
+ANSI_country_PE			= ${ANSI_country}.604
+# ANSI Country PHILIPPINES
+ANSI_country_PH			= ${ANSI_country}.608
+# ANSI Country PITCAIRN
+ANSI_country_PN			= ${ANSI_country}.612
+# ANSI Country POLAND
+ANSI_country_PL			= ${ANSI_country}.616
+# ANSI Country PORTUGAL
+ANSI_country_PT			= ${ANSI_country}.620
+# ANSI Country PUERTO RICO
+ANSI_country_PR			= ${ANSI_country}.630
+# ANSI Country QATAR
+ANSI_country_QA			= ${ANSI_country}.634
+# ANSI Country REUNION
+ANSI_country_RE			= ${ANSI_country}.638
+# ANSI Country ROMANIA
+ANSI_country_RO			= ${ANSI_country}.642
+# ANSI Country RUSSIAN FEDERATION
+ANSI_country_RU			= ${ANSI_country}.643
+# ANSI Country RWANDA
+ANSI_country_RW			= ${ANSI_country}.646
+# ANSI Country SAINT HELENA
+ANSI_country_SH			= ${ANSI_country}.654
+# ANSI Country SAINT KITTS AND NEVIS
+ANSI_country_KN			= ${ANSI_country}.659
+# ANSI Country SAINT LUCIA
+ANSI_country_LC			= ${ANSI_country}.662
+# ANSI Country SAINT PIERRE AND MIQUELON
+ANSI_country_PM			= ${ANSI_country}.666
+# ANSI Country SAINT VINCENT AND THE GRENADINES
+ANSI_country_VC			= ${ANSI_country}.670
+# ANSI Country SAMOA
+ANSI_country_WS			= ${ANSI_country}.882
+# ANSI Country SAN MARINO
+ANSI_country_SM			= ${ANSI_country}.674
+# ANSI Country SAO TOME AND PRINCIPE
+ANSI_country_ST			= ${ANSI_country}.678
+# ANSI Country SAUDI ARABIA
+ANSI_country_SA			= ${ANSI_country}.682
+# ANSI Country SENEGAL
+ANSI_country_SN			= ${ANSI_country}.686
+# ANSI Country SERBIA AND MONTENEGRO
+ANSI_country_CS			= ${ANSI_country}.891
+# ANSI Country SEYCHELLES
+ANSI_country_SC			= ${ANSI_country}.690
+# ANSI Country SIERRA LEONE
+ANSI_country_SL			= ${ANSI_country}.694
+# ANSI Country SINGAPORE
+ANSI_country_SG			= ${ANSI_country}.702
+# ANSI Country SLOVAKIA
+ANSI_country_SK			= ${ANSI_country}.703
+# ANSI Country SLOVENIA
+ANSI_country_SI			= ${ANSI_country}.705
+# ANSI Country SOLOMON ISLANDS
+ANSI_country_SB			= ${ANSI_country}.090
+# ANSI Country SOMALIA
+ANSI_country_SO			= ${ANSI_country}.706
+# ANSI Country SOUTH AFRICA
+ANSI_country_ZA			= ${ANSI_country}.710
+# ANSI Country SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS
+ANSI_country_GS			= ${ANSI_country}.239
+# ANSI Country SPAIN
+ANSI_country_ES			= ${ANSI_country}.724
+# ANSI Country SRI LANKA
+ANSI_country_LK			= ${ANSI_country}.144
+# ANSI Country SUDAN
+ANSI_country_SD			= ${ANSI_country}.736
+# ANSI Country SURINAME
+ANSI_country_SR			= ${ANSI_country}.740
+# ANSI Country SVALBARD AND JAN MAYEN ISLANDS
+ANSI_country_SJ			= ${ANSI_country}.744
+# ANSI Country SWAZILAND
+ANSI_country_SZ			= ${ANSI_country}.748
+# ANSI Country SWEDEN
+ANSI_country_SE			= ${ANSI_country}.752
+# ANSI Country SWITZERLAND
+ANSI_country_CH			= ${ANSI_country}.756
+# ANSI Country SYRIAN ARAB REPUBLIC
+ANSI_country_SY			= ${ANSI_country}.760
+# ANSI Country TAIWAN
+ANSI_country_TW			= ${ANSI_country}.158
+# ANSI Country TAJIKISTAN
+ANSI_country_TJ			= ${ANSI_country}.762
+# ANSI Country TANZANIA, UNITED REPUBLIC OF
+ANSI_country_TZ			= ${ANSI_country}.834
+# ANSI Country THAILAND
+ANSI_country_TH			= ${ANSI_country}.764
+# ANSI Country TIMOR-LESTE
+ANSI_country_TL			= ${ANSI_country}.626
+# ANSI Country TOGO
+ANSI_country_TG			= ${ANSI_country}.768
+# ANSI Country TOKELAU
+ANSI_country_TK			= ${ANSI_country}.772
+# ANSI Country TONGA
+ANSI_country_TO			= ${ANSI_country}.776
+# ANSI Country TRINIDAD AND TOBAGO
+ANSI_country_TT			= ${ANSI_country}.780
+# ANSI Country TUNISIA
+ANSI_country_TN			= ${ANSI_country}.788
+# ANSI Country TURKEY
+ANSI_country_TR			= ${ANSI_country}.792
+# ANSI Country TURKMENISTAN
+ANSI_country_TM			= ${ANSI_country}.795
+# ANSI Country TURKS AND CAICOS ISLANDS
+ANSI_country_TC			= ${ANSI_country}.796
+# ANSI Country TUVALU
+ANSI_country_TV			= ${ANSI_country}.798
+# ANSI Country UGANDA
+ANSI_country_UG			= ${ANSI_country}.800
+# ANSI Country UKRAINE
+ANSI_country_UA			= ${ANSI_country}.804
+# ANSI Country UNITED ARAB EMIRATES
+ANSI_country_AE			= ${ANSI_country}.784
+# ANSI Country UNITED KINGDOM
+ANSI_country_GB			= ${ANSI_country}.826
+# ANSI Country UNITED STATES
+ANSI_country_US			= ${ANSI_country}.840
+# ANSI Country UNITED STATES MINOR OUTLYING ISLANDS
+ANSI_country_UM			= ${ANSI_country}.581
+# ANSI Country URUGUAY
+ANSI_country_UY			= ${ANSI_country}.858
+# ANSI Country UZBEKISTAN
+ANSI_country_UZ			= ${ANSI_country}.860
+# ANSI Country VANUATU
+ANSI_country_VU			= ${ANSI_country}.548
+# ANSI Country VATICAN CITY STATE (HOLY SEE)
+ANSI_country_VA			= ${ANSI_country}.336
+# ANSI Country VENEZUELA
+ANSI_country_VE			= ${ANSI_country}.862
+# ANSI Country VIET NAM
+ANSI_country_VN			= ${ANSI_country}.704
+# ANSI Country VIRGIN ISLANDS (BRITISH)
+ANSI_country_VG			= ${ANSI_country}.092
+# ANSI Country VIRGIN ISLANDS (U.S.)
+ANSI_country_VI			= ${ANSI_country}.850
+# ANSI Country WALLIS AND FUTUNA ISLANDS
+ANSI_country_WF			= ${ANSI_country}.876
+# ANSI Country WESTERN SAHARA
+ANSI_country_EH			= ${ANSI_country}.732
+# ANSI Country YEMEN
+ANSI_country_YE			= ${ANSI_country}.887
+# ANSI Country ZAMBIA
+ANSI_country_ZM			= ${ANSI_country}.894
+# ANSI Country ZIMBABWE
+ANSI_country_ZW			= ${ANSI_country}.716
+
+
+2.16.840.1.113730.1.1
+
 # EXAMPLE Policies used by the TSA examples. read RFC 3161
 tsa_policy1				= ${iso_member}.3.4.1
 tsa_policy2				= ${iso_member}.3.4.5.6
@@ -287,7 +801,27 @@ subjectKeyIdentifier		= hash
 authorityKeyIdentifier		= keyid:always,issuer
 subjectAltName				= @piap_srv_subj_alt_names
 issuerAltName				= issuer:copy
-nsCaRevocationUrl			= http://www.domain.dom/ca-crl.pem
+#nsCaRevocationUrl			= http://www.domain.dom/ca-crl.pem
+#nsCaRevocationUrl			= https://pocket.PiAP.local/ca/crls/CA.crl
+#nsBaseUrl					= https://pocket.PiAP.local/ca
+#nsRevocationUrl			= https://pocket.PiAP.local/ca/crls/CA.crl
+#nsCaPolicyUrl				= https://pocket.PiAP.local/ca/policy.html
+#nsSslServerName			= pocket.PiAP.local
+
+####################################################################
+[ PiAP_CA_cert ]
+
+# This goes against PKIX guidelines. Should peer-review this
+basicConstraints			= critical,CA:TRUE
+nsCertType					= sslCA,emailCA,objsign
+extendedKeyUsage			= any
+keyUsage					= digitalSignature,cRLSign,keyCertSign
+nsComment					= "Pocket PiAP Certificate Authority"
+subjectKeyIdentifier		= hash
+authorityKeyIdentifier		= hash
+#subjectAltName				= @piap_srv_subj_alt_names
+issuerAltName				= issuer:copy
+#nsCaRevocationUrl			= http://www.domain.dom/ca-crl.pem
 #nsCaRevocationUrl			= https://pocket.PiAP.local/ca/crls/CA.crl
 #nsBaseUrl					= https://pocket.PiAP.local/ca
 #nsRevocationUrl			= https://pocket.PiAP.local/ca/crls/CA.crl
@@ -297,6 +831,7 @@ nsCaRevocationUrl			= http://www.domain.dom/ca-crl.pem
 ####################################################################
 [ piap_srv_subj_alt_names ]
 DNS.1						= Pocket.PiAP.local.
+DNS.2						= pocket.PiAP.local
 DNS.3						= HOST-1.PiAP.local
 # RFC 2818 vs RFC6125 [section 1.7.2] - should peer review
 IP.1						= 10.0.40.1

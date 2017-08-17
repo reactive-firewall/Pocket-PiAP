@@ -1,0 +1,62 @@
+#
+# This file MUST be edited with the 'visudo' command as root.
+#
+# PiAP sudoers file
+#
+# to enable add the following to /etc/sudoers:
+# "includedir /etc/sudoers.d"
+#
+# See the man page for details on how to write a sudoers file.
+#
+Defaults	env_reset
+Defaults	mail_badpass
+Defaults	secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# Host alias specification
+
+# User alias specification
+User_Alias      WEBMASTERS = www-data, nginx, pocket-www, pocket-admin
+
+# Runas alias specification
+Runas_Alias	OP = root, operator, pocket-admin
+Runas_Alias	NETOPS = netdev, www-data, pocket-www
+Runas_Alias	WEB = www-data, pocket-www
+Runas_Alias	ADMINGRP = adm, bin, pocket-admin
+Runas_Alias	SYSTEM = sys
+
+# Cmnd alias specification
+# Cmnd_Alias	DUMPS = /usr/bin/mt, /usr/sbin/dump, /usr/sbin/rdump,\
+#                        /usr/sbin/restore, /usr/sbin/rrestore,\
+#                        sha224:0GomF8mNN3wlDt1HD9XldjJ3SNgpFdbjO1+NsQ== \
+#                        /home/operator/bin/start_backups
+Cmnd_Alias	PIAPS = /srv/PiAP/bin/power_off.bash, /srv/PiAP/bin/reboot.bash, /srv/PiAP/bin/updatePiAP.bash, /srv/PiAP/bin/updateWiFi.bash
+Cmnd_Alias	PIAPOPS = /srv/PiAP/bin/do_updatePiAP.bash,\
+                      /srv/PiAP/bin/client_status_table.bash,\
+                      /srv/PiAP/bin/client_con_state.bash,\
+                      /srv/PiAP/bin/do_updateWiFi.bash,\
+                      /srv/PiAP/bin/fw_status.bash,\
+                      /srv/PiAP/bin/client_status_table.bash
+Cmnd_Alias	PIAPNETOPS = /usr/bin/python3 -m piaplib.pocket lint check clients --all --html
+Cmnd_Alias	KILL = /bin/kill
+Cmnd_Alias	SHUTDOWN = /sbin/shutdown
+Cmnd_Alias	HALT = /sbin/halt
+Cmnd_Alias	REBOOT = /sbin/reboot
+Cmnd_Alias	SHELLS = /bin/sh, /bin/dash, /bin/bash
+Cmnd_Alias	SU = /bin/su
+Cmnd_Alias	PAGERS = /usr/bin/more, /bin/less, /usr/bin/less
+
+# User privilege specification
+root	ALL=(ALL:ALL) ALL
+
+# Allow members of group sudo to execute any command
+%sudo	ALL=(ALL:ALL) ALL
+%sudo	ALL=(OP) NOPASSWD: SHUTDOWN, HALT, REBOOT
+%sudo	ALL=(SYSTEM:ADMINGRP) NOPASSWD: PAGERS
+
+# See sudoers(5) for more information on "#include" directives:
+
+WEBMASTERS	ALL=(OP) NOPASSWD: SHUTDOWN, REBOOT, HALT
+WEBMASTERS	ALL=(OP) NOPASSWD: PIAPOPS
+WEBMASTERS	ALL=(WEB:NETOPS) NOPASSWD: PIAPNETOPS
+WEBMASTERS	ALL=(WEB:WEB) NOPASSWD: PIAPS
+
