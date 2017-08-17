@@ -140,10 +140,12 @@ uninstall-optbin: must_be_root
 install-optsbin: install-optroot must_be_root
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/sbin
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/sbin/kick_client /opt/PiAP/sbin/kick_client
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/sbin/autosign_client /opt/PiAP/sbin/autosign_client
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall-optsbin: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/sbin/kick_client 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/sbin/autosign_client 2>/dev/null || true
 	$(QUIET)$(RMDIR) /opt/PiAP/sbin 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 	
@@ -266,7 +268,7 @@ configure-PiAP-keyring: /etc/ssl/ must_be_root
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/crl
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/certs
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/private
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/ssl/openssl.cnf /etc/ssl/PiAP_keyring.cfg
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_WEB_OPTS) ./PiAP/etc/ssl/openssl.cnf /etc/ssl/PiAP_keyring.cfg
 	private/PiAP_CA
 	$(QUIET)if [[ ( -z $( grep -E "[0-9]+" /etc/ssl/PiAPCA/serial 2>/dev/null ) ) ]] ; then $(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/ssl/PiAPCA/serial /etc/ssl/PiAPCA/serial ; fi
 	$(QUIET)touch -cam /etc/ssl/PiAPCA/index.txt 2>/dev/null || true
@@ -294,8 +296,8 @@ remove-PiAP-sudoers: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 configure-PiAP-dnsmasq: /etc/ must_be_root
-	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_OPTS) ./PiAP/etc/dnsmasq.conf /etc/dnsmasq.conf
-	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_OPTS) ./PiAP/etc/dnsmasq.d/dnsmasq.PiAP.conf /etc/dnsmasq.d/dnsmasq.PiAP.conf
+	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_FILE_OPTS) ./PiAP/etc/dnsmasq.conf /etc/dnsmasq.conf
+	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_FILE_OPTS) ./PiAP/etc/dnsmasq.d/dnsmasq.PiAP.conf /etc/dnsmasq.d/dnsmasq.PiAP.conf
 	$(QUIET)$(ECHO) "$@: Done."
 
 remove-PiAP-dnsmasq: must_be_root
@@ -304,8 +306,8 @@ remove-PiAP-dnsmasq: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 configure-PiAP-hostapd: /etc/hostapd must_be_root
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/hostapd/hostapd.conf.backup /etc/hostapd/hostapd.conf.backup
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/hostapd/hostapd.conf.failsafe /etc/hostapd/hostapd.conf.failsafe
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPTS) ./PiAP/etc/hostapd/hostapd.conf.backup /etc/hostapd/hostapd.conf.backup
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPTS) ./PiAP/etc/hostapd/hostapd.conf.failsafe /etc/hostapd/hostapd.conf.failsafe
 	$(QUIET)$(ECHO) "$@: Done."
 
 remove-PiAP-hostapd: must_be_root
