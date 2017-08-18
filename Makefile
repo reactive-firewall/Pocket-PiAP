@@ -268,8 +268,7 @@ configure-PiAP-keyring: /etc/ssl/ must_be_root
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/crl
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/certs
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/private
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_WEB_OPTS) ./PiAP/etc/ssl/openssl.cnf /etc/ssl/PiAP_keyring.cfg
-	private/PiAP_CA
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/ssl/openssl.cnf /etc/ssl/PiAP_keyring.cfg
 	$(QUIET)if [[ ( -z $( grep -E "[0-9]+" /etc/ssl/PiAPCA/serial 2>/dev/null ) ) ]] ; then $(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/ssl/PiAPCA/serial /etc/ssl/PiAPCA/serial ; fi
 	$(QUIET)touch -cam /etc/ssl/PiAPCA/index.txt 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
@@ -318,7 +317,7 @@ remove-PiAP-hostapd: must_be_root
 
 configure-PiAP-interfaces: /etc/network must_be_root
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/network/interfaces /etc/network/interfaces
-		$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/cron.hourly/clear_zeroconf_ip.sh /etc/cron.hourly/clear_zeroconf_ip.sh
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/cron.hourly/clear_zeroconf_ip.sh /etc/cron.hourly/clear_zeroconf_ip.sh
 	$(QUIET)$(ECHO) "$@: Done."
 
 remove-PiAP-interfaces: must_be_root
