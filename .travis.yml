@@ -44,7 +44,7 @@ addons:
   - pocket.PiAP.local
 
 before_install:
-	- echo "travis_fold:start:piap-setup" 2>/dev/null || true
+  - echo "travis_fold:start:piap-setup" 2>/dev/null || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew tap homebrew/versions || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew upgrade || brew upgrade || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install php7 $INSTALL || true ; fi
