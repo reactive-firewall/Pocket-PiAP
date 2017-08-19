@@ -92,6 +92,8 @@ ifeq "$(LOG)" "no"
 	QUIET=@
 endif
 
+SHELL=/bin/bash
+
 PHONY: must_be_root cleanup
 
 build:
@@ -264,12 +266,12 @@ remove-httpd: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 configure-PiAP-keyring: /etc/ssl/ must_be_root
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/crl
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/certs
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/private
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/ssl/openssl.cnf /etc/ssl/PiAP_keyring.cfg
-	$(QUIET)if [[ ( -z $( grep -E "[0-9]+" /etc/ssl/PiAPCA/serial 2>/dev/null ) ) ]] ; then $(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/ssl/PiAPCA/serial /etc/ssl/PiAPCA/serial ; fi
+	$(QUIET)if [[ -z $$(grep -E "[0-9]+" /etc/ssl/PiAPCA/serial 2>/dev/null) ]] ; then $(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/ssl/PiAPCA/serial /etc/ssl/PiAPCA/serial ; fi
 	$(QUIET)touch -cam /etc/ssl/PiAPCA/index.txt 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -286,7 +288,7 @@ remove-PiAP-keyring: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 configure-PiAP-sudoers: /etc/ must_be_root
-	$(QUIET)if [[ ( -z $( grep -F "includedir /etc/sudoers.d" /etc/sudoers | grep -vE "^[#]+" ) ) ]] ; then echo "includedir /etc/sudoers.d" | tee -a /etc/sudoers || exit 2 ; fi
+	$(QUIET)if [[ ( -z $$( grep -F "includedir /etc/sudoers.d" /etc/sudoers | grep -vE "^[#]+" ) ) ]] ; then echo "includedir /etc/sudoers.d" | tee -a /etc/sudoers || exit 2 ; fi
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/sudoers /etc/sudoers.d/PiAP
 	$(QUIET)$(ECHO) "$@: Done."
 
