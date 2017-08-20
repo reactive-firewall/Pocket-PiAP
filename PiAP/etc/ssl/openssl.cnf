@@ -9,7 +9,7 @@ RANDFILE				= $ENV::HOME/.rnd
 
 # set these if you wish
 COUNTRY					= US
-# STATE					= California
+STATE					= California
 
 
 # Extra OBJECT IDENTIFIER info:
@@ -187,7 +187,6 @@ ANSI_country_CK			= ${ANSI_country}.184
 ANSI_country_CR			= ${ANSI_country}.188
 # ANSI Country COTE D'IVOIRE
 ANSI_country_CI			= ${ANSI_country}.384
-CROATIA (local name: Hrvatska):HRV
 # ANSI Country CUBA
 ANSI_country_CU			= ${ANSI_country}.192
 # ANSI Country CYPRUS
@@ -559,8 +558,9 @@ ANSI_country_ZM			= ${ANSI_country}.894
 # ANSI Country ZIMBABWE
 ANSI_country_ZW			= ${ANSI_country}.716
 
+#key usage rfc2459
 
-2.16.840.1.113730.1.1
+# 2.16.840.1.113730.1.1
 
 # EXAMPLE Policies used by the TSA examples. read RFC 3161
 tsa_policy1				= ${iso_member}.3.4.1
@@ -670,7 +670,7 @@ dir							= /etc/ssl/PiAPCA
 crl_dir						= $dir/crl
 crlnumber					= $dir/crlnumber
 crl							= $dir/PiAP_CA.crl
-crl_extensions				= crl_v3_ext
+crl_extensions				= crl_ext
 default_crl_days			= 30
 database					= $dir/index.txt
 unique_subject				= no
@@ -687,12 +687,13 @@ default_days				= 365
 # CWE- weak default - see https://github.com/openssl/openssl/issues/439
 default_md					= sha512
 preserve					= no
-policy						= policy_match
+policy						= policy_anything
 
 ####################################################################
 [ policy_match ]
-countryName					= match
-stateOrProvinceName			= match
+countryName					= optional
+stateOrProvinceName			= optional
+localityName				= optional
 organizationName			= match
 organizationalUnitName		= optional
 commonName					= supplied
@@ -814,11 +815,11 @@ issuerAltName				= issuer:copy
 # This goes against PKIX guidelines. Should peer-review this
 basicConstraints			= critical,CA:TRUE
 nsCertType					= sslCA,emailCA,objsign
-extendedKeyUsage			= any
+#extendedKeyUsage			= 2.5.29.37.0
 keyUsage					= digitalSignature,cRLSign,keyCertSign
 nsComment					= "Pocket PiAP Certificate Authority"
 subjectKeyIdentifier		= hash
-authorityKeyIdentifier		= hash
+#authorityKeyIdentifier		= keyid:issuer
 #subjectAltName				= @piap_srv_subj_alt_names
 issuerAltName				= issuer:copy
 #nsCaRevocationUrl			= http://www.domain.dom/ca-crl.pem
@@ -844,7 +845,7 @@ basicConstraints			= critical,CA:FALSE
 nsCertType					= email, objsign
 keyUsage					= nonRepudiation, digitalSignature, keyEncipherment
 nsComment					= "Pocket PiAP Issued Signing Certificate"
-subjectKeyIdentifier=hash
+subjectKeyIdentifier		= hash
 authorityKeyIdentifier		= keyid:always,issuer
 subjectAltName				= email:copy
 issuerAltName				= issuer:copy
@@ -865,6 +866,7 @@ keyUsage					= cRLSign, keyCertSign
 # obj=DER:02:03
 # You can even override a supported extension:
 # basicConstraints= critical, DER:30:03:01:01:FF
+# 2.5.29.37.0
 
 ####################################################################
 [ crl_ext ]
