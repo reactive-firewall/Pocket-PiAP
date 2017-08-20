@@ -82,6 +82,9 @@ ifeq "$(INSTALL)" ""
 	ifeq "$(INST_DIR_OPTS)" ""
 		INST_DIR_OPTS=-m 750 -d
 	endif
+	ifeq "$(INST_PUB_DIR_OPTS)" ""
+		INST_PUB_DIR_OPTS=-m 755 -d
+	endif
 endif
 
 ifeq "$(LOG)" ""
@@ -229,7 +232,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 /etc/ssl/PiAPCA/private/PiAP_CA.csr: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
-	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_CA.csr -key /etc/ssl/PiAPCA/private/PiAP_CA.key -subj "/CN=PiAP\ CA/OU=PiAP/O=PiAP\ Root/" 2>/dev/null
+	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_CA.csr -key /etc/ssl/PiAPCA/private/PiAP_CA.key -subj "/CN=Pocket\ PiAP\ CA/OU=PiAP\ Root/O=PiAP\ Network/" 2>/dev/null
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -266,9 +269,9 @@ remove-httpd: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 configure-PiAP-keyring: /etc/ssl/ must_be_root
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/crl
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/certs
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA/crl
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA/certs
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/private
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/ssl/openssl.cnf /etc/ssl/PiAP_keyring.cfg
 	$(QUIET)if [[ -z $$(grep -E "[0-9]+" /etc/ssl/PiAPCA/serial 2>/dev/null) ]] ; then $(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/ssl/PiAPCA/serial /etc/ssl/PiAPCA/serial ; fi
