@@ -246,12 +246,23 @@ uninstall-pifi: must_be_root
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
+/etc/ssl/PiAPCA/private/PiAP_SSL.key: /etc/ssl/certs/ssl-cert-CA-nginx.pem must_be_root
+	$(QUIET)dd if=/dev/hwrng bs=1024 count=4096 of=/tmp/.rand_seed.data 2>/dev/null || true
+	$(QUIET)openssl genrsa -rand /tmp/.rand_seed.data -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null || openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null
+	$(QUITE)$(WAIT)
+	$(QUIET)rm -f /tmp/.rand_seed.data 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+/etc/ssl/certs/ssl-cert-nginx.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
+	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_CA.csr -key /etc/ssl/PiAPCA/private/PiAP_CA.key -subj "/CN=Pocket\ PiAP\ CA/OU=PiAP\ Root/O=PiAP\ Network/" 2>/dev/null
+	$(QUITE)$(WAIT)
+	$(QUIET)$(ECHO) "$@: Done."
 
 configure-httpd: /etc/nginx /etc/ssl/certs/ssl-cert-CA-nginx.pem must_be_root
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi.conf /etc/nginx/fastcgi.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi_params /etc/nginx/fastcgi_params 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/nginx.conf /etc/nginx/nginx.conf 2>/dev/null
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/proxy_params /etc/nginx/proxy_params 2>/dev/null
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/proxy_params /etc/nginx/proxy_params 2>/dev/null || true
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/snippets/fastcgi-php.conf /etc/nginx/snippets/fastcgi-php.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/snippets/pocket_ssl.conf /etc/nginx/snippets/pocket_ssl.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP 2>/dev/null
@@ -262,7 +273,10 @@ configure-httpd: /etc/nginx /etc/ssl/certs/ssl-cert-CA-nginx.pem must_be_root
 remove-httpd: must_be_root
 	$(QUIET)$(RM) /etc/nginx/fastcgi.conf 2>/dev/null || true
 	$(QUIET)$(RM) /etc/nginx/fastcgi_params 2>/dev/null || true
+	$(QUIET)$(RM) /etc/nginx/proxy_params 2>/dev/null || true
 	$(QUIET)$(RM) /etc/nginx/snippets/pocket_ssl.conf 2>/dev/null || true
+	$(QUIET)$(RM) /etc/nginx/snippets/fastcgi-php.conf 2>/dev/null || true
+	$(QUIET)$(RM) /etc/nginx/nginx.conf 2>/dev/null || true
 	$(QUIET)$(RM) /etc/nginx/sites-available/PiAP 2>/dev/null || true
 	$(QUIET)$(RM) /etc/nginx/sites-enabled/PiAP 2>/dev/null || true
 	$(QUITE)$(WAIT)
