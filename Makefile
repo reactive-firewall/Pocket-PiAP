@@ -118,7 +118,7 @@ install-optroot: ./PiAP must_be_root
 	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket  pocket 2>/dev/null || true
 	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket-admin pocket-admin 2>/dev/null || true
 	$(QUIET)adduser --system --disabled-password --home /srv/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket-www pocket-www 2>/dev/null || true
-	$(QUIET)adduser --system --disabled-password --home /srv/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket-dns pocket-dns 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /usr/lib/misc --shell /bin/bash --force-badname --no-create-home --group pocket-dns pocket-dns 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket-dns,pocket-www,pocket,netdev pocket-admin 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket,www-data pocket-www 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket pocket-dns 2>/dev/null || true
@@ -253,12 +253,22 @@ uninstall-pifi: must_be_root
 	$(QUIET)rm -f /tmp/.rand_seed.data 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-/etc/ssl/certs/ssl-cert-nginx.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
-	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_CA.csr -key /etc/ssl/PiAPCA/private/PiAP_CA.key -subj "/CN=Pocket\ PiAP\ CA/OU=PiAP\ Root/O=PiAP\ Network/" 2>/dev/null
+/etc/ssl/PiAPCA/private/PiAP_SSL.csr: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_SSL.key must_be_root
+	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_SSL.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=Pocket\ PiAP\ CA/OU=PiAP\ Root/O=PiAP\ Network/" 2>/dev/null
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-configure-httpd: /etc/nginx /etc/ssl/certs/ssl-cert-CA-nginx.pem must_be_root
+/etc/ssl/PiAPCA/certs/PiAP_SSL.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_CA.csr must_be_root
+	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_SSL.csr -out /etc/ssl/PiAPCA/certs/PiAP_SSL.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_server_cert 2>/dev/null
+	$(QUITE)$(WAIT)
+	$(QUIET)$(ECHO) "$@: Done."
+
+/etc/ssl/certs/ssl-cert-nginx.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/certs/PiAP_SSL.pem /etc/ssl/PiAPCA/private/PiAP_CA.key /etc/ssl/certs/ssl-cert-CA-nginx.pem must_be_root
+	$(QUITE)$(WAIT)
+	$(QUIET)ln -sf ../PiAPCA/certs/PiAP_SSL.pemPiAP_SSL.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+configure-httpd: /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem must_be_root
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi.conf /etc/nginx/fastcgi.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi_params /etc/nginx/fastcgi_params 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/nginx.conf /etc/nginx/nginx.conf 2>/dev/null
@@ -305,7 +315,7 @@ remove-PiAP-keyring: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 configure-PiAP-sudoers: /etc/ must_be_root
-	$(QUIET)if [[ ( -z $$( grep -F "includedir /etc/sudoers.d" /etc/sudoers | grep -vE "^[#]+" ) ) ]] ; then echo "includedir /etc/sudoers.d" | tee -a /etc/sudoers || exit 2 ; fi
+	$(QUIET)if [[ ( -z $$( grep -F "#includedir /etc/sudoers.d" /etc/sudoers ) ) ]] ; then echo "#includedir /etc/sudoers.d" | tee -a /etc/sudoers || exit 2 ; fi
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/sudoers /etc/sudoers.d/PiAP
 	$(QUIET)$(ECHO) "$@: Done."
 
