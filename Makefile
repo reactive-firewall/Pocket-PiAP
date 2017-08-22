@@ -315,12 +315,14 @@ remove-PiAP-keyring: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 configure-PiAP-sudoers: /etc/ must_be_root
+	$(QUIET)if [[ ( -n $$( grep -F "PiAP" /etc/sudoers ) ) ]] ; then $(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPS) ./PiAP/etc/sudoers.failsafe /etc/sudoers || exit 2 ; fi
+	$(QUIET)if [[ ( -n $$( grep -F "PIAPS" /etc/sudoers ) ) ]] ; then $(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPS) ./PiAP/etc/sudoers.failsafe /etc/sudoers || exit 2 ; fi
 	$(QUIET)if [[ ( -z $$( grep -F "#includedir /etc/sudoers.d" /etc/sudoers ) ) ]] ; then echo "#includedir /etc/sudoers.d" | tee -a /etc/sudoers || exit 2 ; fi
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/sudoers /etc/sudoers.d/PiAP
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPS) ./PiAP/etc/sudoers /etc/sudoers.d/001_PiAP || exit 2
 	$(QUIET)$(ECHO) "$@: Done."
 
 remove-PiAP-sudoers: must_be_root
-	$(QUIET)$(RM) /etc/sudoers.d/PiAP 2>/dev/null || true
+	$(QUIET)$(RM) /etc/sudoers.d/001_PiAP 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 configure-PiAP-dnsmasq: /etc/ must_be_root
@@ -345,7 +347,7 @@ remove-PiAP-hostapd: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 configure-PiAP-interfaces: /etc/network must_be_root
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/network/interfaces /etc/network/interfaces
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/network/interfaces /etc/network/interfaces
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/cron.hourly/clear_zeroconf_ip.sh /etc/cron.hourly/clear_zeroconf_ip.sh
 	$(QUIET)$(ECHO) "$@: Done."
 
