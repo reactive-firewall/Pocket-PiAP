@@ -134,7 +134,7 @@ message "Checking TLS Beta cert dates."
 if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c OK ) -le 0 ) ]] ; then
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
 	sudo openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null ; wait ;
-	sudo openssl req -new -outform PEM -out /root/ssl-cert-nginx.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.PiAP.local/OU=PiAP.local/O=Pocket\ PiAP/" 2>/dev/null
+	sudo openssl req -new -outform PEM -out /root/ssl-cert-nginx.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.PiAP.local/OU=PiAP.local/O=PiAP\ Network/" 2>/dev/null
 	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions server_cert -CA /etc/ssl/PiAPCA/PiAP_CA.pem -CAkey /etc/ssl/PiAPCA/private/PiAP_CA.key -CAcreateserial | fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
 	message "DONE"
 elif [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c 'certificate has expired' ) -gt 0 ) ]] ; then
