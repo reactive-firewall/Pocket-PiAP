@@ -245,13 +245,13 @@ uninstall-pifi: must_be_root
 	$(QUIET)rm -f /tmp/.rand_seed.data 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Generated."
 
-/etc/ssl/PiAPCA/private/PiAP_CA.csr: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
+/etc/ssl/PiAPCA/private/PiAP_CA.csr: /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
 	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_CA.csr -key /etc/ssl/PiAPCA/private/PiAP_CA.key -subj "/CN=Pocket\ PiAP\ CA/OU=PiAP\ Root/O=PiAP\ Network/" 2>/dev/null
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(SYS_OWN) /etc/ssl/PiAPCA/private/PiAP_CA.key || exit 2
 	$(QUIET)$(ECHO) "$@: Requested."
 
-/etc/ssl/PiAPCA/PiAP_CA.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_CA.csr must_be_root
+/etc/ssl/PiAPCA/PiAP_CA.pem: /etc/ssl/PiAPCA/private/PiAP_CA.csr must_be_root
 	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_CA.csr -out /etc/ssl/PiAPCA/PiAP_CA.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_CA_cert 2>/dev/null
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Self-Signed."
@@ -269,7 +269,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)rm -f /tmp/.rand_seed.data 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Generated."
 
-/etc/ssl/PiAPCA/private/PiAP_SSL.csr: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_SSL.key must_be_root
+/etc/ssl/PiAPCA/private/PiAP_SSL.csr: /etc/ssl/PiAPCA/private/PiAP_SSL.key must_be_root
 	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_SSL.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=Pocket\ PiAP\ CA/OU=PiAP\ Root/O=PiAP\ Network/" 2>/dev/null
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/private/PiAP_SSL.csr || exit 2
@@ -310,23 +310,34 @@ remove-httpd: must_be_root
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-configure-PiAP-keyring: install-optroot /etc/ssl/ must_be_root
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA/crl
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA/certs
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/private
+configure-PiAP-keyring: install-optroot /etc/ssl/PiAPCA/crl /etc/ssl/PiAPCA/certs /etc/ssl/PiAPCA/private must_be_root
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/ssl/openssl.cnf /etc/ssl/PiAP_keyring.cfg
 	$(QUIET)if [[ -z $$(grep -E "[0-9]+" /etc/ssl/PiAPCA/serial 2>/dev/null) ]] ; then $(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/ssl/PiAPCA/serial /etc/ssl/PiAPCA/serial ; fi
 	$(QUIET)touch -am /etc/ssl/PiAPCA/index.txt 2>/dev/null || true
-	$(QUITE)$(CHOWN) $(FILE_OWN) /etc/ssl/PiAPCA/index.txt || exit 2
+	$(QUITE)$(CHOWN) $(FILE_OWN) /etc/ssl/PiAPCA/index.txt || true
 	$(QUIET)$(ECHO) "$@: Done."
 
+/etc/ssl/PiAPCA: /etc/ssl
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA 2>/dev/null || true
+
+/etc/ssl/PiAPCA/private: /etc/ssl/PiAPCA/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/private 2>/dev/null || true
+
 remove-PiAP-keyring: must_be_root
-	$(QUIET)$(RM) /etc/ssl/PiAP_keyring.cfg || true
+	$(QUIET)$(RM) /etc/ssl/PiAP_keyring.cfg 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+purge-PiAP-keyring: remove-PiAP-keyring must_be_root
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/index.txt || true
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/index.txt.old || true
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/serial || true
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/serial.old || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_SSL.csr || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_SSL.key || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_CA.csr || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_CA.key || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/PiAP_CA.pem || true
 	$(QUIET)$(RMDIR) /etc/ssl/PiAPCA/crl 2>/dev/null || true
 	$(QUIET)$(RMDIR) /etc/ssl/PiAPCA/certs 2>/dev/null || true
 	$(QUIET)$(RMDIR) /etc/ssl/PiAPCA/private 2>/dev/null || true
@@ -383,12 +394,12 @@ uninstall-webroot: remove-httpd uninstall-wpa-actions
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
-uninstall: uninstall-optroot uninstall-dsauth remove-PiAP-keyring remove-PiAP-sudoers remove-PiAP-dnsmasq uninstall-pifi
+uninstall: uninstall-optroot uninstall-dsauth remove-PiAP-sudoers remove-PiAP-dnsmasq uninstall-pifi
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile uninstall
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-purge: clean uninstall
+purge: clean uninstall remove-PiAP-keyring
 	$(QUIET)deluser --system pocket 2>/dev/null || true
 	$(QUIET)deluser --system pocket-www 2>/dev/null || true
 	$(QUIET)deluser --system pocket-dns 2>/dev/null || true
@@ -452,6 +463,11 @@ clean: cleanup
 must_be_root:
 	$(QUIET)runner=`whoami` ; \
 	if test $$runner != "root" ; then echo "You are not root." ; exit 1 ; fi
+
+/etc/ssl/PiAPCA/%: ./PiAP/etc/ssl/PiAPCA/% /etc/ssl/PiAPCA/
+	$(QUIET)$(ECHO) "Auto Rule Found For $@" ; $(WAIT) ;
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) $@ 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
 
 %:
 	$(QUIET)$(ECHO) "No Rule Found For $@" ; $(WAIT) ;
