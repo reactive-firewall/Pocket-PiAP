@@ -118,7 +118,7 @@ build:
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: install-dsauth install-webroot install-optroot install-wpa-actions install-hostapd-actions install-optsbin configure-PiAP-keyring install-optbin configure-PiAP-sudoers configure-PiAP-dnsmasq install-pifi must_be_root
+install: install-dsauth install-webroot install-optroot install-wpa-actions install-hostapd-actions install-optsbin install-optbin configure-PiAP-sudoers configure-PiAP-dnsmasq install-pifi configure-PiAP-keyring must_be_root
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile install
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
@@ -276,7 +276,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Requested."
 
 /etc/ssl/PiAPCA/certs/PiAP_SSL.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_SSL.csr /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
-	$(QUIET)openssl ca -config /etc/ssl/PiAP_keyring.cfg -days 180 -in /etc/ssl/PiAPCA/private/PiAP_SSL.csr -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_server_cert -batch | fgrep --after-context=800 -e $"-----BEGIN CERTIFICATE-----" | tee -a /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null > /dev/null || true
+	$(QUIET)openssl ca -config /etc/ssl/PiAP_keyring.cfg -days 180 -in /etc/ssl/PiAPCA/private/PiAP_SSL.csr -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_server_cert -batch | fgrep --after-context=800 -e $"-----BEGIN CERTIFICATE-----" | tee /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null > /dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/private/PiAP_SSL.pem || exit 2
 	$(QUIET)$(ECHO) "$@: Signed."
