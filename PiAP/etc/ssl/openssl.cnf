@@ -27,13 +27,14 @@ oid_section				= basic_oids
 [ basic_oids ]
 
 # ITU-T assigned OIDs defined in X.680(1994 E) annex C, also known as ISO/IEC 8824-1:1995
-x_680_oid				= 0
+# commented as this causes a parsing bug
+# x_680_oid				= 0
 
 # ITU-T Data - unofficial value
-x_680_data				= ${x_680_oid}.9
+x_680_data				= 0.9
 
 # unofficial data Object identifiers (PPS)
-x_680_DOID				= ${x_680_oid}.9.2342
+x_680_DOID				= ${x_680_data}.2342
 
 # UCL Data networks
 x_680_DN				= ${x_680_DOID}.19200300
