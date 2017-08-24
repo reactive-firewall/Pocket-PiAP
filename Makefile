@@ -276,7 +276,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Requested."
 
 /etc/ssl/PiAPCA/certs/PiAP_SSL.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_SSL.csr /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
-	$(QUIET)openssl ca -config /etc/ssl/PiAP_keyring.cfg -days 180 -in /etc/ssl/PiAPCA/private/PiAP_SSL.csr -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_server_cert -batch | fgrep --after-context=800 -e $"-----BEGIN CERTIFICATE-----" | tee /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null > /dev/null || true
+	$(QUIET)openssl ca -config /etc/ssl/PiAP_keyring.cfg -days 180 -in /etc/ssl/PiAPCA/private/PiAP_SSL.csr -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_server_cert -batch | fgrep --after-context=800 -e "-----BEGIN CERTIFICATE-----" | tee /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null > /dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/private/PiAP_SSL.pem || exit 2
 	$(QUIET)$(ECHO) "$@: Signed."
