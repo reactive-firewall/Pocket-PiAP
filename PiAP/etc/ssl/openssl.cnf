@@ -64,14 +64,15 @@ uniqueIdentifier		= ${RFC_1274_UID}
 #--------------------------
 # Global defaults
 # ISO is the first 1
-iso_oid					= 1
+# commented as this causes a parsing bug
+#iso_oid					= 1
 
 
 # OSI Registration Authorities (registration-authority) 1.1
-iso_RA					= ${iso_oid}.1
+iso_RA					= 1.1
 
 # ISO Member body 1.2
-iso_member				= ${iso_oid}.2
+iso_member				= 1.2
 
 # ISO Member body US 1.2.840
 iso_country_us			= ${iso_member}.840
@@ -80,10 +81,10 @@ iso_country_us			= ${iso_member}.840
 iso_identified_org		= ${iso_oid}.3
 
 # DoD registered OID
-DoD_oid					= ${iso_oid}.2
+DoD_oid					= ${iso_member}.2
 
 # "Amazon unique identification scheme" registered OID
-Amazon_oid				= ${iso_oid}.187
+Amazon_oid				= ${iso_member}.187
 
 
 #--------------------------
