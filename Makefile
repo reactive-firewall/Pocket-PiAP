@@ -48,6 +48,19 @@ ifeq "$(CPDIR)" ""
 	CPDIR=$(CP)R
 endif
 
+ifeq "$(CHOWN)" ""
+	CHOWN=`which chown` -vf
+	ifeq "$(FILE_OWN)" ""
+		FILE_OWN=pocket-admin:pocket
+	endif
+	ifeq "$(WEB_OWN)" ""
+		WEB_OWN=pocket-admin:pocket-www
+	endif
+	ifeq "$(SYS_OWN)" ""
+		SYS_OWN=root:root
+	endif
+endif
+
 ifeq "$(RM)" ""
 	RM=rm -f
 endif
@@ -105,7 +118,7 @@ build:
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: install-dsauth install-webroot install-optroot install-wpa-actions install-hostapd-actions install-optsbin configure-PiAP-keyring install-optbin configure-PiAP-sudoers configure-PiAP-dnsmasq install-pifi must_be_root
+install: install-dsauth install-webroot install-optroot install-wpa-actions install-hostapd-actions install-optsbin install-optbin configure-PiAP-sudoers configure-PiAP-dnsmasq install-pifi configure-PiAP-keyring must_be_root
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile install
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
@@ -213,9 +226,9 @@ uninstall-dsauth: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 install-pifi: must_be_root
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/init.d/wirelessWiFi /etc/init.d/wirelessWiFi
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_FILE_OPTS) ./PiAP/etc/init.d/wirelessWiFi /etc/init.d/wirelessWiFi
 	$(QUIET)update-rc.d wirelessWiFi enable 2>/dev/null || update-rc.d start 30 2345 . stop 0 1 6 wirelessWiFi 2>/dev/null ; wait ;
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/init.d/wirelessPiAP /etc/init.d/wirelessPiAP
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_FILE_OPTS) ./PiAP/etc/init.d/wirelessPiAP /etc/init.d/wirelessPiAP
 	$(QUIET)update-rc.d wirelessPiAP enable 2>/dev/null || update-rc.d start 30 2345 . stop 0 1 6 wirelessPiAP 2>/dev/null ; wait ;
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -226,49 +239,54 @@ uninstall-pifi: must_be_root
 
 /etc/ssl/PiAPCA/private/PiAP_CA.key: configure-PiAP-keyring must_be_root
 	$(QUIET)dd if=/dev/hwrng bs=1024 count=4096 of=/tmp/.rand_seed.data 2>/dev/null || true
-	$(QUIET)openssl genrsa -rand /tmp/.rand_seed.data -out /etc/ssl/PiAPCA/private/PiAP_CA.key 4096 2>/dev/null || openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_CA.key 4096 2>/dev/null
+	$(QUIET)openssl genrsa -rand /tmp/.rand_seed.data -out /etc/ssl/PiAPCA/private/PiAP_CA.key 4096 2>/dev/null || openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_CA.key 4096 2>/dev/null || true
 	$(QUITE)$(WAIT)
+	$(QUITE)$(CHOWN) $(SYS_OWN) /etc/ssl/PiAPCA/private/PiAP_CA.key || exit 2
 	$(QUIET)rm -f /tmp/.rand_seed.data 2>/dev/null || true
-	$(QUIET)$(ECHO) "$@: Done."
+	$(QUIET)$(ECHO) "$@: Generated."
 
-/etc/ssl/PiAPCA/private/PiAP_CA.csr: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
+/etc/ssl/PiAPCA/private/PiAP_CA.csr: /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
 	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_CA.csr -key /etc/ssl/PiAPCA/private/PiAP_CA.key -subj "/CN=Pocket\ PiAP\ CA/OU=PiAP\ Root/O=PiAP\ Network/" 2>/dev/null
 	$(QUITE)$(WAIT)
-	$(QUIET)$(ECHO) "$@: Done."
+	$(QUITE)$(CHOWN) $(SYS_OWN) /etc/ssl/PiAPCA/private/PiAP_CA.key || exit 2
+	$(QUIET)$(ECHO) "$@: Requested."
 
-/etc/ssl/PiAPCA/PiAP_CA.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_CA.csr must_be_root
+/etc/ssl/PiAPCA/PiAP_CA.pem: /etc/ssl/PiAPCA/private/PiAP_CA.csr must_be_root
 	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_CA.csr -out /etc/ssl/PiAPCA/PiAP_CA.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_CA_cert 2>/dev/null
 	$(QUITE)$(WAIT)
-	$(QUIET)$(ECHO) "$@: Done."
+	$(QUIET)$(ECHO) "$@: Self-Signed."
 
 /etc/ssl/certs/ssl-cert-CA-nginx.pem: /etc/ssl/PiAPCA/PiAP_CA.pem must_be_root
 	$(QUIET)ln -sf ../PiAPCA/PiAP_CA.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem 2>/dev/null || true
 	$(QUITE)$(WAIT)
-	$(QUIET)$(ECHO) "$@: Done."
+	$(QUIET)$(ECHO) "$@: Installed."
 
 /etc/ssl/PiAPCA/private/PiAP_SSL.key: /etc/ssl/certs/ssl-cert-CA-nginx.pem must_be_root
 	$(QUIET)dd if=/dev/hwrng bs=1024 count=4096 of=/tmp/.rand_seed.data 2>/dev/null || true
-	$(QUIET)openssl genrsa -rand /tmp/.rand_seed.data -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null || openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null
+	$(QUIET)openssl genrsa -rand /tmp/.rand_seed.data -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null || openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null || exit 3
 	$(QUITE)$(WAIT)
+	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/private/PiAP_SSL.key || exit 2
 	$(QUIET)rm -f /tmp/.rand_seed.data 2>/dev/null || true
-	$(QUIET)$(ECHO) "$@: Done."
+	$(QUIET)$(ECHO) "$@: Generated."
 
-/etc/ssl/PiAPCA/private/PiAP_SSL.csr: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_SSL.key must_be_root
+/etc/ssl/PiAPCA/private/PiAP_SSL.csr: /etc/ssl/PiAPCA/private/PiAP_SSL.key must_be_root
 	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_SSL.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=Pocket\ PiAP\ CA/OU=PiAP\ Root/O=PiAP\ Network/" 2>/dev/null
 	$(QUITE)$(WAIT)
-	$(QUIET)$(ECHO) "$@: Done."
+	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/private/PiAP_SSL.csr || exit 2
+	$(QUIET)$(ECHO) "$@: Requested."
 
-/etc/ssl/PiAPCA/certs/PiAP_SSL.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_CA.csr must_be_root
-	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_SSL.csr -out /etc/ssl/PiAPCA/certs/PiAP_SSL.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_server_cert 2>/dev/null
+/etc/ssl/PiAPCA/certs/PiAP_SSL.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/private/PiAP_SSL.csr /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
+	$(QUIET)openssl ca -config /etc/ssl/PiAP_keyring.cfg -days 180 -in /etc/ssl/PiAPCA/private/PiAP_SSL.csr -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_server_cert -batch | fgrep --after-context=800 -e "-----BEGIN CERTIFICATE-----" | tee /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null > /dev/null || true
 	$(QUITE)$(WAIT)
-	$(QUIET)$(ECHO) "$@: Done."
+	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || exit 2
+	$(QUIET)$(ECHO) "$@: Signed."
 
-/etc/ssl/certs/ssl-cert-nginx.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/certs/PiAP_SSL.pem /etc/ssl/PiAPCA/private/PiAP_CA.key /etc/ssl/certs/ssl-cert-CA-nginx.pem must_be_root
+/etc/ssl/certs/ssl-cert-nginx.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/certs/PiAP_SSL.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem must_be_root
 	$(QUITE)$(WAIT)
-	$(QUIET)ln -sf ../PiAPCA/certs/PiAP_SSL.pemPiAP_SSL.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null || true
-	$(QUIET)$(ECHO) "$@: Done."
+	$(QUIET)ln -sf ../PiAPCA/certs/PiAP_SSL.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Installed."
 
-configure-httpd: /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem must_be_root
+configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem must_be_root
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi.conf /etc/nginx/fastcgi.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi_params /etc/nginx/fastcgi_params 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/nginx.conf /etc/nginx/nginx.conf 2>/dev/null
@@ -288,26 +306,38 @@ remove-httpd: must_be_root
 	$(QUIET)$(RM) /etc/nginx/snippets/fastcgi-php.conf 2>/dev/null || true
 	$(QUIET)$(RM) /etc/nginx/nginx.conf 2>/dev/null || true
 	$(QUIET)$(RM) /etc/nginx/sites-available/PiAP 2>/dev/null || true
-	$(QUIET)$(RM) /etc/nginx/sites-enabled/PiAP 2>/dev/null || true
+	$(QUIET)unlink /etc/nginx/sites-enabled/PiAP 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-configure-PiAP-keyring: /etc/ssl/ must_be_root
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA/crl
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA/certs
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/private
+configure-PiAP-keyring: install-optroot /etc/ssl/PiAPCA/crl /etc/ssl/PiAPCA/certs /etc/ssl/PiAPCA/private must_be_root
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/ssl/openssl.cnf /etc/ssl/PiAP_keyring.cfg
 	$(QUIET)if [[ -z $$(grep -E "[0-9]+" /etc/ssl/PiAPCA/serial 2>/dev/null) ]] ; then $(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/ssl/PiAPCA/serial /etc/ssl/PiAPCA/serial ; fi
-	$(QUIET)touch -cam /etc/ssl/PiAPCA/index.txt 2>/dev/null || true
+	$(QUIET)touch -am /etc/ssl/PiAPCA/index.txt 2>/dev/null || true
+	$(QUITE)$(CHOWN) $(FILE_OWN) /etc/ssl/PiAPCA/index.txt || true
 	$(QUIET)$(ECHO) "$@: Done."
 
+/etc/ssl/PiAPCA: /etc/ssl
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA 2>/dev/null || true
+
+/etc/ssl/PiAPCA/private: /etc/ssl/PiAPCA/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/private 2>/dev/null || true
+
 remove-PiAP-keyring: must_be_root
-	$(QUIET)$(RM) /etc/ssl/PiAP_keyring.cfg || true
+	$(QUIET)$(RM) /etc/ssl/PiAP_keyring.cfg 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+purge-PiAP-keyring: remove-PiAP-keyring must_be_root
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/index.txt || true
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/index.txt.old || true
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/serial || true
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/serial.old || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_SSL.csr || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_SSL.key || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_CA.csr || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_CA.key || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/PiAP_CA.pem || true
 	$(QUIET)$(RMDIR) /etc/ssl/PiAPCA/crl 2>/dev/null || true
 	$(QUIET)$(RMDIR) /etc/ssl/PiAPCA/certs 2>/dev/null || true
 	$(QUIET)$(RMDIR) /etc/ssl/PiAPCA/private 2>/dev/null || true
@@ -318,16 +348,16 @@ configure-PiAP-sudoers: /etc/ must_be_root
 	$(QUIET)if [[ ( -n $$( grep -F "PiAP" /etc/sudoers ) ) ]] ; then $(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPS) ./PiAP/etc/sudoers.failsafe /etc/sudoers || exit 2 ; fi
 	$(QUIET)if [[ ( -n $$( grep -F "PIAPS" /etc/sudoers ) ) ]] ; then $(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPS) ./PiAP/etc/sudoers.failsafe /etc/sudoers || exit 2 ; fi
 	$(QUIET)if [[ ( -z $$( grep -F "#includedir /etc/sudoers.d" /etc/sudoers ) ) ]] ; then echo "#includedir /etc/sudoers.d" | tee -a /etc/sudoers || exit 2 ; fi
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPS) ./PiAP/etc/sudoers /etc/sudoers.d/001_PiAP || exit 2
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPTS) ./PiAP/etc/sudoers /etc/sudoers.d/001_PiAP || exit 2
 	$(QUIET)$(ECHO) "$@: Done."
 
 remove-PiAP-sudoers: must_be_root
 	$(QUIET)$(RM) /etc/sudoers.d/001_PiAP 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-configure-PiAP-dnsmasq: /etc/ must_be_root
-	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_FILE_OPTS) ./PiAP/etc/dnsmasq.conf /etc/dnsmasq.conf
-	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_FILE_OPTS) ./PiAP/etc/dnsmasq.d/dnsmasq.PiAP.conf /etc/dnsmasq.d/dnsmasq.PiAP.conf
+configure-PiAP-dnsmasq: install-optroot /etc/ must_be_root
+	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_WEB_OPTS) ./PiAP/etc/dnsmasq.conf /etc/dnsmasq.conf
+	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_WEB_OPTS) ./PiAP/etc/dnsmasq.d/dnsmasq.PiAP.conf /etc/dnsmasq.d/dnsmasq.PiAP.conf
 	$(QUIET)$(ECHO) "$@: Done."
 
 remove-PiAP-dnsmasq: must_be_root
@@ -335,9 +365,9 @@ remove-PiAP-dnsmasq: must_be_root
 	$(QUIET)$(RM) /etc/dnsmasq.conf 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-configure-PiAP-hostapd: /etc/hostapd must_be_root
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPTS) ./PiAP/etc/hostapd/hostapd.conf.backup /etc/hostapd/hostapd.conf.backup
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPTS) ./PiAP/etc/hostapd/hostapd.conf.failsafe /etc/hostapd/hostapd.conf.failsafe
+configure-PiAP-hostapd: install-optroot /etc/hostapd must_be_root
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/hostapd/hostapd.conf.backup /etc/hostapd/hostapd.conf.backup
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/hostapd/hostapd.conf.failsafe /etc/hostapd/hostapd.conf.failsafe
 	$(QUIET)$(ECHO) "$@: Done."
 
 remove-PiAP-hostapd: must_be_root
@@ -347,8 +377,8 @@ remove-PiAP-hostapd: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 configure-PiAP-interfaces: /etc/network must_be_root
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/network/interfaces /etc/network/interfaces
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) ./PiAP/etc/cron.hourly/clear_zeroconf_ip.sh /etc/cron.hourly/clear_zeroconf_ip.sh
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/network/interfaces /etc/network/interfaces
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPTS) ./PiAP/etc/cron.hourly/clear_zeroconf_ip.sh /etc/cron.hourly/clear_zeroconf_ip.sh
 	$(QUIET)$(ECHO) "$@: Done."
 
 remove-PiAP-interfaces: must_be_root
@@ -364,12 +394,12 @@ uninstall-webroot: remove-httpd uninstall-wpa-actions
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
-uninstall: uninstall-optroot uninstall-dsauth remove-PiAP-keyring remove-PiAP-sudoers remove-PiAP-dnsmasq uninstall-pifi
+uninstall: uninstall-optroot uninstall-dsauth remove-PiAP-sudoers remove-PiAP-dnsmasq uninstall-pifi
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile uninstall
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-purge: clean uninstall
+purge: clean uninstall remove-PiAP-keyring
 	$(QUIET)deluser --system pocket 2>/dev/null || true
 	$(QUIET)deluser --system pocket-www 2>/dev/null || true
 	$(QUIET)deluser --system pocket-dns 2>/dev/null || true
@@ -433,6 +463,11 @@ clean: cleanup
 must_be_root:
 	$(QUIET)runner=`whoami` ; \
 	if test $$runner != "root" ; then echo "You are not root." ; exit 1 ; fi
+
+/etc/ssl/PiAPCA/%: ./PiAP/etc/ssl/PiAPCA/% /etc/ssl/PiAPCA/
+	$(QUIET)$(ECHO) "Auto Rule Found For $@" ; $(WAIT) ;
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) $@ 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
 
 %:
 	$(QUIET)$(ECHO) "No Rule Found For $@" ; $(WAIT) ;

@@ -75,7 +75,7 @@ before_install:
   - pip install tox || pip install --upgrade tox || true ;
   - travis_retry python3 -m pip install coverage || python3 -m pip install coverage || true ;
   - travis_retry python3 -m pip install codecov || python3 -m pip install codecov || true ;
-  - travis_retry pip install flake8 || true ;
+  - travis_retry pip install flake8 || travis_retry python3 -m pip install flake8 || true ;
   - travis_retry pip install flake || true ;
   - travis_retry pip install codecov || true ;
   - echo "travis_fold:end:piap-setup" 2>/dev/null || true
