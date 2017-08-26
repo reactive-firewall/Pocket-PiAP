@@ -41,7 +41,7 @@ ifeq "$(WAIT)" ""
 endif
 
 ifeq "$(CP)" ""
-	CP=cp -vpub
+	CP=cp -vpb
 endif
 
 ifeq "$(CPDIR)" ""
