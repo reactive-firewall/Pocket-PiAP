@@ -210,10 +210,14 @@ uninstall-wpa-actions: must_be_root
 install-hostapd-actions: install-optroot must_be_root
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/hostapd_actions
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/hostapd_actions/clients /opt/PiAP/hostapd_actions/clients
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/hostapd_actions/deauth /opt/PiAP/hostapd_actions/deauth
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/hostapd_actions/disassociate /opt/PiAP/hostapd_actions/disassociate
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall-hostapd-actions: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/hostapd_actions/clients 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/hostapd_actions/deauth 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/hostapd_actions/disassociate 2>/dev/null || true
 	$(QUIET)$(RMDIR) /opt/PiAP/hostapd_actions 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -263,7 +267,7 @@ uninstall-pifi: must_be_root
 
 /etc/ssl/PiAPCA/private/PiAP_SSL.key: /etc/ssl/certs/ssl-cert-CA-nginx.pem must_be_root
 	$(QUIET)dd if=/dev/hwrng bs=1024 count=4096 of=/tmp/.rand_seed.data 2>/dev/null || true
-	$(QUIET)openssl genrsa -rand /tmp/.rand_seed.data -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null || openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null || exit 3
+	$(QUIET)openssl genrsa -rand /tmp/.rand_seed.data -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null || openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 2048 2>/dev/null || exit 3
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/private/PiAP_SSL.key || exit 2
 	$(QUIET)rm -f /tmp/.rand_seed.data 2>/dev/null || true

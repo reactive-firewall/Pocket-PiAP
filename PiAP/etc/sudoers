@@ -34,9 +34,9 @@ Cmnd_Alias	PIAPOPS = /srv/PiAP/bin/do_updatePiAP.bash,\
                       /srv/PiAP/bin/client_status_table.bash,\
                       /srv/PiAP/bin/client_con_state.bash,\
                       /srv/PiAP/bin/do_updateWiFi.bash,\
-                      /srv/PiAP/bin/fw_status.bash,\
-                      /srv/PiAP/bin/client_status_table.bash
-Cmnd_Alias	PIAPNETOPS = /usr/bin/python3 -m piaplib.pocket lint check clients --all --html
+                      /srv/PiAP/bin/fw_status.bash
+Cmnd_Alias	PIAPNETOPS = /usr/bin/python3 -m piaplib.pocket lint check clients --all --html,\
+                         /opt/PiAP/hostapd_actions/clients
 Cmnd_Alias	PIAPAUTOSIGN = /opt/PiAP/sbin/autosign_client
 Cmnd_Alias	OPENSSL = /usr/bin/openssl
 Cmnd_Alias	KILL = /bin/kill
