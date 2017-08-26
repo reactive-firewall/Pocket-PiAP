@@ -98,7 +98,7 @@ script:
   - echo "travis_fold:end:piap-test" 2>/dev/null || true
   - echo "travis_fold:start:piap-codecov" 2>/dev/null || true
   - codecov || true
-  - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
+  - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT 2>/dev/null || true ; fi
   - make clean || exit $? ;
   - echo "travis_fold:end:piap-codecov" 2>/dev/null || true
   - if [ $TRAVIS_OS_NAME != osx ] ; then travis_retry make test-tox ; fi
