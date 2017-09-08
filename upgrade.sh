@@ -180,7 +180,13 @@ message "--------------------[LOG]----------------------"
 head -n 9999999 "${PIAP_LOG_PATH}" || true ; wait ;
 
 message "[DONE] SCRIPT IS NOW DONE. SAFE TO MOVE TO NEXT STEP"
+if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
+message "[NEXT] Verify backups were restored."
+message "[NEXT] copy logs for bug report."
+message "[NEXT] submit bug report."
+else
 message "[NEXT] Restart Pocket to complete the upgrades."
+fi
 sudo -k
 exit ${ROLL_BACK:-3} ;
 
