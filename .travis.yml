@@ -44,6 +44,10 @@ matrix:
 
 
 addons:
+  apt:
+    packages:
+    - python3
+    - tox
   hosts:
   - pocket.PiAP.local
 
