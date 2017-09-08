@@ -47,7 +47,7 @@ addons:
   apt:
     packages:
     - python3
-    - tox
+    - python3-pip
   hosts:
   - pocket.PiAP.local
 
