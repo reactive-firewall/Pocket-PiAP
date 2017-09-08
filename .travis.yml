@@ -1,5 +1,9 @@
 language: generic
 sudo: false
+env:
+  global:
+    - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
+
 
 branches:
   only:
@@ -80,19 +84,26 @@ before_install:
   - travis_retry pip install codecov || true ;
   - echo "travis_fold:end:piap-setup" 2>/dev/null || true
 
+before_script:
+  - make clean ;
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter 2>/dev/null || true
+  - chmod +x ./cc-test-reporter 2>/dev/null || true
+  - ./cc-test-reporter before-build 2>/dev/null || true
+
 install: "true"
 # command to run tests
 script:
-  - make clean ;
   - echo "travis_fold:start:piap-test" 2>/dev/null || true
   - make test || exit $? ;
   - echo "travis_fold:end:piap-test" 2>/dev/null || true
   - echo "travis_fold:start:piap-codecov" 2>/dev/null || true
   - codecov || true
+  - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT 2>/dev/null || true ; fi
   - make clean || exit $? ;
   - echo "travis_fold:end:piap-codecov" 2>/dev/null || true
   - if [ $TRAVIS_OS_NAME != osx ] ; then travis_retry make test-tox ; fi
   - make clean 2>/dev/null || true ;
+
 
 after_success:
   - codecov 2>/dev/null || true
