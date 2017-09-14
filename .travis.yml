@@ -48,6 +48,8 @@ addons:
     packages:
     - python3
     - python3-pip
+    - tox
+    - python-flake8
   hosts:
   - pocket.PiAP.local
 
