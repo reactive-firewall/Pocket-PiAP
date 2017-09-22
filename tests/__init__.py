@@ -20,13 +20,13 @@ try:
 	try:
 		import sys
 		import os
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
+		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str(".."))))
 	except Exception as ImportErr:
-		print(str(''))
+		print(str(""))
 		print(str(type(ImportErr)))
 		print(str(ImportErr))
 		print(str((ImportErr.args)))
-		print(str(''))
+		print(str(""))
 		ImportErr = None
 		del ImportErr
 		raise ImportError(str("Test module failed completely."))
@@ -35,21 +35,20 @@ try:
 		if test_basic.__name__ is None:
 			raise ImportError(str("Test module failed to import even the basic tests."))
 	except Exception as impErr:
-		print(str(''))
+		print(str(""))
 		print(str(type(impErr)))
 		print(str(impErr))
 		print(str((impErr.args)))
-		print(str(''))
+		print(str(""))
 		impErr = None
 		del impErr
 		raise ImportError(str("Test module failed completely."))
-		exit(1)
 except Exception as badErr:
-	print(str(''))
+	print(str(""))
 	print(str(type(badErr)))
 	print(str(badErr))
 	print(str((badErr.args)))
-	print(str(''))
+	print(str(""))
 	badErr = None
 	del badErr
 	exit(0)
