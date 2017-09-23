@@ -31,7 +31,7 @@ iface lan0 inet static
 
 allow-hotplug eth0
 iface eth0 inet manual
-#	hwaddess b8:27:eb:*:*:*
+#	hwaddress b8:27:eb:*:*:*
 	pre-up sysctl -w net.ipv6.conf.eth0.disable_ipv6=1 2>/dev/null ; wait ; ip link set ${IFACE} up ; brctl addif lan0 eth0 || true ;
 	post-up ip addr del $(ip addr show ${IFACE:-eth0} | fgrep 169.254 | grepCIDR | grepCIDR -m1) dev ${IFACE} 2>/dev/null || true
 	post-down ip route del default via 10.0.40.1 dev ${IFACE:-eth0} src 10.0.40.1 ; wait ; brctl delif lan0 eth0 || true ; ip link set ${IFACE} down ; wait ;

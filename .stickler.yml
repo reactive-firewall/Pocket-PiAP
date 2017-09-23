@@ -1,12 +1,12 @@
 linters:
-    shellcheck:
-        shell: bash
-        exclude: ['.git', 'units']
-    flake8:
-        max-line-length: 100
-        max-complexity: 15
-        ignore: 'W191,W391'
-        exclude: ['.git', '__pycache__', 'docs', '.tox', 'build']
-        format: default
+  shellcheck:
+    shell: bash
+    exclude: ['.git', 'units', 'tests']
+  flake8:
+    max-line-length: 100
+    max-complexity: 15
+    ignore: 'W191,W391'
+    exclude: ['.git', '__pycache__', 'docs', '.tox', 'build']
+    format: default
 files:
-    ignore: ['*/*.pyc', '.tox/*', '*.pyc', '*~', '.git', '__pycache__', '*/__pycache__/*']
+  ignore: ['*/*.pyc', '.tox/*', '*.pyc', '*~', '.git', '__pycache__', '*/__pycache__/*']
