@@ -44,12 +44,4 @@ try:
 		del impErr
 		raise ImportError(str("Test module failed completely."))
 except Exception as badErr:
-	print(str(""))
-	print(str(type(badErr)))
-	print(str(badErr))
-	print(str((badErr.args)))
-	print(str(""))
-	badErr = None
-	del badErr
-	exit(0)
-
+	raise ImportError(str("Test module failed completely."))
