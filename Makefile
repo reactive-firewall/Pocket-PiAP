@@ -327,6 +327,12 @@ configure-PiAP-keyring: install-optroot /etc/ssl/PiAPCA/crl /etc/ssl/PiAPCA/cert
 /etc/ssl/PiAPCA/private: /etc/ssl/PiAPCA/
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/private 2>/dev/null || true
 
+/etc/ssl/PiAPCA/crl: /etc/ssl/PiAPCA/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/crl 2>/dev/null || true
+
+/etc/ssl/PiAPCA/certs: /etc/ssl/PiAPCA/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /etc/ssl/PiAPCA/certs 2>/dev/null || true
+
 remove-PiAP-keyring: must_be_root
 	$(QUIET)$(RM) /etc/ssl/PiAP_keyring.cfg 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."

@@ -1,0 +1,4 @@
+PRETTY_HOSTNAME="Pocket WiFi AP"
+#XDG Icon Naming Specification[1]
+ICON_NAME=computer-server
+CHASSIS=server
