@@ -67,16 +67,16 @@ cd ./Pocket-PiAP || ROLL_BACK=2 ;
 git fetch || ROLL_BACK=2 ;
 git pull || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
-sudo git submodule init || ROLL_BACK=2 ;
-sudo git submodule update --remote --checkout || ROLL_BACK=2 ;
-sudo git config --local fetch.recursesubmodules true
+git submodule init || ROLL_BACK=2 ;
+git submodule update --remote --checkout || ROLL_BACK=2 ;
+git config --local fetch.recursesubmodules true
 git fetch || ROLL_BACK=2 ;
 git pull || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
 # keys
-GIT_GPG_CMD=$(sudo git config --get gpg.program)
+GIT_GPG_CMD=$(git config --get gpg.program)
 GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
-sudo git config --local gpg.program ${GIT_GPG_CMD}
+git config --local gpg.program ${GIT_GPG_CMD}
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
 	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
 
