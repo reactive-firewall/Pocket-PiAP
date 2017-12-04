@@ -698,6 +698,34 @@ oid_subj_org_type = ${ANSI_oid}.5.4.15
 #1.3.6.1.4.1.11129.2.5.1
 #2.23.140.1.2.2
 
+#alt name:
+UID = 1.3.6.1.1.1.1.0
+netgear_org = 1.3.6.1.4.1.4526
+netgear_firewall = ${netgear_org}.100.6
+fwag114 = ${netgear_firewall}.3
+fvs124g = ${netgear_firewall}.4
+fvs318v3 = ${netgear_firewall}.5
+dgfv338 = ${netgear_firewall}.6
+netgear_AP = ${netgear_org}.100.7
+netgear_WLAN = ${netgear_org}.100.8
+netgear_ngfirewall = ${netgear_org}.13
+
+# policy user notice:
+userNotice = 1.3.6.1.5.5.7.2.2
+
+# IETF RFC 2459
+# Extended Key Purposes (KPs):
+extendedKeyPurposes = 1.3.6.1.5.5.7.3
+msSmartcardlogon = 1.3.6.1.4.1.311.20.2.2
+# ipsec ike
+ipsecIKE = ${extendedKeyPurposes}.17
+# access controller
+capwapAC = ${extendedKeyPurposes}.18
+# end points
+capwapWTP = ${extendedKeyPurposes}.19
+clientsshauth = ${extendedKeyPurposes}.21
+serversshhost = ${extendedKeyPurposes}.22
+
 ####################################################################
 [ ca ]
 default_ca	= CA_default		# The default ca section
