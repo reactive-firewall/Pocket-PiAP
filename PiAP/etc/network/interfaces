@@ -64,7 +64,7 @@ iface wlan1 inet manual
 	wireless-rate 150M
 	wireless-txpower auto
 	wireless-frag auto
-	#wireless-mode Master
+	wireless-mode AP
 	hostapd /etc/hostapd/hostapd.conf
 	pre-up sysctl -w net.ipv6.conf.wlan1.disable_ipv6=1 2>/dev/null >>/dev/null ; wait ; ip link set ${IFACE:-wlan1} up ; wait ; sysctl -w net.ipv4.conf.${IFACE:-wlan1}.forwarding=1 2>/dev/null >>/dev/null || true ;
 	post-up brctl addif lan0 ${IFACE:-wlan1} 2>/dev/null || true ; ip addr del $(ip addr show ${IFACE:-wlan1} | fgrep 169.254 | grepCIDR | grepCIDR -m1) dev ${IFACE:-wlan1} 2>/dev/null || true

@@ -274,7 +274,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Generated."
 
 /etc/ssl/PiAPCA/private/PiAP_SSL.csr: /etc/ssl/PiAPCA/private/PiAP_SSL.key must_be_root
-	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_SSL.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.piap.local/OU=PiAP\ Root/O=PiAP\ Network/" 2>/dev/null
+	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_SSL.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.piap.local/OU=PiAP\ SSL/O=PiAP\ Network/" 2>/dev/null
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/private/PiAP_SSL.csr || exit 2
 	$(QUIET)$(ECHO) "$@: Requested."
