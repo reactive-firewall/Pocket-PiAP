@@ -1,0 +1,2 @@
+#! /bin/bash
+sudo -u pocket-admin python3 -m piaplib.pocket $@
