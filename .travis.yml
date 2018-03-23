@@ -30,8 +30,6 @@ matrix:
     language: generic
   allow_failures:
   - os: linux
-    language: generic
-  - os: linux
     language: python
   - os: linux
     language: php7

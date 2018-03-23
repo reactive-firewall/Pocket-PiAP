@@ -1,0 +1,44 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/Pocket-PiAP
+    docker:
+      - image: circleci/ubuntu-server:latest
+        environment:
+          CI: cicleci
+          DEBIAN_FRONTEND: noninteractive
+    steps:
+      - run:
+          name: "clean apt"
+          command: |
+            sudo apt-get autoclean ; wait ;
+      - run:
+          name: "update apt"
+          command: |
+            sudo apt-get -yq update ; wait ;
+      - checkout
+      - run:
+          shell: /bin/bash
+          name: "clean up for test"
+          command: |
+            make clean || true
+      - run:
+          name: "fetch not pull"
+          command: |
+            curl -fsSL --tlsv1.2 --url https://raw.githubusercontent.com/reactive-firewall/Pocket-PiAP/${CIRCLE_SHA1:-stable}/upgrade.sh -o ~/Pocket-PiAP/upgrade.sh 2>/dev/null || true
+      - run:
+          shell: /bin/bash
+          name: "install attempt"
+          command: |
+            sudo bash ~/Pocket-PiAP/upgrade.sh || true
+      - run:
+          shell: /bin/bash
+          name: "Unit Tests"
+          command: |
+            make test
+      - run:
+          shell: /bin/bash
+          name: "clean up when done"
+          command: |
+            make clean
+destination: build
