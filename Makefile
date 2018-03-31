@@ -140,7 +140,15 @@ install-optroot: ./PiAP must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall-optroot: /opt/PiAP/ uninstall-wpa-actions uninstall-hostapd-actions uninstall-optbin uninstall-optsbin must_be_root
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/ || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+/opt/PiAP/: /opt/ must_be_root
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/
+	$(QUIET)$(ECHO) "$@: Done."
+
+/opt/: must_be_root
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /opt/
 	$(QUIET)$(ECHO) "$@: Done."
 
 install-optbin: install-optroot must_be_root
