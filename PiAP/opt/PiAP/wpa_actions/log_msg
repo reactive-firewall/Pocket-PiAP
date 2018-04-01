@@ -1,2 +1,8 @@
-#! /sbin/wpa_cli note "${@}"
-quit
+#! /bin/bash
+
+echo "note \"${@}\"" >3
+echo "quit" >>3
+/sbin/wpa_cli <3 ; wait ;
+
+echo -n "" >3
+exit 0

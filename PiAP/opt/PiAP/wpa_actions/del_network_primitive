@@ -1,2 +1,8 @@
-#! /sbin/wpa_cli remove_network ${1}
-quit
+#! /bin/bash
+
+echo "remove_network ${1}" >3
+echo "quit" >>3
+/sbin/wpa_cli <3 ; wait ;
+
+echo -n "" >3
+exit 0
