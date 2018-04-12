@@ -7,16 +7,26 @@ jobs:
         environment:
           CI: cicleci
           DEBIAN_FRONTEND: noninteractive
+          SHELL: /bin/bash
     steps:
-      - run:
-          name: "clean apt"
-          command: |
-            sudo apt-get autoclean ; wait ;
       - run:
           name: "update apt"
           command: |
             sudo apt-get -yq update ; wait ;
+      - run:
+          name: "install dependencies"
+          command: |
+            sudo apt-get -y install build-essential make git ; wait ;
       - checkout
+      - run:
+          shell: /bin/bash
+          name: "fetch and pull"
+          command: |
+            git fetch && git pull --all || true
+      - run:
+          name: "clean apt"
+          command: |
+            sudo apt-get autoclean ; wait ;
       - run:
           shell: /bin/bash
           name: "clean up for test"
