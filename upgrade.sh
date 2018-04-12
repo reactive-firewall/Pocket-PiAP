@@ -2,6 +2,8 @@
 
 ROLL_BACK=0
 
+umask 027
+
 PIAP_UI_BRANCH="${PIAP_UI_BRANCH:-stable}"
 
 PIAP_USER=${PIAP_USER:-0}
@@ -28,6 +30,36 @@ function check_depends() {
 	return $DID_WORK
 }
 
+function check_path() {
+	local THEPATH=$"${1:-/}"
+	local DID_WORK=0
+	if [[ ( -d "${THEPATH}" ) ]] ; then
+		message "Found [\"${THEPATH}\"]"
+	else
+		message "Ensuring paths [\"${THEPATH}\"]"
+		mkdir -p -m 755 "${THEPATH}" 2>/dev/null || DID_WORK=1 ;
+		chown ${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}} "${THEPATH}" 2>/dev/null || DID_WORK=1 ;
+		message "DONE"
+	fi
+	return $DID_WORK
+}
+
+function check_link() {
+	local THEPATH=$"${1:-/}"
+	local THELINK=$"${2:-/}"
+	local DID_WORK=0
+	if [[ ( -L "${THELINK}" ) ]] ; then
+		message "Found [\"${THELINK}\"]"
+	else
+		check_path "${THEPATH}"
+		message "Ensuring Links [\"${THEPATH}\"]"
+		ln -sf "${THEPATH}" "${THELINK}" 2>/dev/null || DID_WORK=1 ;
+		chown -h ${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}} "${THELINK}" 2>/dev/null || true ;
+		message "DONE"
+	fi
+	return $DID_WORK
+}
+
 message "Date:"$(date)
 
 if [[ ( -n $(which apt-get ) ) ]] ; then
@@ -43,11 +75,13 @@ else
 fi ;
 
 cd /tmp ;
-test -d /var/ || exit 2 ;
-test -d /var/opt/ || mkdir -m 755 /var/opt/ && sudo chown 0:0 /var/opt/ || exit 2 ;
+check_path /var/ || exit 2 ;
+check_path /srv/ || exit 2 ;
+check_path /opt/ || exit 2 ;
+check_link /var/opt/ || exit 2 ;
 sudo rm -Rvf /var/opt/PiAP/backups/PiAP_OLD/ 2>/dev/null || true ;
-test -d /var/opt/PiAP/ || mkdir -m 755 /var/opt/PiAP/ || exit 2 ;
-test -d /var/opt/PiAP/backups/ || mkdir -m 755 /var/opt/PiAP/backups/ || exit 2 ;
+check_path /var/opt/PiAP/ || exit 2 ;
+check_path /var/opt/PiAP/backups/ || exit 2 ;
 sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/backups/ || true ;
 sudo chown 750 /var/opt/PiAP/backups/ || true ;
 sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/ || true ;
@@ -100,7 +134,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 
 	if [[ ( ${WARN_VAR:-2} -gt 0 ) ]] ; then
 		message "FAILED TO VERIFY CODESIGN TRUST ANCHORS"
-		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably DE175595F735CA8E... [FIX ME]"
+		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably 87F06F1425B180C7... [FIX ME]"
 		# FIX THIS
 		message "BETA: Attempting upgrading..."
 	fi
@@ -111,12 +145,15 @@ fi
 sudo git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || (sudo git show --show-signature | fgrep ": " | fgrep "Signature made" && sudo git show --show-signature | fgrep ": " | fgrep "Invalid public key algorithm" ) || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
-	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably DE175595F735CA8E... [FIX ME]"
+	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably 87F06F1425B180C7... [FIX ME]"
 #fi # temp roll back [CAUTION for BETA]
 #	message "NOT Attempting upgrading..."
 else
 message "Attempting upgrading..."
 message "DO NOT INTERRUPT OR POWER OFF. [CAUTION for BETA]"
+
+# set LED flashing here
+
 ( sudo make uninstall || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 ( sudo make install || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 make clean

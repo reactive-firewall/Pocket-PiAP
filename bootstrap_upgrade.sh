@@ -14,7 +14,7 @@ sudo apt-get autoremove || ROLL_BACK=1 ;
 
 cd /tmp ;
 test -d /var/ || exit 2 ;
-test -d /var/opt/ || mkdir -m 755 /var/opt/ && chown 0:0 /var/opt/ || exit 2 ;
+test -d /var/opt/ || test -L /var/opt/ || mkdir -m 755 /opt/ && ln -sf /opt /var/opt && chown -h 0:0 /var/opt/ || exit 2 ;
 test -d /var/opt/PiAP/ || mkdir /var/opt/PiAP/ || exit 2 ;
 test -d /var/opt/PiAP/backups/ || mkdir /var/opt/PiAP/backups/ || exit 2 ;
 chown 0:0 /var/opt/PiAP/backups/ || true ;
