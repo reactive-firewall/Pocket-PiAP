@@ -2,7 +2,7 @@
 
 # License
 #
-# Copyright (c) 2017 Mr. Walls
+# Copyright (c) 2017-2018 Mr. Walls
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,7 +33,7 @@ ifeq "$(LINK)" ""
 endif
 
 ifeq "$(MAKE)" ""
-	MAKE=make
+	MAKE=`which make`
 endif
 
 ifeq "$(WAIT)" ""
