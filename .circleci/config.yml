@@ -22,7 +22,7 @@ jobs:
           shell: /bin/bash
           name: "fetch and pull"
           command: |
-            git fetch && git pull --all || true
+            git fetch && git pull --all && (git init || true ) && git submodule update --remote --checkout || true
       - run:
           name: "clean apt"
           command: |
