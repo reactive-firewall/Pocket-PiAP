@@ -53,7 +53,7 @@ function check_link() {
 	else
 		check_path "${THEPATH}"
 		message "Ensuring Links [\"${THEPATH}\"]"
-		ln -sf "${THEPATH}" "${THELINK}" 2>/dev/null || test -L "${THELINK}" || DID_WORK=1 ;
+		ln -sf "${THEPATH}" "${THELINK}" 2>/dev/null || test -L "${THELINK}" || stat "${THELINK}" || DID_WORK=1 ;
 		chown -h ${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}} "${THELINK}" 2>/dev/null || true ;
 		message "DONE"
 	fi
@@ -78,7 +78,7 @@ cd /tmp ;
 check_path /var/ || exit 2 ;
 check_path /srv/ || exit 2 ;
 check_path /opt/ || exit 2 ;
-check_link /var/opt/ || exit 2 ;
+check_link /var/opt/ /opt/ || check_link /var/opt/PiAP/ /opt/PiAP/ || exit 2 ;
 sudo rm -Rvf /var/opt/PiAP/backups/PiAP_OLD/ 2>/dev/null || true ;
 check_path /var/opt/PiAP/ || exit 2 ;
 check_path /var/opt/PiAP/backups/ || exit 2 ;
