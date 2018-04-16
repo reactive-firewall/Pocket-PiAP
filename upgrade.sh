@@ -53,7 +53,7 @@ function check_link() {
 	else
 		check_path "${THEPATH}"
 		message "Ensuring Links [\"${THEPATH}\"]"
-		ln -sf "${THEPATH}" "${THELINK}" 2>/dev/null || DID_WORK=1 ;
+		ln -sf "${THEPATH}" "${THELINK}" 2>/dev/null || test -L "${THELINK}" || DID_WORK=1 ;
 		chown -h ${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}} "${THELINK}" 2>/dev/null || true ;
 		message "DONE"
 	fi
