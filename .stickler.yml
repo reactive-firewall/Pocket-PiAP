@@ -1,7 +1,7 @@
 linters:
   shellcheck:
     shell: bash
-    exclude: ['.git', 'units', 'tests']
+    exclude: ['.git', 'units', 'tests', '.circleci']
   flake8:
     max-line-length: 100
     max-complexity: 15
