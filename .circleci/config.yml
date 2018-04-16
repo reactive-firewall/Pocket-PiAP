@@ -40,7 +40,7 @@ jobs:
           shell: /bin/bash
           name: "install attempt"
           command: |
-            sudo bash ~/Pocket-PiAP/upgrade.sh || true
+            export -x PIAP_UI_BRANCH="${CIRCLE_BRANCH:-stable}" && sudo bash ~/Pocket-PiAP/upgrade.sh || true
       - run:
           shell: /bin/bash
           name: "Unit Tests"
