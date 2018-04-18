@@ -128,10 +128,10 @@ install-users: ./PiAP must_be_root
 	$(QUIET)addgroup --system --force-badname pocket-admin 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-www 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-dns 2>/dev/null || true
-	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket  pocket 2>/dev/null || true
-	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket-admin pocket-admin 2>/dev/null || true
-	$(QUIET)adduser --system --disabled-password --home /srv/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket-www pocket-www 2>/dev/null || true
-	$(QUIET)adduser --system --disabled-password --home /usr/lib/misc --shell /bin/bash --force-badname --no-create-home --group pocket-dns pocket-dns 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket  pocket 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket-admin pocket-admin 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /srv/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket-www pocket-www 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /usr/lib/misc --shell /bin/bash --force-badname --no-create-home --ingroup pocket-dns pocket-dns 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket-dns,pocket-www,pocket,netdev pocket-admin 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket,www-data pocket-www 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket pocket-dns 2>/dev/null || true
