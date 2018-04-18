@@ -91,12 +91,21 @@ sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/ || true ;
 sudo chown 755 /var/opt/PiAP/ || true ;
 message "Making space for new backup up pre-upgrade version"
 sudo rm -Rvf /var/opt/PiAP/backups/PiAP_OLD/ 2>/dev/null || true ;
-sudo mv -vf /var/opt/PiAP/backups/PiAP /var/opt/PiAP/backups/PiAP_OLD || true
+if [[ ( -e /var/opt/PiAP/backups/PiAP ) ]] ; then
+	sudo mv -vf /var/opt/PiAP/backups/PiAP /var/opt/PiAP/backups/PiAP_OLD || true ;
+fi
 message "Backing up pre-upgrade version"
-sudo cp -vfRpub /srv/PiAP /var/opt/PiAP/backups/PiAP || exit 3 ;
-message "disabling web-server to prevent inconsistent state. All sessions will be logged out."
-sudo service nginx stop ;
-sudo service php5-fpm stop ;
+if [[ ( -e /srv/PiAP ) ]] ; then
+	sudo cp -vfRpub /srv/PiAP /var/opt/PiAP/backups/PiAP || exit 3 ;
+else
+	message "Nothing to backup! No pre-upgrade version."
+	check_path /srv/PiAP/ || exit 2 ;
+fi
+message "Backing up Complete"
+message "Disabling web-server to prevent inconsistent state. All sessions will be logged out."
+sudo service nginx stop || true ;
+sudo service php5-fpm stop || true ;
+sudo service php7.0-fpm stop 2>/dev/null || true ;
 message "Fetching upgrade files..."
 # data
 git clone -b ${PIAP_UI_BRANCH:-stable} https://github.com/reactive-firewall/Pocket-PiAP.git || true ;
@@ -122,7 +131,17 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf "trust 1\n3\nsave\n" | gpg2 --command-fd 0 --edit-key 2FDAFC993A61112D 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key F55A399B1FE18BCB 2>/dev/null || WARN_VAR=2 ; wait ;
+	printf "trust 1\n3\nsave\n" | gpg2 --command-fd 0 --edit-key F55A399B1FE18BCB 2>/dev/null || true ; wait ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_ABC.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key DE1F0294A79F5244 2>/dev/null || WARN_VAR=2 ; wait ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_D.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 055521972A2DF921 2>/dev/null || WARN_VAR=2 ; wait ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_E.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 7A4FC8AFC5FF91EE 2>/dev/null || true ; wait ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_F.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 1B38E552E4E90FDB 2>/dev/null || WARN_VAR=2 ; wait ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_G.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 157F7C20C1B17EAF 2>/dev/null || WARN_VAR=2 ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	${GIT_GPG_CMD} --check-trustdb 2>/dev/null || ROLL_BACK=2 ;
 
@@ -137,7 +156,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 
 	if [[ ( ${WARN_VAR:-2} -gt 0 ) ]] ; then
 		message "FAILED TO VERIFY CODESIGN TRUST ANCHORS"
-		message "[MISSING BETA KEY ISSUE] need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably 87F06F1425B180C7... [FIX ME]"
+		message "[MISSING BETA KEY ISSUE] need to download keys F55A399B1FE18BCB, 055521972A2DF921, 1B38E552E4E90FDB, 157F7C20C1B17EAF and the current beta key. Probably 87F06F1425B180C7... [FIX ME]"
 		# FIX THIS
 		message "BETA: Attempting upgrading..."
 	fi
@@ -148,7 +167,7 @@ fi
 sudo git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || (sudo git show --show-signature | fgrep ": " | fgrep "Signature made" && sudo git show --show-signature | fgrep ": " | fgrep "Invalid public key algorithm" ) || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
-	message "[MISSING BETA KEY ISSUE] might need to download keys CF76FC3B8CD0B15F, 2FDAFC993A61112D, F55A399B1FE18BCB, and the current beta key. Probably 87F06F1425B180C7... [FIX ME]"
+		message "[MISSING BETA KEY ISSUE] need to download keys F55A399B1FE18BCB, 055521972A2DF921, 1B38E552E4E90FDB, 157F7C20C1B17EAF and the current beta key. Probably 87F06F1425B180C7... [FIX ME]"
 #fi # temp roll back [CAUTION for BETA]
 #	message "NOT Attempting upgrading..."
 else
