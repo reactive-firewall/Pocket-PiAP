@@ -69,15 +69,21 @@ message "Date:"$(date)
 
 if [[ ( -n $(which apt-get ) ) ]] ; then
 	message "updating system to latest."
-	sudo apt-get update || ROLL_BACK=1 ;
-	sudo apt-key update || ROLL_BACK=1 ;
-	sudo apt-get --only-upgrade --assume-yes dist-upgrade || ROLL_BACK=1 ;
-	sudo apt-get --assume-yes autoremove || ROLL_BACK=1 ;
-	sudo apt-key update || ROLL_BACK=1 ;
+	sudo apt-get --assume-no update || ROLL_BACK=1 ;
+	sudo apt-key update || true ;
+	sudo apt-get --only-upgrade --assume-yes dist-upgrade || sudo apt-get --only-upgrade -f --assume-yes dist-upgrade || ROLL_BACK=1 ;
+	sudo apt-get --assume-yes autoremove || true ;
+	sudo apt-key update || true ;
 else
 	message "WARNING: enviroment seems wrong."
 	message "WARNING: NOT updating system to latest."
 fi ;
+
+if [[ ( ${ROLL_BACK:-1} -gt 0 ) ]] ; then
+	message "WARNING: enviroment failed to upgrade."
+	message "WARNING: NOT updating system to latest."
+	exit 2 ;
+fi
 
 cd /tmp ;
 check_path /var/ || exit 2 ;
