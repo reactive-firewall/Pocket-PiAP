@@ -145,6 +145,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_G.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
 	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 157F7C20C1B17EAF 2>/dev/null || WARN_VAR=2 ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 87F06F1425B180C7 2>/dev/null || WARN_VAR=2 ; wait ;
 	${GIT_GPG_CMD} --check-trustdb 2>/dev/null || ROLL_BACK=2 ;
 
 	# BUG WHERE ELIPTIC CURVE keys are unusable ?!?! wtf is this weak sauce ?
