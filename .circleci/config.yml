@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/Pocket-PiAP
     docker:
-      - image: circleci/ubuntu-server:latest
+      - image: circleci/buildpack-deps:latest
         environment:
           CI: cicleci
           DEBIAN_FRONTEND: noninteractive
