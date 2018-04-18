@@ -921,8 +921,8 @@ inhibitAnyPolicy = 2
  OU.1=PiAP Root
  OU.2=Class A
  CN=PiAP CA
- ${UID}=ASN1:UTF8String:0
- ${RFC_1274_UID}=ASN1:INTEGER:0
+# ${UID}=ASN1:UTF8String:0
+# ${RFC_1274_UID}=ASN1:INTEGER:0
 # SN=
 
 ####################################################################
