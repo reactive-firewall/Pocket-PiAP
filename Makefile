@@ -123,7 +123,7 @@ install: install-dsauth install-webroot install-optroot install-wpa-actions inst
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-optroot: ./PiAP must_be_root
+install-users: ./PiAP must_be_root
 	$(QUIET)addgroup --system --force-badname pocket 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-admin 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-www 2>/dev/null || true
@@ -136,18 +136,20 @@ install-optroot: ./PiAP must_be_root
 	$(QUIET)usermod -a -G pocket,www-data pocket-www 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket pocket-dns 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket-www www-data 2>/dev/null || true
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/
+	$(QUIET)$(ECHO) "$@: Done."
+
+install-optroot: ./PiAP must_be_root install-users /opt/PiAP/
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall-optroot: /opt/PiAP/ uninstall-wpa-actions uninstall-hostapd-actions uninstall-optbin uninstall-optsbin must_be_root
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/ || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-/opt/PiAP/: /opt/ must_be_root
+/opt/PiAP/: /opt/ must_be_root install-users
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/
 	$(QUIET)$(ECHO) "$@: Done."
 
-/opt/: must_be_root
+/opt/: must_be_root install-users
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /opt/
 	$(QUIET)$(ECHO) "$@: Done."
 
