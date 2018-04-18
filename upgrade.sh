@@ -37,8 +37,11 @@ function check_path() {
 		message "Found [\"${THEPATH}\"]"
 	else
 		message "Ensuring paths [\"${THEPATH}\"]"
-		mkdir -p -m 755 "${THEPATH}" 2>/dev/null || DID_WORK=1 ;
-		chown ${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}} "${THEPATH}" 2>/dev/null || DID_WORK=1 ;
+		OLDMASK=$(umask)
+		umask 0022
+		mkdir -p "${THEPATH}" 2>/dev/null || DID_WORK=1 ;
+		chown "${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}}" "${THEPATH}" 2>/dev/null || DID_WORK=1 ;
+		umask $OLDMASK
 		message "DONE"
 	fi
 	return $DID_WORK
