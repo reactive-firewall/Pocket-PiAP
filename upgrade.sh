@@ -166,6 +166,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 else
 	ROLL_BACK=3 ;
 	message "DISABLED TRUST CHECK. [BETA TEST]"
+	${GIT_GPG_CMD} --gpgconf-test || true
 fi
 sudo git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || (sudo git show --show-signature | fgrep ": " | fgrep "Signature made" && sudo git show --show-signature | fgrep ": " | fgrep "Invalid public key algorithm" ) || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
