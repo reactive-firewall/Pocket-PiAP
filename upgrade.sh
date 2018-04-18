@@ -232,6 +232,22 @@ SSH_SERVER=$(echo ${SSH_CONNECTION} | cut -d\  -f 3 )
 message "Status: Upgrade failed."
 message "Please report this issue at https://github.com/reactive-firewall/Pocket-PiAP/issues"
 message "[BETA] Please include the contents of this log \"${PIAP_LOG_PATH}\""
+if [[ ( $CI == "circleci" ) ]] ; then
+	message "[BETA] Environment details:"
+	env
+	pwd
+	message "[BETA] ROLL_BACK=${ROLL_BACK}"
+	message "[BETA] WARN_VAR=${WARN_VAR}"
+	message "[BETA] PIAP_UI_BRANCH=${PIAP_UI_BRANCH}"
+	message "[BETA] PIAP_USER=${PIAP_USER}"
+	message "[BETA] PIAP_GROUP=${PIAP_GROUP}"
+	message "[BETA] PIAP_LOG_NAME=${PIAP_LOG_NAME}"
+	message "[BETA] PIAP_LOG_PATH=${PIAP_LOG_PATH}"
+	message "[BETA] GIT_GPG_CMD=${GIT_GPG_CMD}"
+	${GIT_GPG_CMD} --list-sigs
+	sudo git show --show-signature | fgrep ": "
+	git config --list
+fi	
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT} -r ${LOGNAME:-youruser}@${SSH_SERVER}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
 else
