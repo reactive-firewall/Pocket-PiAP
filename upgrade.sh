@@ -6,7 +6,7 @@ WARN_VAR=0
 
 umask 027
 
-PIAP_UI_BRANCH="${PIAP_UI_BRANCH:-stable}"
+export PIAP_UI_BRANCH="${PIAP_UI_BRANCH:-stable}"
 
 PIAP_USER=${PIAP_USER:-0}
 PIAP_GROUP=${PIAP_GROUP:-0}
@@ -112,6 +112,7 @@ message "Fetching upgrade files..."
 # data
 git clone -b ${PIAP_UI_BRANCH:-stable} https://github.com/reactive-firewall/Pocket-PiAP.git || true ;
 cd ./Pocket-PiAP || ROLL_BACK=2 ;
+message "Selecting branch ${PIAP_UI_BRANCH:-stable}"
 git fetch || ROLL_BACK=2 ;
 git pull || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
