@@ -266,7 +266,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Requested."
 
 /etc/ssl/PiAPCA/PiAP_CA.pem: /etc/ssl/PiAPCA/private/PiAP_CA.csr must_be_root
-	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_CA.csr -out /etc/ssl/PiAPCA/PiAP_CA.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_CA_cert 2>/dev/null
+	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_CA.csr -out /etc/ssl/PiAPCA/PiAP_CA.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_CA_cert
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Self-Signed."
 
