@@ -6,7 +6,7 @@ WARN_VAR=0
 
 umask 027
 
-export PIAP_UI_BRANCH="${PIAP_UI_BRANCH:-stable}"
+export PIAP_UI_BRANCH="${PIAP_UI_BRANCH:-master}"
 
 PIAP_USER=${PIAP_USER:-0}
 PIAP_GROUP=${PIAP_GROUP:-0}
