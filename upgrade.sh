@@ -41,7 +41,7 @@ function check_path() {
 		umask 0022
 		mkdir -p "${THEPATH}" 2>/dev/null || DID_WORK=1 ;
 		chown "${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}}" "${THEPATH}" 2>/dev/null || DID_WORK=1 ;
-		umask $OLDMASK
+		umask "$OLDMASK"
 		message "DONE"
 	fi
 	return $DID_WORK
@@ -57,7 +57,7 @@ function check_link() {
 		check_path "${THEPATH}"
 		message "Ensuring Links [\"${THEPATH}\"]"
 		ln -sf "${THEPATH}" "${THELINK}" 2>/dev/null || test -L "${THELINK}" || stat "${THELINK}" || DID_WORK=1 ;
-		chown -h ${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}} "${THELINK}" 2>/dev/null || true ;
+		chown -h "${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}}" "${THELINK}" 2>/dev/null || true ;
 		message "DONE"
 	fi
 	return $DID_WORK
