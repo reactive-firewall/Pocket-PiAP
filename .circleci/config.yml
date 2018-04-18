@@ -16,7 +16,7 @@ jobs:
       - run:
           name: "install dependencies"
           command: |
-            sudo apt-get -y install build-essential make git ; wait ;
+            sudo apt-get -y install build-essential make git gnupg2 ; wait ;
       - checkout
       - run:
           shell: /bin/bash
