@@ -14,6 +14,10 @@ jobs:
           command: |
             sudo apt-get -yq update ; wait ;
       - run:
+          name: "upgrade apt"
+          command: |
+            sudo apt-get -yq dist-upgrade || sudo apt-get -f -y dist-upgrade ; wait ;
+      - run:
           name: "install dependencies"
           command: |
             sudo apt-get -y install build-essential make git gnupg2 ; wait ;
