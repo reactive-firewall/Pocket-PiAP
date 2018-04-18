@@ -138,7 +138,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_ABC.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
 	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key DE1F0294A79F5244 2>/dev/null || WARN_VAR=2 ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_D.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 055521972A2DF921 2>/dev/null || WARN_VAR=2 ; wait ;
+	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 055521972A2DF921 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_E.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
 	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 7A4FC8AFC5FF91EE 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_F.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
@@ -167,9 +167,8 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 else
 	ROLL_BACK=3 ;
 	message "DISABLED TRUST CHECK. [BETA TEST]"
-	${GIT_GPG_CMD} --gpgconf-test || true
 fi
-sudo git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || (sudo git show --show-signature | fgrep ": " | fgrep "Signature made" && sudo git show --show-signature | fgrep ": " | fgrep "Invalid public key algorithm" ) || ROLL_BACK=1 ;
+sudo git show --show-signature | fgrep ": " | fgrep "Pocket PiAP Codesign CA" | fgrep "Good signature" || (sudo git show --show-signature | fgrep ": " | fgrep "Signature made" && sudo git show --show-signature | fgrep ": " | fgrep "Invalid public key algorithm" || true ) || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
 	message "[MISSING BETA KEY ISSUE] need to download keys F55A399B1FE18BCB, 055521972A2DF921, 1B38E552E4E90FDB, 157F7C20C1B17EAF and the current beta key. Probably 87F06F1425B180C7... [FIX ME]"
