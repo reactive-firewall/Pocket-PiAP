@@ -181,25 +181,15 @@ uninstall-optsbin: must_be_root
 	$(QUIET)$(RMDIR) /opt/PiAP/sbin 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 	
-install-wpa-actions: install-optroot must_be_root
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/wpa_actions
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/list_networks /opt/PiAP/wpa_actions/list_networks
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/status
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/add_network
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/add_network_primitive
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/clear_blacklist
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/count_networks
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/del_network_primitive
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/list_blacklist
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/load_config
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/log_msg
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/ping_wpa
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/readycheck
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/save_config
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/select_network
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/set_network_primitive
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/toggle_blacklist
+install-wpa-actions: install-optroot must_be_root /opt/PiAP/wpa_actions/list_networks /opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/add_network /opt/PiAP/wpa_actions/add_network_primitive /opt/PiAP/wpa_actions/clear_blacklist /opt/PiAP/wpa_actions/count_networks /opt/PiAP/wpa_actions/del_network_primitive /opt/PiAP/wpa_actions/list_blacklist /opt/PiAP/wpa_actions/load_config /opt/PiAP/wpa_actions/log_msg /opt/PiAP/wpa_actions/ping_wpa /opt/PiAP/wpa_actions/readycheck /opt/PiAP/wpa_actions/save_config /opt/PiAP/wpa_actions/select_network /opt/PiAP/wpa_actions/select_network /opt/PiAP/wpa_actions/set_network_primitive /opt/PiAP/wpa_actions/toggle_blacklist
 	$(QUIET)$(ECHO) "$@: Done."
+
+/opt/PiAP/wpa_actions/%: ./PiAP/opt/PiAP/wpa_actions/% must_be_root /opt/PiAP/wpa_actions/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) $< $@
+	$(QUIET)$(ECHO) "$@: installed."
+
+/opt/PiAP/wpa_actions/: install-optroot must_be_root /opt/PiAP/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/wpa_actions
 
 uninstall-wpa-actions: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/wpa_actions/list_networks 2>/dev/null || true
@@ -270,7 +260,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Requested."
 
 /etc/ssl/PiAPCA/PiAP_CA.pem: /etc/ssl/PiAPCA/private/PiAP_CA.csr must_be_root
-	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_CA.csr -out /etc/ssl/PiAPCA/PiAP_CA.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_CA_cert
+	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_CA.csr -out /etc/ssl/PiAPCA/PiAP_CA.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_CA_cert 2>/dev/null >/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Self-Signed."
 
