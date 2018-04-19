@@ -31,10 +31,11 @@ oid_section				= basic_oids
 # x_680_oid				= 0
 
 # ITU-T Data - unofficial value
-x_680_data				= 0.9
+#x_680_data				= 0.9
 
 # unofficial data Object identifiers (PPS)
-x_680_DOID				= ${x_680_data}.2342
+#x_680_DOID				= ${x_680_data}.2342
+x_680_DOID				= 0.9.2342
 
 # UCL Data networks
 x_680_DN				= ${x_680_DOID}.19200300
