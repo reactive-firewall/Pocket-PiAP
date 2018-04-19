@@ -112,7 +112,7 @@ fi
 message "Backing up Complete"
 message "Disabling web-server to prevent inconsistent state. All sessions will be logged out."
 sudo service nginx stop || true ;
-sudo service php5-fpm stop || true ;
+sudo service php5-fpm stop 2>/dev/null || true ;
 sudo service php7.0-fpm stop 2>/dev/null || true ;
 message "Fetching upgrade files..."
 # data
@@ -230,9 +230,9 @@ else
 	message "SSH keys seem fine."
 fi
 message "Restarting web-server."
-sudo service php5-fpm start || ROLL_BACK=1 ;
+sudo service php5-fpm start || sudo service php7.0-fpm start || ROLL_BACK=1 ;
 sudo service nginx start || ROLL_BACK=1 ;
-sudo service php5-fpm restart || ROLL_BACK=1 ;
+sudo service php5-fpm restart || sudo service php7.0-fpm restart || ROLL_BACK=1 ;
 message "DONE"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 SSH_PORT=$(echo ${SSH_CONNECTION} | cut -d\  -f 4 )
