@@ -435,7 +435,7 @@ purge: clean uninstall remove-PiAP-keyring
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test
 	$(QUIET)$(CP) ./units/PiAP-python-tools/.coverage ./.coverage || true
 	$(QUIET)$(CP) ./units/PiAP-python-tools/.coverage.xml ./.coverage.xml 2>/dev/null || true
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test
