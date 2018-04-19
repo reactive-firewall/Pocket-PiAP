@@ -926,10 +926,10 @@ inhibitAnyPolicy = 2
 
 ####################################################################
 [polsect_root]
- policyIdentifier=2.16.840.1.101.2.1.11.19,2.16.840.1.113733.1.7.23.6
+ policyIdentifier=2.16.840.1.101.2.1.11.19
  userNotice.1=@notice_all
  userNotice.2=@notice_root
- userNotice.3=@notice_smart_card_dod
+# userNotice.3=@notice_smart_card_dod
 # policyIdentifier = ${DOD_POLICY_SC},${verisign_class_ev}
 #nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
 # nameConstraints=permitted;email:.somedomain.com
