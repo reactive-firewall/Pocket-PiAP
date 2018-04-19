@@ -10,6 +10,9 @@
 
 ### Dependencies:
 
+![Languages](https://img.shields.io/github/languages/count/reactive-firewall/Pocket-PiAP.svg)
+![Size](https://img.shields.io/github/languages/code-size/reactive-firewall/Pocket-PiAP.svg)
+
 #### Python Tools
 
 [![Build Status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
@@ -21,6 +24,9 @@
 [![Build Status](https://travis-ci.org/reactive-firewall/PiAP-Webroot.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-Webroot)
 
 # Pocket PiAP is still in private beta. FOSS under heavy development, No production support at this time. USE AT OWN RISK.
+
+![issues](https://img.shields.io/github/issues-raw/reactive-firewall/Pocket-PiAP.svg)
+![pr](https://img.shields.io/github/issues-pr-raw/reactive-firewall/Pocket-PiAP.svg)
 
 ### License
 

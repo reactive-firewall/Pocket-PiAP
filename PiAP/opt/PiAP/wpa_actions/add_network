@@ -85,11 +85,19 @@ touch ${LOCK_FILE} 2>/dev/null || exit 0 ;
 
 # actual action
 $(dirname $0)/load_config
-NEW_NET_ID=$($(dirname $0)/add_network_primitive 2>/dev/null)
-$(dirname $0)/set_network_primitive ${NEW_NET_ID} mgmt "WPA-PSK"
-$(dirname $0)/set_network_primitive ${NEW_NET_ID} ssid "${1:-any}"
-$(dirname $0)/set_network_primitive ${NEW_NET_ID} psk "${2:-password}"
-$(dirname $0)/save_config
+NEW_NET_ID=$($(dirname $0)/add_network_primitive 2>/dev/null | grep -Eo '^([0-9]+){1}' | tail -n 1)
+
+#echo "add_network" >3
+echo "set_network ${NEW_NET_ID} ssid \"${1:-any}\"" >3
+echo "set_network ${NEW_NET_ID} key_mgmt WPA2-PSK" >>3
+echo "set_network ${NEW_NET_ID} proto RSN" >>3
+echo "set_network ${NEW_NET_ID} psk \"${2:-password}\"" >>3
+echo "enable_network ${NEW_NET_ID}" >>3
+echo "save_config" >>3
+echo "quit" >>3
+/sbin/wpa_cli <3 ; wait ;
+
+echo -n "" >3
 
 rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ;
 

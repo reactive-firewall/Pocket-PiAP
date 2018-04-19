@@ -1,0 +1,58 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/Pocket-PiAP
+    docker:
+      - image: circleci/buildpack-deps:latest
+        environment:
+          CI: cicleci
+          DEBIAN_FRONTEND: noninteractive
+          SHELL: /bin/bash
+    steps:
+      - run:
+          name: "update apt"
+          command: |
+            sudo apt-get -yq update ; wait ;
+      - run:
+          name: "upgrade apt"
+          command: |
+            sudo apt-get -yq dist-upgrade || sudo apt-get -f -y dist-upgrade ; wait ;
+      - run:
+          name: "install dependencies"
+          command: |
+            sudo apt-get -y install build-essential make git gnupg2 nginx nginx-full php-fpm dnsmasq hostapd python3 python3-pip ; wait ;
+      - checkout
+      - run:
+          shell: /bin/bash
+          name: "fetch and pull"
+          command: |
+            git fetch && git pull --all && (git init || true ) && git submodule update --remote --checkout || true
+      - run:
+          name: "clean apt"
+          command: |
+            sudo apt-get autoclean ; wait ;
+      - run:
+          shell: /bin/bash
+          name: "clean up for test"
+          command: |
+            make clean || true
+      - run:
+          name: "fetch not pull"
+          command: |
+            curl -fsSL --tlsv1.2 --url https://raw.githubusercontent.com/reactive-firewall/Pocket-PiAP/${CIRCLE_SHA1:-stable}/upgrade.sh -o ~/Pocket-PiAP/upgrade.sh 2>/dev/null || true
+      - run:
+          shell: /bin/bash
+          name: "install attempt"
+          command: |
+            export PIAP_UI_BRANCH="${CIRCLE_BRANCH:-stable}" && sudo bash ~/Pocket-PiAP/upgrade.sh || true
+      - run:
+          shell: /bin/bash
+          name: "Unit Tests"
+          command: |
+            make test
+      - run:
+          shell: /bin/bash
+          name: "clean up when done"
+          command: |
+            make clean
+destination: build

@@ -2,7 +2,7 @@
 
 # License
 #
-# Copyright (c) 2017 Mr. Walls
+# Copyright (c) 2017-2018 Mr. Walls
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,7 +33,11 @@ ifeq "$(LINK)" ""
 endif
 
 ifeq "$(MAKE)" ""
-	MAKE=make
+	MAKE=`which make`
+endif
+
+ifeq "$(GIT)" ""
+	GIT=git
 endif
 
 ifeq "$(WAIT)" ""
@@ -123,24 +127,34 @@ install: install-dsauth install-webroot install-optroot install-wpa-actions inst
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-optroot: ./PiAP must_be_root
+install-users: ./PiAP must_be_root
 	$(QUIET)addgroup --system --force-badname pocket 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-admin 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-www 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-dns 2>/dev/null || true
-	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket  pocket 2>/dev/null || true
-	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket-admin pocket-admin 2>/dev/null || true
-	$(QUIET)adduser --system --disabled-password --home /srv/PiAP/ --shell /bin/bash --force-badname --no-create-home --group pocket-www pocket-www 2>/dev/null || true
-	$(QUIET)adduser --system --disabled-password --home /usr/lib/misc --shell /bin/bash --force-badname --no-create-home --group pocket-dns pocket-dns 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket  pocket 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket-admin pocket-admin 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /srv/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket-www pocket-www 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /usr/lib/misc --shell /bin/bash --force-badname --no-create-home --ingroup pocket-dns pocket-dns 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket-dns,pocket-www,pocket,netdev pocket-admin 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket,www-data pocket-www 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket pocket-dns 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket-www www-data 2>/dev/null || true
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/
+	$(QUIET)$(ECHO) "$@: Done."
+
+install-optroot: ./PiAP must_be_root install-users /opt/PiAP/
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall-optroot: /opt/PiAP/ uninstall-wpa-actions uninstall-hostapd-actions uninstall-optbin uninstall-optsbin must_be_root
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/ || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+/opt/PiAP/: /opt/ must_be_root install-users
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/
+	$(QUIET)$(ECHO) "$@: Done."
+
+/opt/: must_be_root install-users
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /opt/
 	$(QUIET)$(ECHO) "$@: Done."
 
 install-optbin: install-optroot must_be_root
@@ -256,7 +270,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Requested."
 
 /etc/ssl/PiAPCA/PiAP_CA.pem: /etc/ssl/PiAPCA/private/PiAP_CA.csr must_be_root
-	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_CA.csr -out /etc/ssl/PiAPCA/PiAP_CA.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_CA_cert 2>/dev/null
+	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_CA.csr -out /etc/ssl/PiAPCA/PiAP_CA.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_CA_cert
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Self-Signed."
 
@@ -365,7 +379,7 @@ remove-PiAP-sudoers: must_be_root
 	$(QUIET)$(RM) /etc/sudoers.d/001_PiAP 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-configure-PiAP-dnsmasq: install-optroot /etc/ must_be_root
+configure-PiAP-dnsmasq: install-optroot /etc/ /etc/dnsmasq.d/ must_be_root
 	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_WEB_OPTS) ./PiAP/etc/dnsmasq.conf /etc/dnsmasq.conf
 	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_WEB_OPTS) ./PiAP/etc/dnsmasq.d/dnsmasq.PiAP.conf /etc/dnsmasq.d/dnsmasq.PiAP.conf
 	$(QUIET)$(ECHO) "$@: Done."
@@ -425,20 +439,19 @@ purge: clean uninstall remove-PiAP-keyring
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test || true
+	$(QUIET)$(GIT) submodule foreach make test 2>/dev/null || true
 	$(QUIET)$(CP) ./units/PiAP-python-tools/.coverage ./.coverage || true
 	$(QUIET)$(CP) ./units/PiAP-python-tools/.coverage.xml ./.coverage.xml 2>/dev/null || true
-	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup test
+	$(QUIET)$(GIT) submodule foreach make test-tox 2>/dev/null || true
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test-tox
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
-	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile cleanup 2>/dev/null || true
-	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile cleanup 2>/dev/null || true
+	$(QUIET)$(GIT) submodule foreach make cleanup 2>/dev/null || true
 	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
 	$(QUIET)rm -Rf tests/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -f PiAP/*.pyc 2>/dev/null || true
@@ -465,8 +478,7 @@ cleanup:
 	$(QUIET)rm -f ./the_test_file.txt 2>/dev/null || true
 
 clean: cleanup
-	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile clean 2>/dev/null || true
-	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile clean 2>/dev/null || true
+	$(QUIET)$(GIT) submodule foreach make clean 2>/dev/null || true
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 

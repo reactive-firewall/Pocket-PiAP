@@ -1,0 +1,19 @@
+#! /bin/bash
+# create a file disk image and mount it
+PIAP_BLK_CHUNK_INDEX="A"
+PIAP_BLK_CHUNK_PREFIX="/tmp"
+PIAP_BLK_CHUNK_BLOCK_SIZE="1"
+PIAP_BLK_CHUNK_BLOCK_UNITS="M"
+PIAP_BLK_CHUNK_PAGE_SIZE=$((500*${PIAP_BLK_CHUNK_BLOCK_SIZE}))
+PIAP_BLK_CHUNK_FQDN="${PIAP_BLK_CHUNK_PREFIX}/pocket_drive_${PIAP_BLK_CHUNK_INDEX}.img"
+PIAP_BLK_CHUNK_MOUNT_POINT="/mnt/drive_${PIAP_BLK_CHUNK_INDEX}"
+fallocate -l ${PIAP_BLK_CHUNK_BLOCK_SIZE:-500}${PIAP_BLK_CHUNK_BLOCK_UNITS:-M} "${PIAP_BLK_CHUNK_FQDN}"
+dd if=/dev/zero of=${PIAP_BLK_CHUNK_FQDN} count=${PIAP_BLK_CHUNK_PAGE_SIZE:-500} bs=${PIAP_BLK_CHUNK_BLOCK_SIZE}${PIAP_BLK_CHUNK_BLOCK_UNITS:-M}
+mkfs -t ext4 ${PIAP_BLK_CHUNK_FQDN}
+sudo mkdir ${PIAP_BLK_CHUNK_MOUNT_POINT}
+sudo mount -o dirsync,acl -t ext4 ${PIAP_BLK_CHUNK_FQDN} ${PIAP_BLK_CHUNK_MOUNT_POINT:-/mnt/drive_unknown/}
+
+
+exit 0 ;
+
+#lsblk --list --ascii | grep -E "^([mmcblk0]+){1}[p]{1}[0-9]\s+" | tr -s ' \t' ' ' | cut -d \  -f4
