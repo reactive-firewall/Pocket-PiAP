@@ -375,7 +375,7 @@ remove-PiAP-sudoers: must_be_root
 	$(QUIET)$(RM) /etc/sudoers.d/001_PiAP 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-configure-PiAP-dnsmasq: install-optroot /etc/ must_be_root
+configure-PiAP-dnsmasq: install-optroot /etc/ /etc/dnsmasq.d/ must_be_root
 	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_WEB_OPTS) ./PiAP/etc/dnsmasq.conf /etc/dnsmasq.conf
 	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_WEB_OPTS) ./PiAP/etc/dnsmasq.d/dnsmasq.PiAP.conf /etc/dnsmasq.d/dnsmasq.PiAP.conf
 	$(QUIET)$(ECHO) "$@: Done."
