@@ -1,5 +1,6 @@
 #! /bin/bash
 
+CI="${CI:-false}"
 ROLL_BACK=0
 
 WARN_VAR=0
@@ -24,9 +25,9 @@ function message() {
 function check_depends() {
 	local THEDEPENDS=$"${1:-python3}"
 	local DID_WORK=0
-	if [[ ( $(dpkg --list | grep -E "^ii\s" | tr -s '\s' ' ' | cut -d \  -f 2 | grep -F -c "${THEDEPENDS}" ) -le 0 ) ]] ; then
+if [[ ( $(dpkg --list | grep -E "^[i]{2}[[:space:]]+" | tr -s '\s' ' ' | cut -d \  -f 2 | grep -F -c "${THEDEPENDS}" ) -le 0 ) ]] ; then
 		message "Installing new dependencies. [\"${THEDEPENDS}\"]"
-		sudo apt-get install -y ${THEDEPENDS} 2>/dev/null || DID_WORK=1 ;
+		sudo apt-get install -y "${THEDEPENDS}" 2>/dev/null || DID_WORK=1 ;
 		message "DONE"
 	fi
 	return $DID_WORK
@@ -240,7 +241,7 @@ SSH_SERVER=$(echo ${SSH_CONNECTION} | cut -d\  -f 3 )
 message "Status: Upgrade failed."
 message "Please report this issue at https://github.com/reactive-firewall/Pocket-PiAP/issues"
 message "[BETA] Please include the contents of this log \"${PIAP_LOG_PATH}\""
-if [[ ( $CI == "circleci" ) ]] ; then
+if [[ $CI ]] ; then
 	message "[BETA] Environment details:"
 	env
 	pwd
@@ -253,7 +254,7 @@ if [[ ( $CI == "circleci" ) ]] ; then
 	message "[BETA] PIAP_LOG_PATH=${PIAP_LOG_PATH}"
 	message "[BETA] GIT_GPG_CMD=${GIT_GPG_CMD}"
 	${GIT_GPG_CMD} --list-sigs
-	sudo git show --show-signature | fgrep ": "
+	sudo git show --show-signature | grep -F ": "
 	git config --list
 fi	
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
