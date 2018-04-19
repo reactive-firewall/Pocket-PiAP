@@ -6,7 +6,7 @@ WARN_VAR=0
 
 umask 027
 
-export PIAP_UI_BRANCH="${PIAP_UI_BRANCH:-master}"
+export PIAP_UI_BRANCH="${PIAP_UI_BRANCH:-stable}"
 
 PIAP_USER=${PIAP_USER:-0}
 PIAP_GROUP=${PIAP_GROUP:-0}
@@ -231,7 +231,7 @@ else
 fi
 message "Restarting web-server."
 sudo service php5-fpm start || sudo service php7.0-fpm start || ROLL_BACK=1 ;
-sudo service nginx start || ROLL_BACK=1 ;
+sudo service nginx start || sudo service nginx status || ROLL_BACK=1 ;
 sudo service php5-fpm restart || sudo service php7.0-fpm restart || ROLL_BACK=1 ;
 message "DONE"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
