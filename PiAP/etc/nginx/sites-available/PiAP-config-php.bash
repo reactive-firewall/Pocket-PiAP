@@ -22,11 +22,15 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 #
-if [[ ( $(php --version | grep -oF "PHP 7" | wc -l ) -gt 0 )]] ; then
-	if [[ ( $(grep -oF "php5" /etc/nginx/sites-available/PiAP | wc -l ) -gt 0 )]] ; then
-		sed -E -e 's/php5/php7.0/g' /etc/nginx/sites-available/PiAP ;
+umask 0027
+if [[ ( $(php --version | grep -oF "PHP 7" | wc -l ) -gt 0 ) ]] ; then
+	echo "detected PHP 7"
+	if [[ ( $(grep -oF "php5" /etc/nginx/sites-available/PiAP | wc -l ) -gt 0 ) ]] ; then
 		echo "Reconfigure for PHP 7" ;
+		mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp ;
+		sed -E -e 's/php5/php7.0/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 	fi
+	ls -lap /var/run/ | grep -F "php"
 fi
 
 exit 0;
