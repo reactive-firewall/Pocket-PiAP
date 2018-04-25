@@ -264,7 +264,7 @@ if [[ $CI ]] ; then
 	bash --version
 	nginx --version
 	head -n 4000 /etc/nginx/sites-available/PiAP
-	sudo nginx -t -c /usr/nginx/conf/nginx.conf || true
+	sudo nginx -t -c /etc/nginx/nginx.conf || true
 fi	
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
