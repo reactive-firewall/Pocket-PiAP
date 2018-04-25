@@ -135,7 +135,7 @@ GIT_GPG_CMD=$(git config --get gpg.program)
 GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
 git config --local gpg.program ${GIT_GPG_CMD}
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
-	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
+	message "Enabled TRUST CHECK. [BETA TEST]"
 
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n3\nsave\n' | gpg2 --command-fd 0 --edit-key CF76FC3B8CD0B15F 2>/dev/null || true ; wait ;
@@ -258,6 +258,13 @@ if [[ $CI ]] ; then
 	${GIT_GPG_CMD} --list-sigs
 	sudo git show --show-signature | grep -F ": "
 	git config --list
+	python3 -m piaplib.pocket book version --all || true
+	php --version
+	python3 --version
+	bash --version
+	nginx --version
+	head -n 4000 /etc/nginx/sites-available/PiAP
+	sudo nginx -t -c /usr/nginx/conf/nginx.conf || true
 fi	
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
