@@ -22,8 +22,8 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 #
-if [[ ( $(php --version | grep -F -o "PHP 7" | wc -l ) -gt 0 )]] ;
-	if [[ ( $(grep -F -o "php5" /etc/nginx/sites-available/PiAP | wc -l ) -gt 0 )]] ;
+if [[ ( $(php --version | grep -oF "PHP 7" | wc -l ) -gt 0 )]] ; then
+	if [[ ( $(grep -oF "php5" /etc/nginx/sites-available/PiAP | wc -l ) -gt 0 )]] ; then
 		sed -E -e 's/php5/php7.0/g' /etc/nginx/sites-available/PiAP ;
 		echo "Reconfigure for PHP 7" ;
 	fi
