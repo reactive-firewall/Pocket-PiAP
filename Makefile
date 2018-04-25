@@ -302,6 +302,7 @@ configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem mu
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/snippets/fastcgi-php.conf /etc/nginx/snippets/fastcgi-php.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/snippets/pocket_ssl.conf /etc/nginx/snippets/pocket_ssl.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP 2>/dev/null
+	$(QUIET)bash ./PiAP/etc/nginx/sites-available/PiAP-config-php.bash || true
 	$(QUIET)ln -sf /etc/nginx/sites-available/PiAP /etc/nginx/sites-enabled/PiAP 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
