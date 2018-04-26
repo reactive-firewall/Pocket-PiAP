@@ -306,7 +306,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)ln -sf ../PiAPCA/certs/PiAP_SSL.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Installed."
 
-configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem must_be_root /etc/nginx/sites-enabled/
+configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem must_be_root /etc/nginx/sites-enabled/ remove-nginx-default
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi.conf /etc/nginx/fastcgi.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi_params /etc/nginx/fastcgi_params 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/nginx.conf /etc/nginx/nginx.conf 2>/dev/null
@@ -331,6 +331,14 @@ remove-httpd: must_be_root
 	$(QUIET)$(RM) /etc/nginx/nginx.conf 2>/dev/null || true
 	$(QUIET)$(RM) /etc/nginx/sites-available/PiAP 2>/dev/null || true
 	$(QUIET)unlink /etc/nginx/sites-enabled/PiAP 2>/dev/null || true
+	$(QUITE)$(WAIT)
+	$(QUIET)$(ECHO) "$@: Done."
+
+remove-nginx-default: must_be_root /etc/nginx/sites-enabled/
+	$(QUIET)$(RM) /etc/nginx/sites-available/default 2>/dev/null || true
+	$(QUIET)unlink /etc/nginx/sites-available/default 2>/dev/null || true
+	$(QUIET)$(RM) /etc/nginx/sites-enabled/default 2>/dev/null || true
+	$(QUIET)unlink /etc/nginx/sites-enabled/default 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
