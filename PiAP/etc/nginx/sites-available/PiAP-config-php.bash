@@ -30,7 +30,7 @@ if [[ ( $(php --version | grep -oF "PHP 7" | wc -l ) -gt 0 ) ]] ; then
 		mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp ;
 		sed -E -e 's/php5/php7.0/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 	fi
-	ls -lap /var/run/ | grep -F "php"
+	ls -1 /var/run/php* 2>/dev/null || true ; # REMOVE AFTER DEBUGGING CI
 fi
 
 exit 0;
