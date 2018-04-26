@@ -232,7 +232,7 @@ else
 fi
 message "Restarting web-server."
 sudo service php5-fpm start 2>/dev/null || sudo service php7.0-fpm start 2>/dev/null || ROLL_BACK=1 ;
-sudo service nginx start || ROLL_BACK=1 ;
+sudo service nginx start || sudo rm -vf /etc/nginx/sites-enabled/default 2>/dev/null || true && sudo service nginx start || ROLL_BACK=1 ;
 sudo systemctl status nginx.service || sudo service nginx status ;
 sudo service php5-fpm restart 2>/dev/null || sudo service php7.0-fpm restart 2>/dev/null || ROLL_BACK=1 ;
 message "DONE"
