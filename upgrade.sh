@@ -17,8 +17,7 @@ PIAP_LOG_PATH=${PIAP_LOG_PATH:-"/tmp/${PIAP_LOG_NAME:-PiAP_update_log.log}"}
 function message() {
 	local PIAP_MESSAGE="${@}"
 	echo ""
-	echo "${PIAP_MESSAGE}" | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
-	echo ""
+	echo "${PIAP_MESSAGE}" | tee -a "${PIAP_LOG_PATH}" 2>/dev/null || true
 	return 0
 }
 
@@ -258,12 +257,12 @@ if [[ $CI ]] ; then
 	${GIT_GPG_CMD} --list-sigs
 	sudo git show --show-signature | grep -F ": "
 	git config --list
+	python3 --version
 	python3 -m piaplib.pocket book version --all || true
 	php --version
-	python3 --version
 	bash --version
-	nginx --version
 	head -n 4000 /etc/nginx/sites-available/PiAP
+	head -n 4000 /etc/nginx/sites-available/default
 	sudo nginx -t -c /etc/nginx/nginx.conf || true
 fi	
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"

@@ -127,7 +127,7 @@ install: install-dsauth install-webroot install-optroot install-wpa-actions inst
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-users: ./PiAP must_be_root /usr/lib/misc
+install-users: ./PiAP must_be_root /usr/lib/misc/
 	$(QUIET)addgroup --system --force-badname pocket 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-admin 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-www 2>/dev/null || true
@@ -142,8 +142,9 @@ install-users: ./PiAP must_be_root /usr/lib/misc
 	$(QUIET)usermod -a -G pocket-www www-data 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-/usr/lib/misc: /usr/lib/
+/usr/lib/misc/: /usr/lib/
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /usr/lib/misc || true
+	$(QUIET)$(ECHO) "$@: Done."
 
 install-optroot: ./PiAP must_be_root install-users /opt/PiAP/
 	$(QUIET)$(ECHO) "$@: Done."
@@ -305,7 +306,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)ln -sf ../PiAPCA/certs/PiAP_SSL.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Installed."
 
-configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem must_be_root
+configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem must_be_root /etc/nginx/sites-enabled/
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi.conf /etc/nginx/fastcgi.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi_params /etc/nginx/fastcgi_params 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/nginx.conf /etc/nginx/nginx.conf 2>/dev/null
@@ -316,6 +317,7 @@ configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem mu
 	$(QUIET)bash ./PiAP/etc/nginx/sites-available/PiAP-config-php.bash || true
 	$(QUIET)ln -sf /etc/nginx/sites-available/PiAP /etc/nginx/sites-enabled/PiAP 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Disabling default sites."
+	$(QUIET)$(RM) /etc/nginx/sites-enabled/default 2>/dev/null || true
 	$(QUIET)unlink /etc/nginx/sites-enabled/default 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
