@@ -114,7 +114,7 @@ endif
 
 SHELL=/bin/bash
 
-PHONY: must_be_root cleanup 
+PHONY: must_be_root cleanup remove-nginx-default
 
 build:
 	$(QUIET)$(ECHO) "No need to build. Try make -f Makefile install"
@@ -135,7 +135,7 @@ install-users: ./PiAP must_be_root /usr/lib/misc/
 	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket  pocket 2>/dev/null || true
 	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket-admin pocket-admin 2>/dev/null || true
 	$(QUIET)adduser --system --disabled-password --home /srv/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket-www pocket-www 2>/dev/null || true
-	$(QUIET)adduser --system --disabled-password --home /usr/lib/misc --shell /bin/bash --force-badname --no-create-home --ingroup pocket-dns pocket-dns 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /usr/lib/misc/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket-dns pocket-dns 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket-dns,pocket-www,pocket,netdev pocket-admin 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket,www-data pocket-www 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket pocket-dns 2>/dev/null || true
@@ -143,7 +143,7 @@ install-users: ./PiAP must_be_root /usr/lib/misc/
 	$(QUIET)$(ECHO) "$@: Done."
 
 /usr/lib/misc/: /usr/lib/
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /usr/lib/misc || true
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /usr/lib/misc 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 install-optroot: ./PiAP must_be_root install-users /opt/PiAP/
@@ -316,9 +316,6 @@ configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem mu
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP 2>/dev/null
 	$(QUIET)bash ./PiAP/etc/nginx/sites-available/PiAP-config-php.bash || true
 	$(QUIET)ln -sf /etc/nginx/sites-available/PiAP /etc/nginx/sites-enabled/PiAP 2>/dev/null || true
-	$(QUIET)$(ECHO) "$@: Disabling default sites."
-	$(QUIET)$(RM) /etc/nginx/sites-enabled/default 2>/dev/null || true
-	$(QUIET)unlink /etc/nginx/sites-enabled/default 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -335,6 +332,7 @@ remove-httpd: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 remove-nginx-default: must_be_root /etc/nginx/sites-enabled/
+	$(QUIET)$(ECHO) "$@: Disabling default sites."
 	$(QUIET)$(RM) /etc/nginx/sites-available/default 2>/dev/null || true
 	$(QUIET)unlink /etc/nginx/sites-available/default 2>/dev/null || true
 	$(QUIET)$(RM) /etc/nginx/sites-enabled/default 2>/dev/null || true
