@@ -127,7 +127,7 @@ install: install-dsauth install-webroot install-optroot install-wpa-actions inst
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-users: ./PiAP must_be_root
+install-users: ./PiAP must_be_root /usr/lib/misc
 	$(QUIET)addgroup --system --force-badname pocket 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-admin 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-www 2>/dev/null || true
@@ -141,6 +141,9 @@ install-users: ./PiAP must_be_root
 	$(QUIET)usermod -a -G pocket pocket-dns 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket-www www-data 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
+
+/usr/lib/misc: /usr/lib/
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /usr/lib/misc || true
 
 install-optroot: ./PiAP must_be_root install-users /opt/PiAP/
 	$(QUIET)$(ECHO) "$@: Done."
@@ -157,11 +160,15 @@ uninstall-optroot: /opt/PiAP/ uninstall-wpa-actions uninstall-hostapd-actions un
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /opt/
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-optbin: install-optroot must_be_root
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/bin
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/bin/blink_LED.bash /opt/PiAP/bin/blink_LED.bash
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/bin/virus_scan.bash /opt/PiAP/bin/virus_scan.bash
+install-optbin: install-optroot must_be_root /opt/PiAP/bin/blink_LED.bash /opt/PiAP/bin/virus_scan.bash
 	$(QUIET)$(ECHO) "$@: Done."
+
+/opt/PiAP/bin/%: ./PiAP/opt/PiAP/bin/% must_be_root /opt/PiAP/bin/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) $< $@
+	$(QUIET)$(ECHO) "$@: installed."
+
+/opt/PiAP/bin/: install-optroot must_be_root /opt/PiAP/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/bin
 
 uninstall-optbin: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/bin/blink_LED.bash 2>/dev/null || true
@@ -169,11 +176,15 @@ uninstall-optbin: must_be_root
 	$(QUIET)$(RMDIR) /opt/PiAP/bin 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-optsbin: install-optroot must_be_root
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/sbin
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/sbin/kick_client /opt/PiAP/sbin/kick_client
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/sbin/autosign_client /opt/PiAP/sbin/autosign_client
+install-optsbin: install-optroot must_be_root /opt/PiAP/sbin/ /opt/PiAP/sbin/kick_client /opt/PiAP/sbin/autosign_client
 	$(QUIET)$(ECHO) "$@: Done."
+
+/opt/PiAP/sbin/%: ./PiAP/opt/PiAP/sbin/% must_be_root /opt/PiAP/sbin/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) $< $@
+	$(QUIET)$(ECHO) "$@: installed."
+
+/opt/PiAP/sbin/: install-optroot must_be_root /opt/PiAP/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/sbin
 
 uninstall-optsbin: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/sbin/kick_client 2>/dev/null || true
@@ -304,6 +315,8 @@ configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem mu
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP 2>/dev/null
 	$(QUIET)bash ./PiAP/etc/nginx/sites-available/PiAP-config-php.bash || true
 	$(QUIET)ln -sf /etc/nginx/sites-available/PiAP /etc/nginx/sites-enabled/PiAP 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Disabling default sites."
+	$(QUIET)unlink /etc/nginx/sites-enabled/default 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
