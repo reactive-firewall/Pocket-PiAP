@@ -114,7 +114,7 @@ endif
 
 SHELL=/bin/bash
 
-PHONY: must_be_root cleanup
+PHONY: must_be_root cleanup 
 
 build:
 	$(QUIET)$(ECHO) "No need to build. Try make -f Makefile install"
@@ -341,7 +341,7 @@ configure-PiAP-keyring: install-optroot /etc/ssl/PiAPCA/crl /etc/ssl/PiAPCA/cert
 	$(QUITE)$(CHOWN) $(FILE_OWN) /etc/ssl/PiAPCA/index.txt || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-/etc/ssl/PiAPCA: /etc/ssl
+/etc/ssl/PiAPCA/: /etc/ssl
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA 2>/dev/null || true
 
 /etc/ssl/PiAPCA/private: /etc/ssl/PiAPCA/
@@ -416,7 +416,7 @@ remove-PiAP-interfaces: must_be_root
 	$(QUIET)$(RM) /etc/cron.hourly/clear_zeroconf_ip.sh 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-webroot: install-dsauth configure-httpd
+install-webroot: install-dsauth configure-httpd /etc/nginx/
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile install
 	$(QUIET)$(ECHO) "$@: Done."
 
