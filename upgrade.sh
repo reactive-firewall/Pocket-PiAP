@@ -235,7 +235,7 @@ sudo service php5-fpm start 2>/dev/null || sudo service php7.0-fpm start 2>/dev/
 if [[ ${CI} ]] ; then
 	PIAP_IFACE=$(ip route show default | grep -F "default" | grep -oE "[dev]{3}\s[abelhstuwn]{3}[n]?[0-9]+\s" | cut -d \  -f 2 | head -n 1 )
 	PIAP_IP=$( ip route show default | grep -F "${PIAP_IFACE}" | grep -F "via" | cut -d v -f 2 | cut -d \  -f 2 ) ;
-	mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp 2>/dev/null || || ROLL_BACK=1 ;
+	mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp 2>/dev/null || ROLL_BACK=1 ;
 	sed -E -e "s/10.0.40.1/${PIAP_IP:-10.0.40.1}/g" /etc/nginx/sites-available/PiAP.tmp 2>/dev/null | tee /etc/nginx/sites-available/PiAP || ROLL_BACK=3 ;
 	rm -vf /etc/nginx/sites-available/PiAP.tmp || ROLL_BACK=1 ;
 fi
