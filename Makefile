@@ -319,6 +319,10 @@ configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem mu
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
+/etc/hosts: must_be_root
+	$(QUIET)if [[ ( -z $$( grep -F "# PiAP LAN (PiAP.local)" /etc/hosts ) ) ]] ; then $(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/hosts /etc/hosts || exit 2 ; fi
+	$(QUIET)$(ECHO) "$@: Done."	
+
 remove-httpd: must_be_root
 	$(QUIET)$(RM) /etc/nginx/fastcgi.conf 2>/dev/null || true
 	$(QUIET)$(RM) /etc/nginx/fastcgi_params 2>/dev/null || true
