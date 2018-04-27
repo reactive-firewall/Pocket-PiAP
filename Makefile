@@ -455,19 +455,20 @@ purge: clean uninstall remove-PiAP-keyring
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(GIT) submodule foreach make test 2>/dev/null || true
-	$(QUIET)$(CP) ./units/PiAP-python-tools/.coverage ./.coverage || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test
+	$(QUIET)$(CP) ./units/PiAP-python-tools/.coverage ./.coverage 2>/dev/null || true
 	$(QUIET)$(CP) ./units/PiAP-python-tools/.coverage.xml ./.coverage.xml 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup test
-	$(QUIET)$(GIT) submodule foreach make test-tox 2>/dev/null || true
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test-tox
-	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test-tox
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
-	$(QUIET)$(GIT) submodule foreach make cleanup 2>/dev/null || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile cleanup 2>/dev/null || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile cleanup 2>/dev/null || true
 	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
 	$(QUIET)rm -Rf tests/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -f PiAP/*.pyc 2>/dev/null || true
@@ -494,7 +495,8 @@ cleanup:
 	$(QUIET)rm -f ./the_test_file.txt 2>/dev/null || true
 
 clean: cleanup
-	$(QUIET)$(GIT) submodule foreach make clean 2>/dev/null || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile clean 2>/dev/null || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
