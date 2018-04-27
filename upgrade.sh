@@ -233,10 +233,8 @@ fi
 message "Restarting web-server."
 sudo service php5-fpm start 2>/dev/null || sudo service php7.0-fpm start 2>/dev/null || ROLL_BACK=1 ;
 if [[ ${CI} ]] ; then
-	PIAP_IFACE=$(ip route show default | grep -F "default" | grep -oE "[dev]{3}\s[abelhstuwn]{3}[n]?[0-9]+\s" | cut -d \  -f 2 | head -n 1 )
-	PIAP_IP=$( ip route show default | grep -F "${PIAP_IFACE}" | grep -F "via" | cut -d v -f 2 | cut -d \  -f 2 ) ;
 	mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp 2>/dev/null || ROLL_BACK=1 ;
-	sed -E -e "s/10.0.40.1/${PIAP_IP:-10.0.40.1}/g" /etc/nginx/sites-available/PiAP.tmp 2>/dev/null | tee /etc/nginx/sites-available/PiAP || ROLL_BACK=3 ;
+	sed -E -e 's/10.0.40.1://g' /etc/nginx/sites-available/PiAP.tmp 2>/dev/null | tee /etc/nginx/sites-available/PiAP || ROLL_BACK=3 ;
 	rm -vf /etc/nginx/sites-available/PiAP.tmp || ROLL_BACK=1 ;
 fi
 sudo service nginx start || sudo rm -vf /etc/nginx/sites-enabled/default 2>/dev/null || true && sudo service nginx start || ROLL_BACK=1 ;
@@ -262,8 +260,6 @@ if [[ $CI ]] ; then
 	message "[BETA] PIAP_LOG_NAME=${PIAP_LOG_NAME}"
 	message "[BETA] PIAP_LOG_PATH=${PIAP_LOG_PATH}"
 	message "[BETA] GIT_GPG_CMD=${GIT_GPG_CMD}"
-	message "[BETA] PIAP_IFACE=${PIAP_IFACE}"
-	message "[BETA] PIAP_IP=${PIAP_IP}"
 	message "[BETA] GIT ENV"
 	${GIT_GPG_CMD} --list-sigs
 	sudo git show --show-signature | grep -F ": " || true
