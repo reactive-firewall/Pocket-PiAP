@@ -88,6 +88,7 @@ before_install:
   - travis_retry pip install flake || true ;
   - travis_retry pip install codecov || true ;
   - mkdir -p -m 775 /opt/PiAP/ || true ;
+  - rm -vf /opt/PiAP/.beta_* 2>/dev/null || true ;
   - chown -v ${USER} /opt/PiAP/ || true ;
   - echo "travis_fold:end:piap-setup" 2>/dev/null || true
 
