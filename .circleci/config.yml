@@ -42,9 +42,14 @@ jobs:
             curl -fsSL --tlsv1.2 --url https://raw.githubusercontent.com/reactive-firewall/Pocket-PiAP/${CIRCLE_SHA1:-stable}/upgrade.sh -o ~/Pocket-PiAP/upgrade.sh 2>/dev/null || true
       - run:
           shell: /bin/bash
-          name: "install attempt"
+          name: "Install path Tests"
           command: |
             export PIAP_UI_BRANCH="${CIRCLE_BRANCH:-${CIRCLE_SHA1:-master}}" && sudo bash ~/Pocket-PiAP/upgrade.sh || true
+      - run:
+          shell: /bin/bash
+          name: "CWE-501 into CWE-250 attempt"
+          command: |
+            sudo usermod -a -G pocket,pocket-admin circleci || true
       - run:
           shell: /bin/bash
           name: "Unit Tests"
