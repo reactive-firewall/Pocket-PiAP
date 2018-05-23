@@ -52,6 +52,11 @@ jobs:
             sudo usermod -a -G pocket,pocket-admin circleci || true
       - run:
           shell: /bin/bash
+          name: "Break ACL for circle to bootstrap tests"
+          command: |
+            sudo chmod -v 775 /opt/PiAP/ || true
+      - run:
+          shell: /bin/bash
           name: "Unit Tests"
           command: |
             make test
