@@ -58,6 +58,11 @@ jobs:
             sudo chmod -v 775 /opt/PiAP/ || true
       - run:
           shell: /bin/bash
+          name: "Break ACL for circle to bootstrap tests part 2"
+          command: |
+            sudo chown -v circleci /opt/PiAP/ || true
+      - run:
+          shell: /bin/bash
           name: "UnBreak old tests"
           command: |
             sudo rm -vf /opt/PiAP/.beta_* 2>/dev/null || true
