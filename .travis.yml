@@ -28,6 +28,12 @@ matrix:
   - os: osx
     osx_image: xcode9
     language: generic
+  - os: osx
+    osx_image: xcode9.2
+    language: generic
+  - os: osx
+    osx_image: xcode9.3
+    language: generic
   allow_failures:
   - os: linux
     language: python
@@ -87,9 +93,11 @@ before_install:
   - travis_retry pip install flake8 || travis_retry python3 -m pip install flake8 || travis_retry python3 -m pip install --user flake8 || true ;
   - travis_retry pip install flake || true ;
   - travis_retry pip install codecov || true ;
-  - mkdir -p -m 775 /opt/PiAP/ || true ;
+  - sudo mkdir -p -m 775 "/opt/PiAP/"
+  - mkdir -p -m 755 "/opt/PiAP/hostapd_actions/" || true
+  - chmod -v 775 "/opt/PiAP/" || true
+  - cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
   - rm -vf /opt/PiAP/.beta_* 2>/dev/null || true ;
-  - chown -v ${USER} /opt/PiAP/ || true ;
   - echo "travis_fold:end:piap-setup" 2>/dev/null || true
 
 before_script:
