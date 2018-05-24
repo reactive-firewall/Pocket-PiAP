@@ -7,6 +7,7 @@ jobs:
         environment:
           CI: cicleci
           DEBIAN_FRONTEND: noninteractive
+          LANG: en_US.UTF-8
           SHELL: /bin/bash
     steps:
       - run:
