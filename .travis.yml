@@ -28,6 +28,12 @@ matrix:
   - os: osx
     osx_image: xcode9
     language: generic
+  - os: osx
+    osx_image: xcode9.2
+    language: generic
+  - os: osx
+    osx_image: xcode9.3
+    language: generic
   allow_failures:
   - os: linux
     language: python
@@ -87,6 +93,11 @@ before_install:
   - travis_retry pip install flake8 || travis_retry python3 -m pip install flake8 || travis_retry python3 -m pip install --user flake8 || true ;
   - travis_retry pip install flake || true ;
   - travis_retry pip install codecov || true ;
+  - sudo mkdir -p -m 775 "/opt/PiAP/"
+  - mkdir -p -m 755 "/opt/PiAP/hostapd_actions/" || true
+  - chmod -v 775 "/opt/PiAP/" || true
+  - cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
+  - rm -vf /opt/PiAP/.beta_* 2>/dev/null || true ;
   - echo "travis_fold:end:piap-setup" 2>/dev/null || true
 
 before_script:
@@ -104,8 +115,8 @@ script:
   - echo "travis_fold:start:piap-codecov" 2>/dev/null || true
   - codecov || true
   - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT 2>/dev/null || true ; fi
-  - make clean || exit $? ;
   - echo "travis_fold:end:piap-codecov" 2>/dev/null || true
+  - make clean || exit $? ;
   - if [ $TRAVIS_OS_NAME != osx ] ; then travis_retry make test-tox ; fi
   - make clean 2>/dev/null || true ;
 

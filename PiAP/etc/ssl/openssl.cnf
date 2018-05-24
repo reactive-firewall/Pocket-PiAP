@@ -766,7 +766,7 @@ cert_opt					= ca_default
 default_days				= 365
 # CWE- weak default - see https://github.com/openssl/openssl/issues/439
 default_md					= sha512
-digests						= sha512
+digests						= sha512, sha256
 preserve					= no
 policy						= policy_anything
 
@@ -863,7 +863,6 @@ subjectKeyIdentifier			= critical,hash
 authorityKeyIdentifier			= critical,keyid:always,issuer
 #subjectAltName				= @server_subject_alt_names
 issuerAltName				= issuer:copy
-nsCaRevocationUrl			= http://www.domain.dom/ca-crl.pem
 #nsCaRevocationUrl			= https://pocket.PiAP.local/ca/crls/CA.crl
 #nsBaseUrl					= https://pocket.PiAP.local/ca
 #nsRevocationUrl			= https://pocket.PiAP.local/ca/crls/CA.crl
@@ -921,8 +920,8 @@ inhibitAnyPolicy = 2
  O=Individual
  OU=PiAP Root
  CN=PiAP CA
-# ${UID}=ASN1:UTF8String:0
-# ${RFC_1274_UID}=ASN1:INTEGER:0
+#${UID}=ASN1:UTF8String:0
+#${RFC_1274_UID}=ASN1:INTEGER:0
 # SN=
 
 ####################################################################
@@ -960,7 +959,7 @@ inhibitAnyPolicy = 2
 DNS.1						= Pocket.PiAP.local.
 DNS.2						= pocket.PiAP.local
 DNS.3						= HOST-1.PiAP.local
-DNS.5						= pocket.piap.local
+DNS.4						= pocket.piap.local
 # RFC 2818 vs RFC6125 [section 1.7.2] - should peer review
 IP.1						= 10.0.40.1
 
@@ -972,7 +971,7 @@ basicConstraints			= critical,CA:FALSE
 nsCertType					= email, objsign
 keyUsage					= nonRepudiation, digitalSignature, keyEncipherment
 nsComment					= "Pocket PiAP Issued Signing Certificate"
-subjectKeyIdentifier			= critical,hash
+subjectKeyIdentifier		= critical,hash
 authorityKeyIdentifier		= keyid:always,issuer
 subjectAltName				= email:copy
 issuerAltName				= issuer:copy

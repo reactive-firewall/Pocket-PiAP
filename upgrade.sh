@@ -17,8 +17,7 @@ PIAP_LOG_PATH=${PIAP_LOG_PATH:-"/tmp/${PIAP_LOG_NAME:-PiAP_update_log.log}"}
 function message() {
 	local PIAP_MESSAGE="${@}"
 	echo ""
-	echo "${PIAP_MESSAGE}" | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
-	echo ""
+	echo "${PIAP_MESSAGE}" | tee -a "${PIAP_LOG_PATH}" 2>/dev/null || true
 	return 0
 }
 
@@ -113,6 +112,7 @@ fi
 message "Backing up Complete"
 message "Disabling web-server to prevent inconsistent state. All sessions will be logged out."
 sudo service nginx stop || true ;
+sudo service nginx status || true ;
 sudo service php5-fpm stop 2>/dev/null || true ;
 sudo service php7.0-fpm stop 2>/dev/null || true ;
 message "Fetching upgrade files..."
@@ -134,7 +134,7 @@ GIT_GPG_CMD=$(git config --get gpg.program)
 GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
 git config --local gpg.program ${GIT_GPG_CMD}
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
-	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
+	message "Enabled TRUST CHECK. [BETA TEST]"
 
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n3\nsave\n' | gpg2 --command-fd 0 --edit-key CF76FC3B8CD0B15F 2>/dev/null || true ; wait ;
@@ -232,7 +232,13 @@ else
 fi
 message "Restarting web-server."
 sudo service php5-fpm start 2>/dev/null || sudo service php7.0-fpm start 2>/dev/null || ROLL_BACK=1 ;
-sudo service nginx start || sudo service nginx status || ROLL_BACK=1 ;
+if [[ ${CI} ]] ; then
+	mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp 2>/dev/null || ROLL_BACK=1 ;
+	sed -E -e 's/10.0.40.1://g' /etc/nginx/sites-available/PiAP.tmp 2>/dev/null | tee /etc/nginx/sites-available/PiAP || ROLL_BACK=3 ;
+	rm -vf /etc/nginx/sites-available/PiAP.tmp || ROLL_BACK=1 ;
+fi
+sudo service nginx start || sudo rm -vf /etc/nginx/sites-enabled/default 2>/dev/null || true && sudo service nginx start || ROLL_BACK=1 ;
+sudo service nginx status || sudo systemctl status nginx.service || true ;
 sudo service php5-fpm restart 2>/dev/null || sudo service php7.0-fpm restart 2>/dev/null || ROLL_BACK=1 ;
 message "DONE"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
@@ -245,6 +251,7 @@ if [[ $CI ]] ; then
 	message "[BETA] Environment details:"
 	env
 	pwd
+	bash --version
 	message "[BETA] ROLL_BACK=${ROLL_BACK}"
 	message "[BETA] WARN_VAR=${WARN_VAR}"
 	message "[BETA] PIAP_UI_BRANCH=${PIAP_UI_BRANCH}"
@@ -253,9 +260,18 @@ if [[ $CI ]] ; then
 	message "[BETA] PIAP_LOG_NAME=${PIAP_LOG_NAME}"
 	message "[BETA] PIAP_LOG_PATH=${PIAP_LOG_PATH}"
 	message "[BETA] GIT_GPG_CMD=${GIT_GPG_CMD}"
+	message "[BETA] GIT ENV"
 	${GIT_GPG_CMD} --list-sigs
-	sudo git show --show-signature | grep -F ": "
+	sudo git show --show-signature | grep -F ": " || true
 	git config --list
+	message "[BETA] PYTHON ENV"
+	python3 --version
+	python3 -m piaplib.pocket book version --all || true
+	message "[BETA] WEB ENV"
+	php --version
+	head -n 4000 /etc/nginx/sites-available/PiAP
+	head -n 4000 /etc/nginx/sites-available/default
+	sudo nginx -t -c /etc/nginx/nginx.conf || true
 fi	
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"

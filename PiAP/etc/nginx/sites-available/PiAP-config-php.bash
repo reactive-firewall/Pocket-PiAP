@@ -22,8 +22,15 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 #
-SCAN_OPTIONS=$"-i --detect-pua=yes --heuristic-scan-precedence=yes --partition-intersection=yes --block-macros=yes --exclude-dir=/proc/ --exclude-dir=/sys/ --exclude-dir=/dev/ --exclude-dir=\"/lost+found/\" -r /"
-SCAN_COMMAND=$(which clamscan)
-SCAN_LOG_PATH="/srv/PiAP/cache/virus_scan.log"
-(sudo nice -n -5 nohup timeout --kill-after=4m 55m "${SCAN_COMMAND}" $SCAN_OPTIONS | tee "${SCAN_LOG_PATH}" 2>/dev/null >/dev/null ) & disown
-exit 0 ;
+umask 0027
+if [[ ( $(php --version | grep -oF "PHP 7" | wc -l ) -gt 0 ) ]] ; then
+	echo "detected PHP 7"
+	if [[ ( $(grep -oF "php5" /etc/nginx/sites-available/PiAP | wc -l ) -gt 0 ) ]] ; then
+		echo "Reconfigure for PHP 7" ;
+		mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp ;
+		sed -E -e 's/php5/php7.0/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
+	fi
+	ls -1 /var/run/php* 2>/dev/null || true ; # REMOVE AFTER DEBUGGING CI
+fi
+
+exit 0;
