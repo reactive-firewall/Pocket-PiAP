@@ -157,11 +157,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
 	fi
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 055521972A2DF921 2>/dev/null || true ; wait ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_E.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
-		message "FAILED TO import 7A4FC8AFC5FF91EE"
-		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
-	fi
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_E.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || WARN_VAR=2 ;
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 7A4FC8AFC5FF91EE 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_F.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
 	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
