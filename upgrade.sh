@@ -140,7 +140,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 	printf 'trust 1\n3\nsave\n' | gpg2 --command-fd 0 --edit-key CF76FC3B8CD0B15F 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n3\nsave\n' | gpg2 --command-fd 0 --edit-key 2FDAFC993A61112D 2>/dev/null || true ; wait ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key F55A399B1FE18BCB 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_ABC.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key DE1F0294A79F5244 2>/dev/null || WARN_VAR=2 ; wait ;
@@ -154,7 +154,7 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 157F7C20C1B17EAF 2>/dev/null || WARN_VAR=2 ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key BF53A260306CBD6C 2>/dev/null || WARN_VAR=2 ; wait ;
-	${GIT_GPG_CMD} --check-trustdb 2>/dev/null || ROLL_BACK=2 ;
+	${GIT_GPG_CMD} --check-trustdb 2>/dev/null || WARN_VAR=2 ;
 
 	# BUG WHERE ELIPTIC CURVE keys are unusable ?!?! wtf is this weak sauce ?
 
