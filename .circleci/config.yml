@@ -27,7 +27,7 @@ jobs:
           shell: /bin/bash
           name: "fetch and pull"
           command: |
-            git fetch && git pull --all && (git submodule init || true ) && git submodule update --remote --checkout && git submodule foreach git fetch --all || true
+            git checkout --force ${CIRCLE_BRANCH:-${CIRCLE_SHA1:-master}} && git fetch ${CIRCLE_BRANCH:-${CIRCLE_SHA1:-master}} && git pull ${CIRCLE_BRANCH:-${CIRCLE_SHA1:-master}} && git pull --all && (git submodule init || true ) && git submodule update --remote --checkout && git submodule foreach git fetch --all || true
       - run:
           name: "clean apt"
           command: |
