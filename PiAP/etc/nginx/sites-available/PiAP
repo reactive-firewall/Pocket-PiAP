@@ -15,7 +15,7 @@
 #
 server {
 	listen 10.0.40.1:80 default_server;
-	listen [::]:80 http2 default_server;
+	listen [::]:80 default_server;
 	#server_name default_server;
 	rewrite ^ https://$http_host$request_uri? permanent; # force http rewite to https
 }
@@ -23,8 +23,8 @@ server {
 server {
 	# SSL configuration
 	#
-	listen 10.0.40.1:443 ssl http2 default_server;
-	listen [::]:443 ssl http2 default_server;
+	listen 10.0.40.1:443 ssl default_server;
+	listen [::]:443 ssl default_server;
 	ssl on;
 	include snippets/pocket_ssl.conf;
 	root /srv/PiAP;

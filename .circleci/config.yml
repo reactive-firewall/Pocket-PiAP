@@ -27,7 +27,7 @@ jobs:
           shell: /bin/bash
           name: "fetch and pull"
           command: |
-            git fetch && git pull --all && (git submodule init || true ) && git submodule update --remote --checkout && git submodule foreach git fetch --all || true
+            ./.circleci/fetch_and_pull.bash ; wait || true
       - run:
           name: "clean apt"
           command: |
@@ -45,7 +45,7 @@ jobs:
           shell: /bin/bash
           name: "Install path Tests"
           command: |
-            export PIAP_UI_BRANCH="${CIRCLE_BRANCH:-${CIRCLE_SHA1:-master}}" && sudo bash ~/Pocket-PiAP/upgrade.sh || true
+            export PIAP_UI_BRANCH="${CIRCLE_BRANCH:-${CIRCLE_SHA1:-stable}}" && sudo bash ~/Pocket-PiAP/upgrade.sh || true
       - run:
           shell: /bin/bash
           name: "CWE-501 into CWE-250 attempt"
@@ -77,3 +77,4 @@ jobs:
           command: |
             make clean
 destination: build
+ 
