@@ -114,7 +114,7 @@ endif
 
 SHELL=/bin/bash
 
-PHONY: must_be_root cleanup
+PHONY: must_be_root cleanup remove-nginx-default
 
 build:
 	$(QUIET)$(ECHO) "No need to build. Try make -f Makefile install"
@@ -127,7 +127,7 @@ install: install-dsauth install-webroot install-optroot install-wpa-actions inst
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-users: ./PiAP must_be_root
+install-users: ./PiAP must_be_root /usr/lib/misc/
 	$(QUIET)addgroup --system --force-badname pocket 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-admin 2>/dev/null || true
 	$(QUIET)addgroup --system --force-badname pocket-www 2>/dev/null || true
@@ -135,11 +135,15 @@ install-users: ./PiAP must_be_root
 	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket  pocket 2>/dev/null || true
 	$(QUIET)adduser --system --disabled-password --home /opt/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket-admin pocket-admin 2>/dev/null || true
 	$(QUIET)adduser --system --disabled-password --home /srv/PiAP/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket-www pocket-www 2>/dev/null || true
-	$(QUIET)adduser --system --disabled-password --home /usr/lib/misc --shell /bin/bash --force-badname --no-create-home --ingroup pocket-dns pocket-dns 2>/dev/null || true
+	$(QUIET)adduser --system --disabled-password --home /usr/lib/misc/ --shell /bin/bash --force-badname --no-create-home --ingroup pocket-dns pocket-dns 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket-dns,pocket-www,pocket,netdev pocket-admin 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket,www-data pocket-www 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket pocket-dns 2>/dev/null || true
 	$(QUIET)usermod -a -G pocket-www www-data 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+/usr/lib/misc/: /usr/lib/
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /usr/lib/misc 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 install-optroot: ./PiAP must_be_root install-users /opt/PiAP/
@@ -157,11 +161,15 @@ uninstall-optroot: /opt/PiAP/ uninstall-wpa-actions uninstall-hostapd-actions un
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /opt/
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-optbin: install-optroot must_be_root
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/bin
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/bin/blink_LED.bash /opt/PiAP/bin/blink_LED.bash
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/bin/virus_scan.bash /opt/PiAP/bin/virus_scan.bash
+install-optbin: install-optroot must_be_root /opt/PiAP/bin/blink_LED.bash /opt/PiAP/bin/virus_scan.bash
 	$(QUIET)$(ECHO) "$@: Done."
+
+/opt/PiAP/bin/%: ./PiAP/opt/PiAP/bin/% must_be_root /opt/PiAP/bin/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) $< $@
+	$(QUIET)$(ECHO) "$@: installed."
+
+/opt/PiAP/bin/: install-optroot must_be_root /opt/PiAP/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/bin
 
 uninstall-optbin: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/bin/blink_LED.bash 2>/dev/null || true
@@ -169,11 +177,15 @@ uninstall-optbin: must_be_root
 	$(QUIET)$(RMDIR) /opt/PiAP/bin 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-optsbin: install-optroot must_be_root
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/sbin
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/sbin/kick_client /opt/PiAP/sbin/kick_client
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/sbin/autosign_client /opt/PiAP/sbin/autosign_client
+install-optsbin: install-optroot must_be_root /opt/PiAP/sbin/ /opt/PiAP/sbin/kick_client /opt/PiAP/sbin/autosign_client
 	$(QUIET)$(ECHO) "$@: Done."
+
+/opt/PiAP/sbin/%: ./PiAP/opt/PiAP/sbin/% must_be_root /opt/PiAP/sbin/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) $< $@
+	$(QUIET)$(ECHO) "$@: installed."
+
+/opt/PiAP/sbin/: install-optroot must_be_root /opt/PiAP/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/sbin
 
 uninstall-optsbin: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/sbin/kick_client 2>/dev/null || true
@@ -181,25 +193,15 @@ uninstall-optsbin: must_be_root
 	$(QUIET)$(RMDIR) /opt/PiAP/sbin 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 	
-install-wpa-actions: install-optroot must_be_root
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/wpa_actions
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/list_networks /opt/PiAP/wpa_actions/list_networks
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/status
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/add_network
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/add_network_primitive
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/clear_blacklist
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/count_networks
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/del_network_primitive
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/list_blacklist
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/load_config
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/log_msg
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/ping_wpa
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/readycheck
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/save_config
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/select_network
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/set_network_primitive
-	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/toggle_blacklist
+install-wpa-actions: install-optroot must_be_root /opt/PiAP/wpa_actions/list_networks /opt/PiAP/wpa_actions/status /opt/PiAP/wpa_actions/add_network /opt/PiAP/wpa_actions/add_network_primitive /opt/PiAP/wpa_actions/clear_blacklist /opt/PiAP/wpa_actions/count_networks /opt/PiAP/wpa_actions/del_network_primitive /opt/PiAP/wpa_actions/list_blacklist /opt/PiAP/wpa_actions/load_config /opt/PiAP/wpa_actions/log_msg /opt/PiAP/wpa_actions/ping_wpa /opt/PiAP/wpa_actions/readycheck /opt/PiAP/wpa_actions/save_config /opt/PiAP/wpa_actions/select_network /opt/PiAP/wpa_actions/select_network /opt/PiAP/wpa_actions/set_network_primitive /opt/PiAP/wpa_actions/toggle_blacklist
 	$(QUIET)$(ECHO) "$@: Done."
+
+/opt/PiAP/wpa_actions/%: ./PiAP/opt/PiAP/wpa_actions/% must_be_root /opt/PiAP/wpa_actions/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_OPTS) $< $@
+	$(QUIET)$(ECHO) "$@: installed."
+
+/opt/PiAP/wpa_actions/: install-optroot must_be_root /opt/PiAP/
+	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_DIR_OPTS) /opt/PiAP/wpa_actions
 
 uninstall-wpa-actions: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/wpa_actions/list_networks 2>/dev/null || true
@@ -270,7 +272,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Requested."
 
 /etc/ssl/PiAPCA/PiAP_CA.pem: /etc/ssl/PiAPCA/private/PiAP_CA.csr must_be_root
-	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_CA.csr -out /etc/ssl/PiAPCA/PiAP_CA.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_CA_cert
+	$(QUIET)openssl x509 -req -outform PEM -keyform PEM -in /etc/ssl/PiAPCA/private/PiAP_CA.csr -out /etc/ssl/PiAPCA/PiAP_CA.pem -days 180  -signkey /etc/ssl/PiAPCA/private/PiAP_CA.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_CA_cert 2>/dev/null >/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Self-Signed."
 
@@ -304,7 +306,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)ln -sf ../PiAPCA/certs/PiAP_SSL.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Installed."
 
-configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem must_be_root
+configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem must_be_root /etc/nginx/sites-enabled/ remove-nginx-default
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi.conf /etc/nginx/fastcgi.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/fastcgi_params /etc/nginx/fastcgi_params 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/nginx.conf /etc/nginx/nginx.conf 2>/dev/null
@@ -312,9 +314,14 @@ configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem mu
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/snippets/fastcgi-php.conf /etc/nginx/snippets/fastcgi-php.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/snippets/pocket_ssl.conf /etc/nginx/snippets/pocket_ssl.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP 2>/dev/null
+	$(QUIET)bash ./PiAP/etc/nginx/sites-available/PiAP-config-php.bash || true
 	$(QUIET)ln -sf /etc/nginx/sites-available/PiAP /etc/nginx/sites-enabled/PiAP 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
+
+/etc/hosts: must_be_root
+	$(QUIET)if [[ ( -z $$( grep -F "# PiAP LAN (PiAP.local)" /etc/hosts ) ) ]] ; then $(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/hosts /etc/hosts || exit 2 ; fi
+	$(QUIET)$(ECHO) "$@: Done."	
 
 remove-httpd: must_be_root
 	$(QUIET)$(RM) /etc/nginx/fastcgi.conf 2>/dev/null || true
@@ -328,6 +335,15 @@ remove-httpd: must_be_root
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
+remove-nginx-default: must_be_root /etc/nginx/sites-enabled/
+	$(QUIET)$(ECHO) "$@: Disabling default sites."
+	$(QUIET)$(RM) /etc/nginx/sites-available/default 2>/dev/null || true
+	$(QUIET)unlink /etc/nginx/sites-available/default 2>/dev/null || true
+	$(QUIET)$(RM) /etc/nginx/sites-enabled/default 2>/dev/null || true
+	$(QUIET)unlink /etc/nginx/sites-enabled/default 2>/dev/null || true
+	$(QUITE)$(WAIT)
+	$(QUIET)$(ECHO) "$@: Done."
+
 configure-PiAP-keyring: install-optroot /etc/ssl/PiAPCA/crl /etc/ssl/PiAPCA/certs /etc/ssl/PiAPCA/private must_be_root
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/ssl/openssl.cnf /etc/ssl/PiAP_keyring.cfg
 	$(QUIET)if [[ -z $$(grep -E "[0-9]+" /etc/ssl/PiAPCA/serial 2>/dev/null) ]] ; then $(INSTALL) $(INST_OWN) $(INST_OPTS) ./PiAP/etc/ssl/PiAPCA/serial /etc/ssl/PiAPCA/serial ; fi
@@ -335,7 +351,7 @@ configure-PiAP-keyring: install-optroot /etc/ssl/PiAPCA/crl /etc/ssl/PiAPCA/cert
 	$(QUITE)$(CHOWN) $(FILE_OWN) /etc/ssl/PiAPCA/index.txt || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-/etc/ssl/PiAPCA: /etc/ssl
+/etc/ssl/PiAPCA/: /etc/ssl
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_PUB_DIR_OPTS) /etc/ssl/PiAPCA 2>/dev/null || true
 
 /etc/ssl/PiAPCA/private: /etc/ssl/PiAPCA/
@@ -410,7 +426,7 @@ remove-PiAP-interfaces: must_be_root
 	$(QUIET)$(RM) /etc/cron.hourly/clear_zeroconf_ip.sh 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-webroot: install-dsauth configure-httpd
+install-webroot: install-dsauth configure-httpd /etc/nginx/
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile install
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -439,19 +455,20 @@ purge: clean uninstall remove-PiAP-keyring
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(GIT) submodule foreach make test 2>/dev/null || true
-	$(QUIET)$(CP) ./units/PiAP-python-tools/.coverage ./.coverage || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test
+	$(QUIET)$(CP) ./units/PiAP-python-tools/.coverage ./.coverage 2>/dev/null || true
 	$(QUIET)$(CP) ./units/PiAP-python-tools/.coverage.xml ./.coverage.xml 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup test
-	$(QUIET)$(GIT) submodule foreach make test-tox 2>/dev/null || true
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test-tox
-	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test-tox
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
-	$(QUIET)$(GIT) submodule foreach make cleanup 2>/dev/null || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile cleanup 2>/dev/null || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile cleanup 2>/dev/null || true
 	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
 	$(QUIET)rm -Rf tests/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -f PiAP/*.pyc 2>/dev/null || true
@@ -478,7 +495,8 @@ cleanup:
 	$(QUIET)rm -f ./the_test_file.txt 2>/dev/null || true
 
 clean: cleanup
-	$(QUIET)$(GIT) submodule foreach make clean 2>/dev/null || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile clean 2>/dev/null || true
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 

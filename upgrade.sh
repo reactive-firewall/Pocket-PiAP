@@ -1,5 +1,6 @@
 #! /bin/bash
 
+CI="${CI:-false}"
 ROLL_BACK=0
 
 WARN_VAR=0
@@ -16,17 +17,16 @@ PIAP_LOG_PATH=${PIAP_LOG_PATH:-"/tmp/${PIAP_LOG_NAME:-PiAP_update_log.log}"}
 function message() {
 	local PIAP_MESSAGE="${@}"
 	echo ""
-	echo "${PIAP_MESSAGE}" | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
-	echo ""
+	echo "${PIAP_MESSAGE}" | tee -a "${PIAP_LOG_PATH}" 2>/dev/null || true
 	return 0
 }
 
 function check_depends() {
 	local THEDEPENDS=$"${1:-python3}"
 	local DID_WORK=0
-	if [[ ( $(dpkg --list | grep -E "^ii\s" | tr -s '\s' ' ' | cut -d \  -f 2 | grep -F -c "${THEDEPENDS}" ) -le 0 ) ]] ; then
+if [[ ( $(dpkg --list | grep -E "^[i]{2}[[:space:]]+" | tr -s '\s' ' ' | cut -d \  -f 2 | grep -F -c "${THEDEPENDS}" ) -le 0 ) ]] ; then
 		message "Installing new dependencies. [\"${THEDEPENDS}\"]"
-		sudo apt-get install -y ${THEDEPENDS} 2>/dev/null || DID_WORK=1 ;
+		sudo apt-get install -y "${THEDEPENDS}" 2>/dev/null || DID_WORK=1 ;
 		message "DONE"
 	fi
 	return $DID_WORK
@@ -112,6 +112,7 @@ fi
 message "Backing up Complete"
 message "Disabling web-server to prevent inconsistent state. All sessions will be logged out."
 sudo service nginx stop || true ;
+sudo service nginx status || true ;
 sudo service php5-fpm stop 2>/dev/null || true ;
 sudo service php7.0-fpm stop 2>/dev/null || true ;
 message "Fetching upgrade files..."
@@ -133,26 +134,26 @@ GIT_GPG_CMD=$(git config --get gpg.program)
 GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
 git config --local gpg.program ${GIT_GPG_CMD}
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
-	message "Enabled TRUST CHECK. [BETA TEST] [FIXME]"
+	message "Enabled TRUST CHECK. [BETA TEST]"
 
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
-	printf "trust 1\n3\nsave\n" | gpg2 --command-fd 0 --edit-key CF76FC3B8CD0B15F 2>/dev/null || true ; wait ;
+	printf 'trust 1\n3\nsave\n' | gpg2 --command-fd 0 --edit-key CF76FC3B8CD0B15F 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
-	printf "trust 1\n3\nsave\n" | gpg2 --command-fd 0 --edit-key 2FDAFC993A61112D 2>/dev/null || true ; wait ;
+	printf 'trust 1\n3\nsave\n' | gpg2 --command-fd 0 --edit-key 2FDAFC993A61112D 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key F55A399B1FE18BCB 2>/dev/null || true ; wait ;
+	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key F55A399B1FE18BCB 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_ABC.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key DE1F0294A79F5244 2>/dev/null || WARN_VAR=2 ; wait ;
+	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key DE1F0294A79F5244 2>/dev/null || WARN_VAR=2 ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_D.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 055521972A2DF921 2>/dev/null || true ; wait ;
+	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 055521972A2DF921 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_E.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 7A4FC8AFC5FF91EE 2>/dev/null || true ; wait ;
+	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 7A4FC8AFC5FF91EE 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_F.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 1B38E552E4E90FDB 2>/dev/null || WARN_VAR=2 ; wait ;
+	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 1B38E552E4E90FDB 2>/dev/null || WARN_VAR=2 ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_G.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
-	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 157F7C20C1B17EAF 2>/dev/null || WARN_VAR=2 ; wait ;
+	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 157F7C20C1B17EAF 2>/dev/null || WARN_VAR=2 ; wait ;
 	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
-	printf "trust 1\n4\nsave\n" | gpg2 --command-fd 0 --edit-key 87F06F1425B180C7 2>/dev/null || WARN_VAR=2 ; wait ;
+	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 87F06F1425B180C7 2>/dev/null || WARN_VAR=2 ; wait ;
 	${GIT_GPG_CMD} --check-trustdb 2>/dev/null || ROLL_BACK=2 ;
 
 	# BUG WHERE ELIPTIC CURVE keys are unusable ?!?! wtf is this weak sauce ?
@@ -204,13 +205,13 @@ if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
 	sudo openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null ; wait ;
 	sudo openssl req -new -outform PEM -out /root/ssl-cert-nginx.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.PiAP.local/OU=PiAP.local/O=PiAP\ Network/" 2>/dev/null
-	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions server_cert -CA /etc/ssl/PiAPCA/PiAP_CA.pem -CAkey /etc/ssl/PiAPCA/private/PiAP_CA.key -CAcreateserial | fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
+	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions server_cert -CA /etc/ssl/PiAPCA/PiAP_CA.pem -CAkey /etc/ssl/PiAPCA/private/PiAP_CA.key -CAcreateserial | grep -F --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo grep -F --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
 	message "DONE"
 elif [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c 'certificate has expired' ) -gt 0 ) ]] ; then
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
 	sudo openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null ; wait ;
 	sudo openssl req -new -outform PEM -out /root/ssl-cert-nginx.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.PiAP.local/OU=PiAP.local/O=Pocket\ PiAP/" 2>/dev/null
-	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions server_cert -CA /etc/ssl/PiAPCA/PiAP_CA.pem -CAkey /etc/ssl/PiAPCA/private/PiAP_CA.key -CAcreateserial | fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo fgrep --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
+	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions server_cert -CA /etc/ssl/PiAPCA/PiAP_CA.pem -CAkey /etc/ssl/PiAPCA/private/PiAP_CA.key -CAcreateserial | grep -F --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo grep -F --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
 	message "DONE"
 	message "Cert should be fine now."
 	message "You will probably have a browser warning about the new certificate, the next time you visit the web interface."
@@ -230,9 +231,15 @@ else
 	message "SSH keys seem fine."
 fi
 message "Restarting web-server."
-sudo service php5-fpm start || sudo service php7.0-fpm start || ROLL_BACK=1 ;
-sudo service nginx start || sudo service nginx status || ROLL_BACK=1 ;
-sudo service php5-fpm restart || sudo service php7.0-fpm restart || ROLL_BACK=1 ;
+sudo service php5-fpm start 2>/dev/null || sudo service php7.0-fpm start 2>/dev/null || ROLL_BACK=1 ;
+if [[ ${CI} ]] ; then
+	mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp 2>/dev/null || ROLL_BACK=1 ;
+	sed -E -e 's/10.0.40.1://g' /etc/nginx/sites-available/PiAP.tmp 2>/dev/null | tee /etc/nginx/sites-available/PiAP || ROLL_BACK=3 ;
+	rm -vf /etc/nginx/sites-available/PiAP.tmp || ROLL_BACK=1 ;
+fi
+sudo service nginx start || sudo rm -vf /etc/nginx/sites-enabled/default 2>/dev/null || true && sudo service nginx start || ROLL_BACK=1 ;
+sudo service nginx status || sudo systemctl status nginx.service || true ;
+sudo service php5-fpm restart 2>/dev/null || sudo service php7.0-fpm restart 2>/dev/null || ROLL_BACK=1 ;
 message "DONE"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 SSH_PORT=$(echo ${SSH_CONNECTION} | cut -d\  -f 4 )
@@ -240,10 +247,11 @@ SSH_SERVER=$(echo ${SSH_CONNECTION} | cut -d\  -f 3 )
 message "Status: Upgrade failed."
 message "Please report this issue at https://github.com/reactive-firewall/Pocket-PiAP/issues"
 message "[BETA] Please include the contents of this log \"${PIAP_LOG_PATH}\""
-if [[ ( $CI == "circleci" ) ]] ; then
+if [[ $CI ]] ; then
 	message "[BETA] Environment details:"
 	env
 	pwd
+	bash --version
 	message "[BETA] ROLL_BACK=${ROLL_BACK}"
 	message "[BETA] WARN_VAR=${WARN_VAR}"
 	message "[BETA] PIAP_UI_BRANCH=${PIAP_UI_BRANCH}"
@@ -252,12 +260,21 @@ if [[ ( $CI == "circleci" ) ]] ; then
 	message "[BETA] PIAP_LOG_NAME=${PIAP_LOG_NAME}"
 	message "[BETA] PIAP_LOG_PATH=${PIAP_LOG_PATH}"
 	message "[BETA] GIT_GPG_CMD=${GIT_GPG_CMD}"
+	message "[BETA] GIT ENV"
 	${GIT_GPG_CMD} --list-sigs
-	sudo git show --show-signature | fgrep ": "
+	sudo git show --show-signature | grep -F ": " || true
 	git config --list
+	message "[BETA] PYTHON ENV"
+	python3 --version
+	python3 -m piaplib.pocket book version --all || true
+	message "[BETA] WEB ENV"
+	php --version
+	head -n 4000 /etc/nginx/sites-available/PiAP
+	head -n 4000 /etc/nginx/sites-available/default
+	sudo nginx -t -c /etc/nginx/nginx.conf || true
 fi	
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
-echo "     scp -2 -P ${SSH_PORT} -r ${LOGNAME:-youruser}@${SSH_SERVER}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
+echo "     scp -2 -P ${SSH_PORT} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
 else
 message "Status: Upgrade seemed to work. (check by logging in to the Web interface)"
 fi

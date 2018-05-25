@@ -23,14 +23,14 @@
 
 [![Build Status](https://travis-ci.org/reactive-firewall/PiAP-Webroot.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-Webroot)
 
-# Pocket PiAP is still in private beta. FOSS under heavy development, No production support at this time. USE AT OWN RISK.
+# Pocket PiAP is still in private beta. FOSS under heavy development, No production support at this time. USE AT OWN RISK. See the CONTRIBUTING guide.
 
 ![issues](https://img.shields.io/github/issues-raw/reactive-firewall/Pocket-PiAP.svg)
 ![pr](https://img.shields.io/github/issues-pr-raw/reactive-firewall/Pocket-PiAP.svg)
 
 ### License
 
-Copyright (c) 2017 Mr. Walls
+Copyright (c) 2017-2018 Mr. Walls
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

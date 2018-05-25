@@ -7,6 +7,7 @@ jobs:
         environment:
           CI: cicleci
           DEBIAN_FRONTEND: noninteractive
+          LANG: en_US.UTF-8
           SHELL: /bin/bash
     steps:
       - run:
@@ -26,7 +27,7 @@ jobs:
           shell: /bin/bash
           name: "fetch and pull"
           command: |
-            git fetch && git pull --all && (git init || true ) && git submodule update --remote --checkout || true
+            git fetch && git pull --all && (git submodule init || true ) && git submodule update --remote --checkout && git submodule foreach git fetch --all || true
       - run:
           name: "clean apt"
           command: |
@@ -42,9 +43,29 @@ jobs:
             curl -fsSL --tlsv1.2 --url https://raw.githubusercontent.com/reactive-firewall/Pocket-PiAP/${CIRCLE_SHA1:-stable}/upgrade.sh -o ~/Pocket-PiAP/upgrade.sh 2>/dev/null || true
       - run:
           shell: /bin/bash
-          name: "install attempt"
+          name: "Install path Tests"
           command: |
-            export PIAP_UI_BRANCH="${CIRCLE_BRANCH:-stable}" && sudo bash ~/Pocket-PiAP/upgrade.sh || true
+            export PIAP_UI_BRANCH="${CIRCLE_BRANCH:-${CIRCLE_SHA1:-master}}" && sudo bash ~/Pocket-PiAP/upgrade.sh || true
+      - run:
+          shell: /bin/bash
+          name: "CWE-501 into CWE-250 attempt"
+          command: |
+            sudo usermod -a -G pocket,pocket-admin circleci || true
+      - run:
+          shell: /bin/bash
+          name: "Break ACL for circle to bootstrap tests"
+          command: |
+            sudo chmod -v 775 /opt/PiAP/ || true
+      - run:
+          shell: /bin/bash
+          name: "Break ACL for circle to bootstrap tests part 2"
+          command: |
+            sudo chown -v circleci /opt/PiAP/ || true
+      - run:
+          shell: /bin/bash
+          name: "UnBreak old tests"
+          command: |
+            sudo rm -vf /opt/PiAP/.beta_* 2>/dev/null || true
       - run:
           shell: /bin/bash
           name: "Unit Tests"
