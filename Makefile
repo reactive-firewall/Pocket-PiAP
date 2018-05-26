@@ -250,6 +250,7 @@ install-pifi: must_be_root
 	$(QUIET)update-rc.d wirelessWiFi enable 2>/dev/null || update-rc.d start 30 2345 . stop 0 1 6 wirelessWiFi 2>/dev/null ; wait ;
 	$(QUIET)$(INSTALL) $(INST_OWN) $(INST_FILE_OPTS) ./PiAP/etc/init.d/wirelessPiAP /etc/init.d/wirelessPiAP
 	$(QUIET)update-rc.d wirelessPiAP enable 2>/dev/null || update-rc.d start 30 2345 . stop 0 1 6 wirelessPiAP 2>/dev/null ; wait ;
+	$(QUIET)head -n 400 ./PiAP/etc/banner 2>/dev/null || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall-pifi: must_be_root
