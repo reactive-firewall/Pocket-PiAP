@@ -56,7 +56,7 @@ server {
 			fastcgi_param	DN			$ssl_client_s_dn;
 			fastcgi_param	IDN			$ssl_client_i_dn;
 			# MUST MATCH SERVER NAME
-			fastcgi_param	SSL_SERVER_NAME	$ssl_server_name;
+			fastcgi_param	SSL_SERVER_NAME	$server_name;
 		}
 	}
 
