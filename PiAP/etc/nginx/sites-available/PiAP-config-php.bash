@@ -28,9 +28,10 @@ if [[ ( $(php --version | grep -oF "PHP 7" | wc -l ) -gt 0 ) ]] ; then
 	if [[ ( $(grep -oF "php5" /etc/nginx/sites-available/PiAP | wc -l ) -gt 0 ) ]] ; then
 		echo "Reconfigure for PHP 7" ;
 		mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp ;
-		sed -E -e 's/php5/php7.0/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
+		sed -E -e 's/php5/php7.0/g' /etc/nginx/sites-available/PiAP.tmp 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 		sed -E -e 's/0 default_server;/0 http2 default_server;/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 		sed -E -e 's/3 default_server;/3 http2 default_server;/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
+		sed -E -e 's/server_name;/ssl_server_name;/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 	fi
 	ls -1 /var/run/php* 2>/dev/null || true ; # REMOVE AFTER DEBUGGING CI
 fi
