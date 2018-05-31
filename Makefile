@@ -123,6 +123,7 @@ init:
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: install-dsauth install-webroot install-optroot install-wpa-actions install-hostapd-actions install-optsbin install-optbin configure-PiAP-sudoers configure-PiAP-dnsmasq install-pifi configure-PiAP-keyring must_be_root
+	$(QUITE)umask 0002
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile install
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
