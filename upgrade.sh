@@ -26,7 +26,10 @@ function check_depends() {
 	local DID_WORK=0
 if [[ ( $(dpkg --list | grep -E "^[i]{2}[[:space:]]+" | tr -s '\s' ' ' | cut -d \  -f 2 | grep -F -c "${THEDEPENDS}" ) -le 0 ) ]] ; then
 		message "Installing new dependencies. [\"${THEDEPENDS}\"]"
+		OLDMASK=$(umask)
+		umask 0022
 		sudo apt-get install -y "${THEDEPENDS}" 2>/dev/null || DID_WORK=1 ;
+		umask "$OLDMASK"
 		message "DONE"
 	fi
 	return $DID_WORK
@@ -208,7 +211,9 @@ message "DO NOT INTERRUPT OR POWER OFF. [CAUTION for BETA]"
 # set LED flashing here
 
 ( sudo make uninstall || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
+umask 0002
 ( sudo make install || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
+umask 0027
 make clean
 fi
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
