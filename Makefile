@@ -162,7 +162,7 @@ uninstall-optroot: /opt/PiAP/ uninstall-wpa-actions uninstall-hostapd-actions un
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /opt/
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-optbin: install-optroot must_be_root /opt/PiAP/bin/blink_LED.bash /opt/PiAP/bin/virus_scan.bash
+install-optbin: install-optroot must_be_root /opt/PiAP/bin/blink_LED.bash /opt/PiAP/bin/disable_LED.bash /opt/PiAP/bin/set_LED_status_Ready.bash /opt/PiAP/bin/set_LED_status_None.bash /opt/PiAP/bin/set_LED_status_Agro.bash /opt/PiAP/bin/pocket /opt/PiAP/bin/virus_scan.bash
 	$(QUIET)$(ECHO) "$@: Done."
 
 /opt/PiAP/bin/%: ./PiAP/opt/PiAP/bin/% must_be_root /opt/PiAP/bin/
@@ -174,7 +174,12 @@ install-optbin: install-optroot must_be_root /opt/PiAP/bin/blink_LED.bash /opt/P
 
 uninstall-optbin: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/bin/blink_LED.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/disable_LED.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/pocket 2>/dev/null || true
 	$(QUIET)$(RM) /opt/PiAP/bin/virus_scan.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_None.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_Agro.bash 2>/dev/null || true
 	$(QUIET)$(RMDIR) /opt/PiAP/bin 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
