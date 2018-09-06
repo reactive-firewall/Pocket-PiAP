@@ -16,4 +16,5 @@ sudo mount -o dirsync,acl -t ext4 ${PIAP_BLK_CHUNK_FQDN} ${PIAP_BLK_CHUNK_MOUNT_
 
 exit 0 ;
 
+#lsblk --list --ascii | grep -E "^([mmcblk0]+){1}\s+" | tr -s ' \t' ' ' | cut -d \  -f4
 #lsblk --list --ascii | grep -E "^([mmcblk0]+){1}[p]{1}[0-9]\s+" | tr -s ' \t' ' ' | cut -d \  -f4
