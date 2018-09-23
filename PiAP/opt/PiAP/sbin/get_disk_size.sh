@@ -60,13 +60,13 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-# sum partions sizes on root SD card
+# list partions sizes on root SD card
 
-TOOL_PATH=$(dirname ${0})
+PATH="${PATH}:/opt/PiAP/sbin/"
 
 TOTAL_SIZE=0
 
-for SIZE_TEXT  in $(${TOOL_PATH:-/opt/PiAP/sbin/}list_byte_size_root_parts.sh) ; do
+for SIZE_TEXT  in $($(dirname $0)/get_disk_sizes.sh) ; do
 
 TOTAL_SIZE=$((${TOTAL_SIZE:-0}+${SIZE_TEXT:-0})) ;
 
