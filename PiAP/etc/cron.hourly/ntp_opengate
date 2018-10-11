@@ -1,0 +1,12 @@
+#! /bin/bash
+ulimit -t 2
+umask 027
+echo "#! /bin/bash " > /dev/shm/ntp_opengate ; wait ;
+sudo chmod 700 /dev/shm/ntp_opengate ;
+ntpq -pn | grepip | xargs -L 1 -I{} echo "echo +{} | sudo tee /proc/net/xt_recent/ntpguestlist" | tee -a /dev/shm/ntp_opengate 1>/dev/null ; wait ;
+echo "" >> /dev/shm/ntp_opengate ; wait ;
+echo "exit 0" >> /dev/shm/ntp_opengate ; wait ;
+sudo /dev/shm/ntp_opengate 2>/dev/null >/dev/null ;
+wait ;
+rm -f /dev/shm/ntp_opengate 2>/dev/null 1>/dev/null;
+exit 0 ;
