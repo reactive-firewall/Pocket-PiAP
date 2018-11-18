@@ -122,7 +122,7 @@ build:
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: install-dsauth install-webroot install-optroot install-wpa-actions install-hostapd-actions install-optsbin install-optbin configure-PiAP-sudoers configure-PiAP-dnsmasq install-pifi configure-PiAP-keyring must_be_root
+install: install-dsauth install-webroot install-optroot install-wpa-actions install-hostapd-actions install-optsbin install-optbin configure-PiAP-sudoers configure-PiAP-dnsmasq install-pifi configure-PiAP-keyring configure-interfaces must_be_root
 	$(QUITE)umask 0002
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile install
 	$(QUITE)$(WAIT)
@@ -401,6 +401,9 @@ configure-PiAP-sudoers: /etc/ must_be_root
 remove-PiAP-sudoers: must_be_root
 	$(QUIET)$(RM) /etc/sudoers.d/001_PiAP 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
+
+configure-interfaces: must_be_root
+	$(QUIET)if [[ ( -z $$( grep -F "GRUB_CMDLINE_LINUX=\"net.ifnames=0 biosdevname=0\"" /etc/default/grub ) ) ]] ; then echo "GRUB_CMDLINE_LINUX=\"net.ifnames=0 biosdevname=0\"" | tee -a /etc/default/grub && sudo grub-mkconfig -o /boot/grub/grub.cfg || exit 2 ; fi
 
 configure-PiAP-dnsmasq: install-optroot /etc/ /etc/dnsmasq.d/ must_be_root
 	$(QUIET)$(INSTALL) $(INST_DNS_OWN) $(INST_WEB_OPTS) ./PiAP/etc/dnsmasq.conf /etc/dnsmasq.conf

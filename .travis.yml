@@ -39,6 +39,12 @@ matrix:
     language: python
   - os: linux
     language: php7
+  - os: linux
+    dist: xenial
+    language: generic
+  - os: osx
+    osx_image: xcode8.3
+    language: generic
   - os: osx
     osx_image: xcode7.3
     language: generic
