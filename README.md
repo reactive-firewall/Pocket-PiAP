@@ -16,7 +16,6 @@
 #### Python Tools
 
 [![Build Status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
-[![Dependency Status](https://www.versioneye.com/user/projects/5961fc36368b08002a056e48/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/5961fc36368b08002a056e48)
 [![Code Coverage](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/stable/)
 
 #### Web UI
