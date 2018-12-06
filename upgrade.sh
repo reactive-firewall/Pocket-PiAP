@@ -16,7 +16,7 @@ PIAP_LOG_PATH=${PIAP_LOG_PATH:-"/tmp/${PIAP_LOG_NAME:-PiAP_update_log.log}"}
 
 function message() {
 	local PIAP_MESSAGE="${@}"
-	echo ""
+	# echo ""
 	echo "${PIAP_MESSAGE}" | tee -a "${PIAP_LOG_PATH}" 2>/dev/null || true
 	return 0
 }
@@ -24,13 +24,26 @@ function message() {
 function check_depends() {
 	local THEDEPENDS=$"${1:-python3}"
 	local DID_WORK=0
-if [[ ( $(dpkg --list | grep -E "^[i]{2}[[:space:]]+" | tr -s '\s' ' ' | cut -d \  -f 2 | grep -F -c "${THEDEPENDS}" ) -le 0 ) ]] ; then
+	local DOWN_RETRY=5
+	local DOWN_COUNT=0
+	if [[ ( $(dpkg --list | grep -E "^[i]{2}[[:space:]]+" | tr -s '\s' ' ' | cut -d \  -f 2 | grep -F -c "${THEDEPENDS}" ) -le 0 ) ]] ; then
 		message "Installing new dependencies. [\"${THEDEPENDS}\"]"
 		OLDMASK=$(umask)
 		umask 0022
+		while [[ ( $DOWN_COUNT -le $DOWN_RETRY ) ]] ; do
+			DOWN_COUNT=$(($DOWN_COUNT+1)) ;
+			if [[ $DID_WORK -gt 0 ]] ; then
+				message "Retry ${DOWN_COUNT:-again}"
+				( sudo apt-get install --assume-yes --download-only "${THEDEPENDS}" 2>/dev/null && DID_WORK=0 ) || true ;
+			elif [[ ( $DOWN_COUNT -le 1 ) ]] ; then
+				( sudo apt-get install --assume-yes --download-only "${THEDEPENDS}" 2>/dev/null && DID_WORK=0 ) || DID_WORK=1 ;
+			fi
+		done
 		sudo apt-get install -y "${THEDEPENDS}" 2>/dev/null || DID_WORK=1 ;
 		umask "$OLDMASK"
 		message "DONE"
+	else
+		message "Found dependencies. [\"${THEDEPENDS}\"]"
 	fi
 	return $DID_WORK
 }
@@ -87,6 +100,10 @@ if [[ ( ${ROLL_BACK:-1} -gt 0 ) ]] ; then
 	message "WARNING: NOT updating system to latest."
 	exit 2 ;
 fi
+
+for SOME_DEPENDS in build-essential make git gnupg2 nginx nginx-full php-fpm php7.0-xsl dnsmasq hostapd python3 python3-pip ; do
+	check_depends ${SOME_DEPENDS} || exit 2 ;
+done ;
 
 cd /tmp ;
 check_path /var/ || exit 2 ;
@@ -146,35 +163,35 @@ fi
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
 	message "Enabled TRUST CHECK. [BETA TEST]"
 
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n3\nsave\n' | gpg2 --command-fd 0 --edit-key CF76FC3B8CD0B15F 2>/dev/null || true ; wait ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n3\nsave\n' | gpg2 --command-fd 0 --edit-key 2FDAFC993A61112D 2>/dev/null || true ; wait ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key F55A399B1FE18BCB 2>/dev/null || true ; wait ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_ABC.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_ABC.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key DE1F0294A79F5244 2>/dev/null || WARN_VAR=2 ; wait ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_D.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_D.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
 	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
 		message "FAILED TO import 055521972A2DF921"
 		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
 	fi
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 055521972A2DF921 2>/dev/null || true ; wait ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_E.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || WARN_VAR=2 ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_E.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || WARN_VAR=2 ;
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 7A4FC8AFC5FF91EE 2>/dev/null || true ; wait ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_F.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_F.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
 	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
 		message "FAILED TO import 1B38E552E4E90FDB"
 		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
 	fi
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 1B38E552E4E90FDB 2>/dev/null || WARN_VAR=2 ; wait ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_G.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_G.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
 	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
 		message "FAILED TO import 157F7C20C1B17EAF"
 		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
 	fi
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 157F7C20C1B17EAF 2>/dev/null || WARN_VAR=2 ; wait ;
-	curl -fsSL --tlsv1.2 --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key BF53A260306CBD6C 2>/dev/null || WARN_VAR=2 ; wait ;
 	${GIT_GPG_CMD} --check-trustdb 2>/dev/null || WARN_VAR=2 ;
 

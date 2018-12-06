@@ -59,6 +59,17 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
-exit 0;
+
+# list partions sizes on root SD card
+
+PATH="${PATH}:/opt/PiAP/sbin/"
+
+TOTAL_SIZE=0
+
+for SIZE_TEXT  in $($(dirname $0)/get_disk_sizes.sh) ; do
+
+TOTAL_SIZE=$((${TOTAL_SIZE:-0}+${SIZE_TEXT:-0})) ;
+
+done
+echo "${TOTAL_SIZE}"
+exit 0

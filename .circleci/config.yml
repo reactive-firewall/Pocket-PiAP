@@ -21,7 +21,7 @@ jobs:
       - run:
           name: "install dependencies"
           command: |
-            sudo apt-get -y install build-essential make git gnupg2 nginx nginx-full php-fpm dnsmasq hostapd python3 python3-pip ; wait ;
+            sudo apt-get -y install build-essential make git gnupg2 nginx nginx-full php-fpm php7.0-xsl dnsmasq hostapd python3 python3-pip ; wait ;
       - checkout
       - run:
           shell: /bin/bash

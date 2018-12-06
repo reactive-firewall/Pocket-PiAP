@@ -59,6 +59,17 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
+#
+ulimit -t 25
+umask 027
+TEMPLIST_PATH="/dev/shm/auto_scan_list"
+head -n ${MAX_SCAN_BATCH:-500} "${TEMPLIST_PATH}" 2>/dev/null | grepip 2>/dev/null | tee -a "${TEMPLIST_PATH}_pre" 2>/dev/null > /dev/null ;
+echo -n "" > ${TEMPLIST_PATH} 2>/dev/null ; wait ;
+grepip -h /proc/net/xt_recent/scannerlist 2>/dev/null | tee -a "${TEMPLIST_PATH}_pre" 2>/dev/null > /dev/null ;
+sort -t . -n "${TEMPLIST_PATH}_pre" | uniq | tee -a "${TEMPLIST_PATH}" 2>/dev/null > /dev/null ;
+rm -qf "${TEMPLIST_PATH}_pre" 2>/dev/null > /dev/null || true ;
+for BAD_IP in $( head -n ${MAX_SCAN_BATCH:-500} "${TEMPLIST_PATH}" ) ; do
+echo $BAD_IP 2>/dev/null > /dev/null ;
+done ;
+rm -qf "${TEMPLIST_PATH}" 2>/dev/null > /dev/null || true ;
 exit 0;

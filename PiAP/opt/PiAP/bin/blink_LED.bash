@@ -35,11 +35,15 @@ if [[ ( ${PIAP_BLINK_COUNT:-10} -gt 0 ) ]] ; then
 		sleep 0.05s
 		echo 0 | sudo tee /sys/class/leds/led${PIAP_BLINK_LED:-0}/brightness 1>&2 2>/dev/null ;
 	done
-elif [[ ( ${PIAP_BLINK_COUNT:-10} -ge 0 ) ]] ; then
+fi
+sleep 0.05s
+if [[ ( ${PIAP_BLINK_COUNT:-10} -gt 0 ) ]] ; then
 	echo none | sudo tee /sys/class/leds/led${PIAP_BLINK_LED:-0}/trigger 1>&2 2>/dev/null ;
 	echo 0 | sudo tee /sys/class/leds/led${PIAP_BLINK_LED:-0}/brightness 1>&2 2>/dev/null ;
 	echo none | sudo tee /sys/class/leds/led${PIAP_BLINK_LED:-0}/trigger 1>&2 2>/dev/null ;
 else
+	echo $(head -n 1 /sys/class/leds/led${PIAP_BLINK_LED:-0}/max_brightness ) | sudo tee /sys/class/leds/led${PIAP_BLINK_LED:-0}/brightness 1>&2 2>/dev/null ;
+	sleep 0.05s
 	echo heartbeat | sudo tee /sys/class/leds/led${PIAP_BLINK_LED:-0}/trigger 1>&2 2>/dev/null ;
 fi
 exit 0;

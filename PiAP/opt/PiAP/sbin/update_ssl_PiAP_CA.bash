@@ -59,6 +59,22 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
-exit 0;
+cd ${TEMPDIR}
+sudo dd if=/dev/hwrng bs=1024 count=4096 of=./.rand_seed.data
+wait ;
+openssl genrsa -rand ./.rand_seed.data -out ./ssl_cert_nginx.key 4096 ; wait ;
+openssl req -new -outform PEM -out ./ssl-cert-CA-nginx.csr -key ./ssl_cert_nginx.key -subj "/CN=PiAP\ CA/OU=PiAP/O=PiAP\ Root/" ; wait ;
+sudo mv -vf ./ssl_cert_nginx.key /etc/ssl/private/ssl-cert-CA-nginx.key ; sudo shred -zero ./.rand_seed.data 2>/dev/null ; wait ; sudo rm -vf ./.rand_seed.data
+sudo chown 0:0 /etc/ssl/private/ssl-cert-CA-nginx.key
+sudo chmod 600 /etc/ssl/private/ssl-cert-CA-nginx.key
+openssl x509 -req -outform PEM -keyform PEM -in ./ssl-cert-CA-nginx.csr -out ./ssl-cert-CA-nginx.pem -days 180  -signkey /etc/ssl/private/ssl-cert-CA-nginx.key -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_ca ;
+openssl req -in ./ssl-cert-CA-nginx.csr -noout -text ;
+rm -vf ./ssl-cert-CA-nginx.csr ;
+openssl x509 -in ./ssl-cert-CA-nginx.pem -noout -text ;
+mv -vf ./ssl-cert-CA-nginx.pem /etc/ssl/PiAP_CA/PiAP_CA.pem ;
+ln -sf ../PiAP_CA/PiAP_CA.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem ;
+exit 0 ;
+
+#openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile \
+#/etc/ssl/PiAP_keyring.cfg -days 30 -extensions usr_cert -CA cacert.pem -CAkey \
+#/etc/ssl/private/ssl-cert-CA-nginx.key -CAcreateserial

@@ -59,6 +59,37 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
-exit 0;
+
+SIZE_TEXT=$(lsblk --list --ascii | grep -E "^([mmcblk0]+){1}\s+" | tr -s ' \t' ' ' | cut -d \  -f4 )
+
+#GB
+if [[ ( $( echo "${SIZE_TEXT}" | grep -cF "G" ) -gt 0 ) ]] ; then
+
+if [[ ( $( echo "${SIZE_TEXT}" | grep -cF "." ) -gt 0 ) ]] ; then
+#partial GB
+( echo $(( `echo "${SIZE_TEXT}" | sed -E -e 's/^([[:digit:]]+[[:punct:]]+[[:digit:]]{1}){1}[G]{1}/(\1*1024*1024*1024)\/10/g' | tr -d '.' | xargs -L1 -I{} echo {} `)) ) 2>/dev/null
+else
+# whole GB
+( echo $(( `echo "${SIZE_TEXT}" | sed -E -e 's/^([[:digit:]]+){1}[G]/(\1*1024*1024*1024)/g' | xargs -L1 -I{} echo {} `)) ) 2>/dev/null
+fi
+elif [[ ( $( echo "${SIZE_TEXT}" | grep -cF "M" ) -gt 0 ) ]] ; then
+if [[ ( $( echo "${SIZE_TEXT}" | grep -cF "." ) -gt 0 ) ]] ; then
+#partial MB
+( echo $(( `echo "${SIZE_TEXT}" | sed -E -e 's/^([[:digit:]]+[[:punct:]]+[[:digit:]]{1}){1}[M]{1}/(\1*1024*1024)\/10/g' | tr -d '.' | xargs -L1 -I{} echo {} `)) ) 2>/dev/null
+else
+# whole MB
+( echo $(( `echo "${SIZE_TEXT}" | sed -E -e 's/^([[:digit:]]+){1}[M]/(\1*1024*1024)/g' | xargs -L1 -I{} echo {} `)) ) 2>/dev/null
+fi
+elif [[ ( $( echo "${SIZE_TEXT}" | grep -cF "K" ) -gt 0 ) ]] ; then
+if [[ ( $( echo "${SIZE_TEXT}" | grep -cF "." ) -gt 0 ) ]] ; then
+#partial KB
+( echo $(( `echo "${SIZE_TEXT}" | sed -E -e 's/^([[:digit:]]+[[:punct:]]+[[:digit:]]{1}){1}[M]{1}/(\1*1024)\/10/g' | tr -d '.' | xargs -L1 -I{} echo {} `)) ) 2>/dev/null
+else
+# whole KB
+( echo $(( `echo "${SIZE_TEXT}" | sed -E -e 's/^([[:digit:]]+){1}[M]/(\1*1024)/g' | xargs -L1 -I{} echo {} `)) ) 2>/dev/null
+fi
+else
+echo "${SIZE_TEXT}"
+fi
+
+exit 0

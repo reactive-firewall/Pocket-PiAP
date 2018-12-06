@@ -16,11 +16,8 @@ matrix:
   - os: linux
     dist: trusty
     language: generic
-  - os: osx
-    osx_image: xcode7.3
-    language: generic
-  - os: osx
-    osx_image: xcode8
+  - os: linux
+    dist: xenial
     language: generic
   - os: osx
     osx_image: xcode8.3
@@ -29,17 +26,31 @@ matrix:
     osx_image: xcode9
     language: generic
   - os: osx
-    osx_image: xcode9.2
+    osx_image: xcode9.4
     language: generic
   - os: osx
-    osx_image: xcode9.3
+    osx_image: xcode10
+    language: generic
+  - os: osx
+    osx_image: xcode10.1
     language: generic
   allow_failures:
   - os: linux
     language: python
   - os: linux
     language: php7
-
+  - os: linux
+    dist: xenial
+    language: generic
+  - os: osx
+    osx_image: xcode8.3
+    language: generic
+  - os: osx
+    osx_image: xcode7.3
+    language: generic
+  - os: osx
+    osx_image: xcode8
+    language: generic
 
 addons:
   hosts:
@@ -106,8 +117,9 @@ before_script:
   - chmod +x ./cc-test-reporter 2>/dev/null || true
   - ./cc-test-reporter before-build 2>/dev/null || true
 
-install: "true"
-# command to run tests
+install:
+  - make clean || true
+
 script:
   - echo "travis_fold:start:piap-test" 2>/dev/null || true
   - make test || export TRAVIS_TEST_RESULT=$? ;

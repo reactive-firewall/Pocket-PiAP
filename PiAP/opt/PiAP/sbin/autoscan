@@ -59,6 +59,28 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
+
+umask 137
+
+/etc/init.d/fw scanmode || /etc/init.d/fw stop || exit 1 ;
+#nmap --privileged -sT -p T:80,443,43,53,22,21,20,993,25,8080,138,139,17500 -g 5353 --reason --data-length $(((${RANDOM}%100)+63)) $@
+#sleep 3s ; wait ;
+#nmap --privileged -sU -p U:80,443,53,123,67,68,995 -g 5353 --reason --data-length $(((${RANDOM}%100)+56)) $@
+#sleep 1s ; wait ;
+#nmap --privileged -PN -A -F --reason --data-length $(((${RANDOM}%100)+70)) $@
+SCAN_NAME=$(echo "$@" | grepip | sort -t \. -n | uniq | head -n 1 )
+nmap --privileged -PN -A --script='safe and discovery' --script-args=newtargets -T4 --reason --data-length $(((${RANDOM}%100)+70)) -oX /tmp/scan_${SCAN_NAME:-latest}.xml $@ || true ;
+nmap --privileged -PN -A --script='safe and discovery' -T4 --reason --data-length $(((${RANDOM}%100)+70)) --resume /tmp/scan_${SCAN_NAME:-latest}.xml -oX /tmp/scan_${SCAN_NAME:-latest}.xml $@ 2>/dev/null|| true ;
+/etc/init.d/fw start ; wait ;
+umask 0007
+if [[ !( -d /srv/PiAP/files/scans/ ) ]] ; then mkdir -m 751 -p /srv/PiAP/files/scans 2>/dev/null ; wait ; chown -vf pocket:pocket-www /srv/PiAP/files/scans/ ; wait ; fi ;
+if [[ ( -f /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml ) ]] ; then
+head -n 999999 /tmp/scan_${SCAN_NAME:-latest}.xml 2>/dev/null | tee -a /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml 2>/dev/null ; wait ;
+else
+mv -f /tmp/scan_${SCAN_NAME:-latest}.xml /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml 2>/dev/null || true ; wait ;
+chown pocket:pocket-www /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml || true ; wait ;
+chmod 640 /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml || true
+fi
+umask 137
+
 exit 0;

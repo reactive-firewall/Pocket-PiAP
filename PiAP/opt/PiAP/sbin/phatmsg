@@ -59,6 +59,9 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
-exit 0;
+
+umask 177
+
+/bin/echo "${@}" > /tmp/${LOGNAME}_tmp_message ; wait ; sudo wall -n /tmp/${LOGNAME}_tmp_message ; wait ; rm /tmp/${LOGNAME}_tmp_message ; wait ;
+
+exit 0 ;

@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash --posix
 # Disclaimer of Warranties.
 # A. YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT, TO THE EXTENT PERMITTED BY
 #    APPLICABLE LAW, USE OF THIS SHELL SCRIPT AND ANY SERVICES PERFORMED
@@ -59,6 +59,18 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
-exit 0;
+
+# version 20140517
+
+umask 137
+
+GREP_ARGS=""
+
+while [[ ($# -gt 1) && (${1:0:1} = '-') ]] ; do
+GREP_ARGS="${GREP_ARGS} ${1}"
+shift
+done
+
+\grep${GREP_ARGS} -oE "([[:alnum:]]{1}[-[:alnum:]]*[\.]{1}){2,}[[:alnum:]]{1}[-[:alnum:]\.]+" $@
+
+exit 0 ;

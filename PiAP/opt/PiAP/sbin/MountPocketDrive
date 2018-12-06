@@ -59,6 +59,10 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
+sudo service netatalk stop || true
+POCKET_UID=$(grep -F "pocket-admin:x:" /etc/passwd | grep -oE "\b[0-9]+\b" | head -n 1)
+POCKET_GID=$(grep -F "pocket:x:" /etc/group | grep -oE "\b[0-9]+\b")
+sudo mount -o uid=${POCKET_UID:-0},gid=${POCKET_GID:-0} /dev/mmcblk0p3 /mnt/PiFiDrive || exit 2;
+sudo service netatalk start || exit 1;
+
 exit 0;

@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash --posix
 # Disclaimer of Warranties.
 # A. YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT, TO THE EXTENT PERMITTED BY
 #    APPLICABLE LAW, USE OF THIS SHELL SCRIPT AND ANY SERVICES PERFORMED
@@ -59,6 +59,34 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
-exit 0;
+
+# usage ~ remove_line n FILE
+# removes line n from file
+
+declare -ir LINE_NUMBER="${1}"
+wait ;
+declare -i BEFORE_LINE_NUMBER=$((${LINE_NUMBER}-1))
+declare -i AFTER_LINE_NUMBER=$((${LINE_NUMBER}+1))
+declare -r THE_FILE="${2}"
+
+if [[ ( -e "${THE_FILE}" ) ]] ; then
+	if [[ ( -r "${THE_FILE}" ) ]] ; then
+		if [[ ( -w "${THE_FILE}" ) ]] ; then
+			head -n ${BEFORE_LINE_NUMBER} ${THE_FILE} || exit 1 ;
+			wait ;
+			tail -n +${AFTER_LINE_NUMBER} ${THE_FILE} || exit 1 ;
+			wait ;
+		else
+			echo "ERROR: ${THE_FILE} is not writeable." 1>&2 ; wait ;
+			exit 4;
+		fi
+	else
+		echo "ERROR: ${THE_FILE} can not be read." 1>&2 ; wait ;
+		exit 3;
+	fi
+else
+	echo "ERROR: ${THE_FILE} can not be found." 1>&2 ; wait ;
+	exit 2;
+fi
+
+exit 0 ;

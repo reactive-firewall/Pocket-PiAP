@@ -1,4 +1,5 @@
 #! /bin/bash
+# Copied from Open source ymmv code circa 2017
 # Disclaimer of Warranties.
 # A. YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT, TO THE EXTENT PERMITTED BY
 #    APPLICABLE LAW, USE OF THIS SHELL SCRIPT AND ANY SERVICES PERFORMED
@@ -59,6 +60,20 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
-exit 0;
+#
+# update file states
+#
+test -x $(which sha512sum) || exit 1 ;
+test -x $(which rkhunter) || exit 1 ;
+test -x /usr/bin/debsums || exit 1 ;
+test -d /etc/nagios/ || exit 0 ;
+sha512sum /usr/bin/* >> /etc/nagios/check_checksums.sha512
+sha512sum /etc/* >> /etc/nagios/check_checksums.sha512
+sha512sum /bin/* >> /etc/nagios/check_checksums.sha512
+sha512sum /sbin/* >> /etc/nagios/check_checksums.sha512
+sha512sum /usr/sbin/* >> /etc/nagios/check_checksums.sha512
+/usr/bin/debsums -ca -g
+rkhunter --update
+rkhunter --propupd
+sync ; wait ; sync ;
+exit 0

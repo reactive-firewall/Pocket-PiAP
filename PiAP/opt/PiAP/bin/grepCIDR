@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash --posix
 # Disclaimer of Warranties.
 # A. YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT, TO THE EXTENT PERMITTED BY
 #    APPLICABLE LAW, USE OF THIS SHELL SCRIPT AND ANY SERVICES PERFORMED
@@ -58,7 +58,20 @@
 #    be required by applicable law in cases involving personal injury) exceed
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
-################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
-exit 0;
+###############################################################################
+
+
+# version 20160617
+
+# grepCIDR
+
+umask 137
+
+while [[ ($# -gt 1) && (${1:1:1} = '-') ]] ; do
+GREP_ARGS="${GREP_ARGS} ${1}"
+shift
+done
+
+/bin/grep ${GREP_ARGS} -oE "([12]?[0-9]?[0-9]{1}[\.]{1}){3}([12]?[0-9]?[0-9]{1}([/]{1}[1-3]?[0-9]+)?){1}" $@
+
+exit 0 ;

@@ -59,6 +59,31 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-/opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
-/opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
-exit 0;
+
+# WARNING THIS SCRIPT IS INSECURE
+# THIS SCRIPT WILL RESET A PASSWORD BUT WILL NOT RECOVER IT
+
+# THE EFFECTS OF THIS SCRIPT CAN NOT BE UNDONE
+
+# this is a script to overwrite the first user for the web interface password with the configured default
+# must already have root access to system
+# please configure default password in /srv/PiAP/files/db/defaults
+
+ulimit -t 300
+umask 137
+PATH="/bin:/sbin:/usr/sbin:/usr/bin"
+test -r /srv/PiAP/files/db/defaults || exit 1;
+source /srv/PiAP/files/db/defaults
+MY_SALT=$(echo -n "${DEFAULT_SALT:-${RANDOM}}")
+
+# OR change this line to set a custom password (SECURITY RISK)
+NEW_PASSWORD="${DEFAULT_PASSWORD:-IAmFORGETFUL}"
+
+echo -n $(sudo -u pocket-admin -g pocket head -n 1 /srv/PiAP/files/db/passwd | cut -d \  -f 1 )" "$(sudo -u pocket-admin -g pocket-www /srv/PiAP/bin/saltify.bash $(sudo -u pocket-admin -g pocket-www /srv/PiAP/bin/saltify.bash $(echo -n "${NEW_PASSWORD:-${DEFAULT_PASSWORD}}" | openssl dgst -sha512 | cut -d \  -f 2 ) ${MY_SALT} ) $(sudo -u pocket-admin -g pocket-www head -n 1 /srv/PiAP/files/db/pepper) ; wait )" "${MY_SALT} ;
+echo ""
+#sudo tail -n +2 /srv/PiAP/files/db/passwd ;
+
+unset MY_SALT ;
+unset NEW_PASSWORD ;
+unset DEFAULT_PASSWORD ;
+
