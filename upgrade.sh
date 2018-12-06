@@ -101,9 +101,11 @@ if [[ ( ${ROLL_BACK:-1} -gt 0 ) ]] ; then
 	exit 2 ;
 fi
 
-for SOME_DEPENDS in build-essential make git gnupg2 nginx nginx-full php-fpm php7.0-xsl dnsmasq hostapd python3 python3-pip ; do
+for SOME_DEPENDS in build-essential make git gnupg2 nginx nginx-full dnsmasq hostapd python3 python3-pip ; do
 	check_depends ${SOME_DEPENDS} || exit 2 ;
 done ;
+
+check_depends php-fpm && check_depends php7.0-xsl || check_depends php5-fpm || exit 2 ;
 
 cd /tmp ;
 check_path /var/ || exit 2 ;
