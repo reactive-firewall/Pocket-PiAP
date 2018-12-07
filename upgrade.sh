@@ -245,11 +245,11 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || message "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/Pocket-PiAP/issues\" (include as much detail as possible) and might need to reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
 fi
 message "Checking TLS Beta cert dates."
-if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | grep -F -c OK ) -le 0 ) ]] ; then
+if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | grep -cF OK ) -le 0 ) ]] ; then
 	message "Rebuilding cert links"
 	sudo unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
 	sudo ln -sf /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
-elif [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c 'certificate has expired' ) -gt 0 ) ]] ; then
+elif [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | grep -cF 'certificate has expired' ) -gt 0 ) ]] ; then
 	message "Rebuilding cert links"
 	sudo unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
 	sudo ln -sf /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
@@ -260,7 +260,7 @@ if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/ce
 	umask 0002
 	( sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 	message "DONE"
-elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | fgrep -c 'certificate has expired' ) -gt 0 ) ]] ; then
+elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -cF 'certificate has expired' ) -gt 0 ) ]] ; then
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
 	sudo rm -vf /etc/ssl/PiAPCA/certs/PiAP_SSL.pem
 	umask 0002
@@ -278,7 +278,7 @@ if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/ce
 	umask 0002
 	( sudo make /etc/ssl/PiAPCA/PiAP_CA.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 	message "DONE"
-elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | fgrep -c 'certificate has expired' ) -gt 0 ) ]] ; then
+elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -cF 'certificate has expired' ) -gt 0 ) ]] ; then
 	message "Applying HOTFIX - TLS CA Cert rotation for Beta"
 	sudo rm -vf /etc/ssl/PiAPCA/PiAP_CA.pem
 	umask 0002
