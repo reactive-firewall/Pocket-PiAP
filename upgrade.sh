@@ -245,24 +245,52 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || message "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/Pocket-PiAP/issues\" (include as much detail as possible) and might need to reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
 fi
 message "Checking TLS Beta cert dates."
-if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | grep -F -c OK ) -le 0 ) ]] ; then
+if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | grep -cF OK ) -le 0 ) ]] ; then
+	message "Rebuilding cert links"
+	sudo unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
+	sudo ln -sf /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
+elif [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | grep -cF 'certificate has expired' ) -gt 0 ) ]] ; then
+	message "Rebuilding cert links"
+	sudo unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
+	sudo ln -sf /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
+fi
+if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -F -c OK ) -le 0 ) ]] ; then
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
-	sudo openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null ; wait ;
-	sudo openssl req -new -outform PEM -out /root/ssl-cert-nginx.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.PiAP.local/OU=PiAP.local/O=PiAP\ Network/" 2>/dev/null
-	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions server_cert -CA /etc/ssl/PiAPCA/PiAP_CA.pem -CAkey /etc/ssl/PiAPCA/private/PiAP_CA.key -CAcreateserial | grep -F --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo grep -F --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
+	sudo rm -vf /etc/ssl/PiAPCA/certs/PiAP_SSL.pem
+	umask 0002
+	( sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 	message "DONE"
-elif [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | fgrep -c 'certificate has expired' ) -gt 0 ) ]] ; then
+elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -cF 'certificate has expired' ) -gt 0 ) ]] ; then
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
-	sudo openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null ; wait ;
-	sudo openssl req -new -outform PEM -out /root/ssl-cert-nginx.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.PiAP.local/OU=PiAP.local/O=Pocket\ PiAP/" 2>/dev/null
-	sudo openssl x509 -req -in /root/ssl-cert-nginx.csr -extfile /etc/ssl/PiAP_keyring.cfg -days 30 -extensions server_cert -CA /etc/ssl/PiAPCA/PiAP_CA.pem -CAkey /etc/ssl/PiAPCA/private/PiAP_CA.key -CAcreateserial | grep -F --after-context=400 -e $"-----BEGIN CERTIFICATE-----" | sudo tee /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo grep -F --after-context=400 -e $"-----BEGIN CERTIFICATE-----" /etc/ssl/certs/ssl-cert-CA-nginx.pem | sudo tee -a /etc/ssl/certs/ssl-cert-nginx.pem ; wait ; sudo service nginx restart ;
+	sudo rm -vf /etc/ssl/PiAPCA/certs/PiAP_SSL.pem
+	umask 0002
+	( sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 	message "DONE"
 	message "Cert should be fine now."
 	message "You will probably have a browser warning about the new certificate, the next time you visit the web interface."
-	openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null || true ; wait ;
+	openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null || true ; wait ;
 else
-	message "Cert seems fine."
+	message "SSL Cert seems fine."
 fi
+if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -F -c OK ) -le 0 ) ]] ; then
+	message "Applying HOTFIX - TLS CA Cert rotation for Beta"
+	sudo rm -vf /etc/ssl/PiAPCA/PiAP_CA.pem
+	umask 0002
+	( sudo make /etc/ssl/PiAPCA/PiAP_CA.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
+	message "DONE"
+elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -cF 'certificate has expired' ) -gt 0 ) ]] ; then
+	message "Applying HOTFIX - TLS CA Cert rotation for Beta"
+	sudo rm -vf /etc/ssl/PiAPCA/PiAP_CA.pem
+	umask 0002
+	( sudo make /etc/ssl/PiAPCA/PiAP_CA.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
+	message "DONE"
+	message "Cert should be fine now."
+	message "You will probably have a browser warning about the new certificate, the next time you visit the web interface."
+	openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null || true ; wait ;
+else
+	message "CA Cert seems fine."
+fi
+	umask 0027
 if [[ ( $( find /etc/ssh -iname *.pub -ctime +30 -print0 2>/dev/null | wc -l ) -ge 1 ) ]] ; then
 	message "Applying HOTFIX - SSH key rotation for Beta"
 	find /etc/ssh -iname *.pub -ctime +30 -print0 2>/dev/null | xargs -0 -L1 rm -vf ; wait ;
@@ -313,8 +341,8 @@ if [[ $CI ]] ; then
 	python3 -m piaplib.pocket book version --all || true
 	message "[BETA] WEB ENV"
 	php --version
-	head -n 4000 /etc/nginx/sites-available/PiAP
-	head -n 4000 /etc/nginx/sites-available/default
+	head -n 4000 /etc/nginx/sites-available/PiAP || message "Missing /etc/nginx/sites-available/PiAP"
+	head -n 4000 /etc/nginx/sites-available/default || message "Missing /etc/nginx/sites-available/default"
 	sudo nginx -t -c /etc/nginx/nginx.conf || true
 fi	
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
@@ -327,8 +355,10 @@ head -n 9999999 "${PIAP_LOG_PATH}" || true ; wait ;
 
 message "[DONE] SCRIPT IS NOW DONE. SAFE TO MOVE TO NEXT STEP"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
-message "[NEXT] Verify backups were restored."
+message "[NEXT] Verify backups were restored. [This is not a sure thing]"
 message "[NEXT] copy logs for bug report."
+echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
+echo "     scp -2 -P ${SSH_PORT} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
 message "[NEXT] submit bug report."
 else
 message "[NEXT] Restart Pocket to complete the upgrades."
