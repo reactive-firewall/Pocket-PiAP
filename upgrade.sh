@@ -166,35 +166,35 @@ if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] 
 	message "Enabled TRUST CHECK. [BETA TEST]"
 
 curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
-	printf 'trust 1\n3\nsave\n' | gpg2 --command-fd 0 --edit-key CF76FC3B8CD0B15F 2>/dev/null || true ; wait ;
+	printf 'trust 1\n3\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key CF76FC3B8CD0B15F 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
-	printf 'trust 1\n3\nsave\n' | gpg2 --command-fd 0 --edit-key 2FDAFC993A61112D 2>/dev/null || true ; wait ;
+	printf 'trust 1\n3\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 2FDAFC993A61112D 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_C.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
-	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key F55A399B1FE18BCB 2>/dev/null || true ; wait ;
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key F55A399B1FE18BCB 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_ABC.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
-	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key DE1F0294A79F5244 2>/dev/null || WARN_VAR=2 ; wait ;
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key DE1F0294A79F5244 2>/dev/null || WARN_VAR=2 ; wait ;
 	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_D.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
 	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
 		message "FAILED TO import 055521972A2DF921"
 		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
 	fi
-	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 055521972A2DF921 2>/dev/null || true ; wait ;
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 055521972A2DF921 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_E.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || WARN_VAR=2 ;
-	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 7A4FC8AFC5FF91EE 2>/dev/null || true ; wait ;
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 7A4FC8AFC5FF91EE 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_F.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
 	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
 		message "FAILED TO import 1B38E552E4E90FDB"
 		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
 	fi
-	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 1B38E552E4E90FDB 2>/dev/null || WARN_VAR=2 ; wait ;
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 1B38E552E4E90FDB 2>/dev/null || WARN_VAR=2 ; wait ;
 	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_G.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
 	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
 		message "FAILED TO import 157F7C20C1B17EAF"
 		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
 	fi
-	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key 157F7C20C1B17EAF 2>/dev/null || WARN_VAR=2 ; wait ;
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 157F7C20C1B17EAF 2>/dev/null || WARN_VAR=2 ; wait ;
 	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
-	printf 'trust 1\n4\nsave\n' | gpg2 --command-fd 0 --edit-key BF53A260306CBD6C 2>/dev/null || WARN_VAR=2 ; wait ;
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 493E9F9098AAF260 2>/dev/null || WARN_VAR=2 ; wait ;
 	${GIT_GPG_CMD} --check-trustdb 2>/dev/null || WARN_VAR=2 ;
 
 	# BUG WHERE ELIPTIC CURVE keys are unusable ?!?! wtf is this weak sauce ?
@@ -208,7 +208,7 @@ curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" -
 
 	if [[ ( ${WARN_VAR:-2} -gt 0 ) ]] ; then
 		message "FAILED TO VERIFY CODESIGN TRUST ANCHORS"
-		message "[MISSING BETA KEY ISSUE] need to download keys F55A399B1FE18BCB, 055521972A2DF921, 1B38E552E4E90FDB, 157F7C20C1B17EAF and the current beta key. Probably BF53A260306CBD6C... [FIX ME]"
+		message "[MISSING BETA KEY ISSUE] need to download keys F55A399B1FE18BCB, 055521972A2DF921, 1B38E552E4E90FDB, 157F7C20C1B17EAF and the current beta key. Probably 493E9F9098AAF260... [FIX ME]"
 		# FIX THIS
 		message "[BETA] RE-DISABLED TRUST CHECK."
 		message "BETA: Attempting upgrading..."
@@ -220,7 +220,7 @@ fi
 sudo git show --show-signature | grep -F ": " | grep -F "Pocket PiAP Codesign CA" | grep -F "Good signature" || (sudo git show --show-signature | grep -F ": " | grep -F "Signature made" && sudo git show --show-signature | grep -F ": " | grep -F "Invalid public key algorithm" || true ) || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
-	message "[MISSING BETA KEY ISSUE] need to download keys F55A399B1FE18BCB, 055521972A2DF921, 1B38E552E4E90FDB, 157F7C20C1B17EAF and the current beta key. Probably BF53A260306CBD6C... [FIX ME]"
+	message "[MISSING BETA KEY ISSUE] need to download keys F55A399B1FE18BCB, 055521972A2DF921, 1B38E552E4E90FDB, 157F7C20C1B17EAF and the current beta key. Probably 493E9F9098AAF260... [FIX ME]"
 #fi # temp roll back [CAUTION for BETA]
 #	message "NOT Attempting upgrading..."
 else
@@ -346,9 +346,9 @@ if [[ $CI ]] ; then
 	head -n 4000 /etc/nginx/sites-available/PiAP || message "Missing /etc/nginx/sites-available/PiAP"
 	head -n 4000 /etc/nginx/sites-available/default || message "Missing /etc/nginx/sites-available/default"
 	sudo nginx -t -c /etc/nginx/nginx.conf || true
-fi	
+fi
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
-echo "     scp -2 -P ${SSH_PORT} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
+echo "     scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
 else
 message "Status: Upgrade seemed to work. (check by logging in to the Web interface)"
 fi
@@ -360,7 +360,7 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 message "[NEXT] Verify backups were restored. [This is not a sure thing]"
 message "[NEXT] copy logs for bug report."
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
-echo "     scp -2 -P ${SSH_PORT} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
+echo "     scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
 message "[NEXT] submit bug report."
 else
 message "[NEXT] Restart Pocket to complete the upgrades."
