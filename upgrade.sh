@@ -121,8 +121,12 @@ sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/ || true ;
 sudo chown 755 /var/opt/PiAP/ || true ;
 message "Making space for new backup up pre-upgrade version"
 sudo rm -Rvf /var/opt/PiAP/backups/PiAP_OLD/ 2>/dev/null || true ;
+sudo rm -Rvf /var/opt/PiAP/backups/SSL_OLD/ 2>/dev/null || true ;
 if [[ ( -e /var/opt/PiAP/backups/PiAP ) ]] ; then
 	sudo mv -vf /var/opt/PiAP/backups/PiAP /var/opt/PiAP/backups/PiAP_OLD || true ;
+fi
+if [[ ( -e /var/opt/PiAP/backups/PiAP ) ]] ; then
+	sudo mv -vf /var/opt/PiAP/backups/SSL /var/opt/PiAP/backups/SSL_OLD || true ;
 fi
 message "Backing up pre-upgrade version"
 if [[ ( -e /srv/PiAP ) ]] ; then
@@ -130,6 +134,12 @@ if [[ ( -e /srv/PiAP ) ]] ; then
 else
 	message "Nothing to backup! No pre-upgrade version."
 	check_path /srv/PiAP/ || exit 2 ;
+fi
+if [[ ( -e /etc/ssl ) ]] ; then
+	sudo cp -vfRpub /etc/ssl /var/opt/PiAP/backups/SSL || exit 3 ;
+else
+	message "Nothing to backup! No pre-upgrade version."
+	check_path /etc/ssl/ || exit 2 ;
 fi
 message "Backing up Complete"
 message "Disabling web-server to prevent inconsistent state. All sessions will be logged out."
@@ -243,15 +253,16 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	sudo rm -vfR /srv/PiAP_Failed || true ;
 	wait ;
 	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || message "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/Pocket-PiAP/issues\" (include as much detail as possible) and might need to reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
+	sudo cp -vfRpub /var/opt/PiAP/backups/SSL /etc/ssl || message "FATAL error: device will need SSL reset. You found a bug. [BUGS] [FIX ME]"
 fi
 message "Checking TLS Beta cert dates."
 if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | grep -cF OK ) -le 0 ) ]] ; then
 	message "Rebuilding cert links"
-	sudo unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
+	# sudo unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
 	sudo ln -sf /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
 elif [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | grep -cF 'certificate has expired' ) -gt 0 ) ]] ; then
 	message "Rebuilding cert links"
-	sudo unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
+	# sudo unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
 	sudo ln -sf /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
 fi
 if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -F -c OK ) -le 0 ) ]] ; then
@@ -275,13 +286,15 @@ fi
 if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -F -c OK ) -le 0 ) ]] ; then
 	message "Applying HOTFIX - TLS CA Cert rotation for Beta"
 	sudo rm -vf /etc/ssl/PiAPCA/PiAP_CA.pem
+	sudo rm -vf /etc/ssl/PiAPCA/PiAP_SSL.pem
 	umask 0002
 	( sudo make /etc/ssl/PiAPCA/PiAP_CA.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 	( sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 	message "DONE"
-elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -cF 'certificate has expired' ) -gt 0 ) ]] ; then
+elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -F -c 'certificate has expired' ) -gt 0 ) ]] ; then
 	message "Applying HOTFIX - TLS CA Cert rotation for Beta"
 	sudo rm -vf /etc/ssl/PiAPCA/PiAP_CA.pem
+	sudo rm -vf /etc/ssl/PiAPCA/PiAP_SSL.pem
 	umask 0002
 	( sudo make /etc/ssl/PiAPCA/PiAP_CA.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 	( sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null

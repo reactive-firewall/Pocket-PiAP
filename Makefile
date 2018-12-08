@@ -284,7 +284,6 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Self-Signed."
 
 /etc/ssl/certs/ssl-cert-CA-nginx.pem: /etc/ssl/PiAPCA/PiAP_CA.pem must_be_root
-	$(QUIET)unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem 2>/dev/null || true
 	$(QUIET)ln -sf ../PiAPCA/PiAP_CA.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Installed."
