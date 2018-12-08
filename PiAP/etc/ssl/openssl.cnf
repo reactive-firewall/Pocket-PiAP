@@ -953,8 +953,8 @@ inhibitAnyPolicy 			= 2
  O=Individual
  OU=PiAP Root
  CN=PiAP CA
- otherName:UserID;UTF8=ASN1:UTF8String:0
  otherName:RFC_1274_UID;INTEGER=ASN1:INTEGER:0
+# otherName:UserID;UTF8=ASN1:UTF8String:0
 # SN=
 
 ####################################################################
