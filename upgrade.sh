@@ -332,7 +332,7 @@ message "DONE"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 SSH_PORT=$(echo ${SSH_CONNECTION} | cut -d\  -f 4 )
 SSH_SERVER=$(echo ${SSH_CONNECTION} | cut -d\  -f 3 )
-test -x /usr/bin/raspi-config 2>/dev/null && sudo /opt/PiAP/bin/set_LED_status_Agro.bash 2>/dev/null || true
+( test -x /usr/bin/raspi-config 2>/dev/null && sudo /opt/PiAP/bin/set_LED_status_Agro.bash 2>/dev/null ) || true
 message "Status: Upgrade failed."
 message "Please report this issue at https://github.com/reactive-firewall/Pocket-PiAP/issues"
 message "[BETA] Please include the contents of this log \"${PIAP_LOG_PATH}\""
@@ -365,7 +365,7 @@ fi
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
 else
-test -x /usr/bin/raspi-config 2>/dev/null && sudo /opt/PiAP/bin/set_LED_status_Ready.bash || true
+(test -x /usr/bin/raspi-config 2>/dev/null && sudo /opt/PiAP/bin/set_LED_status_Ready.bash ) || true
 message "Status: Upgrade seemed to work. (check by logging in to the Web interface)"
 fi
 message "--------------------[LOG]----------------------"
