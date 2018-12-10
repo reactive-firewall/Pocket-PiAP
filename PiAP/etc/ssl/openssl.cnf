@@ -718,7 +718,7 @@ verisign_class_ev				= ${verisign_policy}.6
 #2.23.140.1.2.2
 
 #alt name:
-UserID = 1.3.6.1.1.1.1.0
+UID = 1.3.6.1.1.1.1.0
 netgear_org = 1.3.6.1.4.1.4526
 netgear_firewall = ${netgear_org}.100.6
 fwag114 = ${netgear_firewall}.3
@@ -829,6 +829,7 @@ UID					= UID (Unique Identifier)
 UID_min					= 0
 UID_max					= 32
 #oid_subj_org_type			= Organization Type
+#uniqueIdentifier			= Unique Identifier
 
 0.organizationName_default		= Pocket WiFi Access Point Project
 organizationalUnitName_default		= Pocket PiAP
@@ -926,12 +927,14 @@ issuerAltName				= issuer:copy
 [ PiAP_CA_cert ]
 
 # This goes against PKIX guidelines. Should peer-review this
-basicConstraints=critical,@root_bs_section
+basicConstraints			= critical,@root_bs_section
 nsCertType				= sslCA,emailCA,objsign
 #extendedKeyUsage			= 2.5.29.37.0
 keyUsage				= digitalSignature,cRLSign,keyCertSign
 nsComment				= "Pocket PiAP Certificate Authority"
 subjectKeyIdentifier			= critical,hash
+#UID					= ASN1:UTF8String:0
+#RFC_1274_UID				= ASN1:INTEGER:0
 #authorityKeyIdentifier			= keyid:issuer
 #subjectAltName				= @piap_srv_subj_alt_names
 subjectAltName				= dirName:dir_sect
@@ -946,15 +949,14 @@ issuerAltName				= issuer:copy
 #nsSslServerName			= pocket.PiAP.local
 certificatePolicies			= @polsect_root
 policyConstraints 			= requireExplicitPolicy:3
-inhibitAnyPolicy 			= 2
+#inhibitAnyPolicy 			= 2
 
 [dir_sect]
  C=US
  O=Individual
  OU=PiAP Root
  CN=PiAP CA
- otherName:RFC_1274_UID;INTEGER=ASN1:INTEGER:0
-# otherName:UserID;UTF8=ASN1:UTF8String:0
+ UID=0
 # SN=
 
 ####################################################################
@@ -985,7 +987,7 @@ inhibitAnyPolicy 			= 2
 ####################################################################
 [root_bs_section]
  CA=true
- pathlen=3
+ pathlen=1
 
 ####################################################################
 [ piap_srv_subj_alt_names ]
@@ -996,6 +998,7 @@ DNS.4						= pocket.piap.local
 # RFC 2818 vs RFC6125 [section 1.7.2] - should peer review
 IP.1						= 10.0.40.1
 IP.2						= fc00::a00:2801
+
 
 ####################################################################
 [ sign_cert ]
