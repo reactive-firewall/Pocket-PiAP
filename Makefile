@@ -284,7 +284,6 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Self-Signed."
 
 /etc/ssl/certs/ssl-cert-CA-nginx.pem: /etc/ssl/PiAPCA/PiAP_CA.pem must_be_root
-	$(QUIET)unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem 2>/dev/null || true
 	$(QUIET)ln -sf ../PiAPCA/PiAP_CA.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Installed."
@@ -294,7 +293,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)openssl genrsa -rand /tmp/.rand_seed.data -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 4096 2>/dev/null || openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_SSL.key 2048 2>/dev/null || exit 3
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/private/PiAP_SSL.key || exit 2
-	$(QUIET)rm -f /tmp/.rand_seed.data 2>/dev/null || true
+	$(QUIET)$(RM) /tmp/.rand_seed.data 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Generated."
 
 /etc/ssl/PiAPCA/private/PiAP_SSL.csr: /etc/ssl/PiAPCA/private/PiAP_SSL.key must_be_root
@@ -307,7 +306,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)openssl ca -config /etc/ssl/PiAP_keyring.cfg -days 180 -in /etc/ssl/PiAPCA/private/PiAP_SSL.csr -extfile /etc/ssl/PiAP_keyring.cfg -extensions PiAP_server_cert -batch | fgrep --after-context=800 -e "-----BEGIN CERTIFICATE-----" | tee /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null > /dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || exit 2
-	$(QUIET)$(ECHO) "$@: Signed."
+	$(QUIET)$(ECHO) "$@: Signed." | tee configure-PiAP-keyring
 
 /etc/ssl/certs/ssl-cert-nginx.pem: configure-PiAP-keyring /etc/ssl/PiAPCA/certs/PiAP_SSL.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem must_be_root
 	$(QUITE)$(WAIT)
@@ -384,6 +383,7 @@ purge-PiAP-keyring: remove-PiAP-keyring must_be_root
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_SSL.csr || true
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_SSL.key || true
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_CA.csr || true
+	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_CA.s* 2>/dev/null || true
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/private/PiAP_CA.key || true
 	$(QUIET)$(RM) /etc/ssl/PiAPCA/PiAP_CA.pem || true
 	$(QUIET)$(RMDIR) /etc/ssl/PiAPCA/crl 2>/dev/null || true
