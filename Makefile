@@ -147,7 +147,7 @@ install-users: ./PiAP must_be_root /usr/lib/misc/
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /usr/lib/misc 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-optroot: ./PiAP must_be_root install-users /opt/PiAP/
+install-optroot: ./PiAP must_be_root install-users /opt/PiAP/ /etc/logrotate.d/PiAP
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall-optroot: /opt/PiAP/ uninstall-wpa-actions uninstall-hostapd-actions uninstall-optbin uninstall-optsbin must_be_root
@@ -162,7 +162,7 @@ uninstall-optroot: /opt/PiAP/ uninstall-wpa-actions uninstall-hostapd-actions un
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /opt/
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-optbin: install-optroot must_be_root /opt/PiAP/bin/blink_LED.bash /opt/PiAP/bin/disable_LED.bash /opt/PiAP/bin/set_LED_status_Ready.bash /opt/PiAP/bin/set_LED_status_None.bash /opt/PiAP/bin/set_LED_status_Agro.bash /opt/PiAP/bin/pocket /opt/PiAP/bin/virus_scan.bash
+install-optbin: install-optroot must_be_root /opt/PiAP/bin/blink_LED.bash /opt/PiAP/bin/disable_LED.bash /opt/PiAP/bin/set_LED_status_Ready.bash /opt/PiAP/bin/set_LED_status_None.bash /opt/PiAP/bin/set_LED_status_Agro.bash /opt/PiAP/bin/pocket /opt/PiAP/bin/virus_scan.bash /opt/PiAP/bin/grepCIDR /opt/PiAP/bin/grepip /opt/PiAP/bin/grepdns
 	$(QUIET)$(ECHO) "$@: Done."
 
 /opt/PiAP/bin/%: ./PiAP/opt/PiAP/bin/% must_be_root /opt/PiAP/bin/
@@ -180,6 +180,9 @@ uninstall-optbin: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true
 	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_None.bash 2>/dev/null || true
 	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_Agro.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/grepdns 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/grepip 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/grepCIDR 2>/dev/null || true
 	$(QUIET)$(RMDIR) /opt/PiAP/bin 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -297,7 +300,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Generated."
 
 /etc/ssl/PiAPCA/private/PiAP_SSL.csr: /etc/ssl/PiAPCA/private/PiAP_SSL.key must_be_root
-	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_SSL.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.piap.local/OU=PiAP\ SSL/O=PiAP\ Network/" 2>/dev/null
+	$(QUIET)openssl req -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_SSL.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.piap.local/OU=PiAP\ SSL/O=PiAP\ Network/UID=0/" 2>/dev/null
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/private/PiAP_SSL.csr || exit 2
 	$(QUIET)$(ECHO) "$@: Requested."
@@ -328,6 +331,11 @@ configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem mu
 
 /etc/hosts: must_be_root
 	$(QUIET)if [[ ( -z $$( grep -F "# PiAP LAN (PiAP.local)" /etc/hosts ) ) ]] ; then $(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/hosts /etc/hosts || exit 2 ; fi
+	$(QUIET)$(ECHO) "$@: Done."	
+
+/etc/logrotate.d/PiAP: must_be_root
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/logrotate.d/PiAP /etc/logrotate.d/PiAP 2>/dev/null
+	$(QUIET)logrotate /etc/logrotate.conf || true
 	$(QUIET)$(ECHO) "$@: Done."	
 
 remove-httpd: must_be_root
