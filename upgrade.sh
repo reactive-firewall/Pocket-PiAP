@@ -287,7 +287,7 @@ fi
 if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -F -c OK ) -le 0 ) ]] ; then
 	message "Applying HOTFIX - TLS CA Cert rotation for Beta"
 	sudo rm -vf /etc/ssl/PiAPCA/PiAP_CA.pem
-	sudo rm -vf /etc/ssl/PiAPCA/PiAP_SSL.pem
+	sudo rm -vf /etc/ssl/PiAPCA/certs/PiAP_SSL.pem
 	umask 0002
 	( sudo make /etc/ssl/PiAPCA/PiAP_CA.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 	( sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
@@ -295,7 +295,7 @@ if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/ce
 elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -F -c 'certificate has expired' ) -gt 0 ) ]] ; then
 	message "Applying HOTFIX - TLS CA Cert rotation for Beta"
 	sudo rm -vf /etc/ssl/PiAPCA/PiAP_CA.pem
-	sudo rm -vf /etc/ssl/PiAPCA/PiAP_SSL.pem
+	sudo rm -vf /etc/ssl/PiAPCA/certs/PiAP_SSL.pem
 	umask 0002
 	( sudo make /etc/ssl/PiAPCA/PiAP_CA.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
 	( sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
