@@ -85,7 +85,7 @@ touch ${LOCK_FILE} 2>/dev/null || exit 0 ;
 
 # actual action
 EXIT_CODE=1
-if [[ ( $($(dirname $0)/ping | fgrep -oc "PONG") -gt 0 ) ]] ; then
+if [[ ( $($(dirname $0)/ping_wpa | fgrep -oc "PONG") -gt 0 ) ]] ; then
 	EXIT_CODE=0
 	echo "OK - Ready"
 else

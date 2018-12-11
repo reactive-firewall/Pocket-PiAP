@@ -1,0 +1,11 @@
+/var/log/PiAP.log
+{
+        rotate 3
+        daily
+        create 0660 pocket-adm pocket
+        size 200k
+        missingok
+        notifempty
+        delaycompress
+        compress
+}
