@@ -2,7 +2,7 @@
 {
         rotate 3
         daily
-        create 0660 pocket-adm pocket
+        create 0660 pocket-admin pocket
         size 200k
         missingok
         notifempty
