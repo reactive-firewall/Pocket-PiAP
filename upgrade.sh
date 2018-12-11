@@ -101,7 +101,7 @@ if [[ ( ${ROLL_BACK:-1} -gt 0 ) ]] ; then
 	exit 2 ;
 fi
 
-for SOME_DEPENDS in build-essential make git gnupg2 nginx nginx-full dnsmasq hostapd python3 python3-pip ; do
+for SOME_DEPENDS in build-essential make logrotate git gnupg2 nginx nginx-full dnsmasq hostapd python3 python3-pip ; do
 	check_depends ${SOME_DEPENDS} || exit 2 ;
 done ;
 
@@ -234,6 +234,7 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 #fi # temp roll back [CAUTION for BETA]
 #	message "NOT Attempting upgrading..."
 else
+head -n 40 ./PiAP/etc/PocketAP_Banner 2>/dev/null || true
 message "Attempting upgrading..."
 message "DO NOT INTERRUPT OR POWER OFF. [CAUTION for BETA]"
 
@@ -331,6 +332,7 @@ message "DONE"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 SSH_PORT=$(echo ${SSH_CONNECTION} | cut -d\  -f 4 )
 SSH_SERVER=$(echo ${SSH_CONNECTION} | cut -d\  -f 3 )
+( test -x /usr/bin/raspi-config 2>/dev/null && sudo /opt/PiAP/bin/set_LED_status_Agro.bash 2>/dev/null ) || true
 message "Status: Upgrade failed."
 message "Please report this issue at https://github.com/reactive-firewall/Pocket-PiAP/issues"
 message "[BETA] Please include the contents of this log \"${PIAP_LOG_PATH}\""
@@ -363,6 +365,7 @@ fi
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
 else
+(test -x /usr/bin/raspi-config 2>/dev/null && sudo /opt/PiAP/bin/set_LED_status_Ready.bash ) || true
 message "Status: Upgrade seemed to work. (check by logging in to the Web interface)"
 fi
 message "--------------------[LOG]----------------------"
