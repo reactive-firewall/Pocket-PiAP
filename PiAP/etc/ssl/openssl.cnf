@@ -34,7 +34,6 @@ oid_section				= basic_oids
 #x_680_data				= 0.9
 
 # unofficial data Object identifiers (PPS)
-#x_680_DOID				= ${x_680_data}.2342
 x_680_DOID				= 0.9.2342
 
 # UCL Data networks
@@ -863,6 +862,10 @@ issuerAltName				= issuer:copy
 #nsBaseUrl				= https://pocket.PiAP.local/ca
 #nsRevocationUrl			= https://pocket.PiAP.local/ca/crls/CA.crl
 #nsCaPolicyUrl				= https://pocket.PiAP.local/ca/policy.html
+certificatePolicies			= @polsect_all
+policyConstraints 			= requireExplicitPolicy:3
+inhibitAnyPolicy 			= 2
+
 
 ####################################################################
 [ usr_auth_cert ]
@@ -870,7 +873,7 @@ issuerAltName				= issuer:copy
 # This goes against PKIX guidelines. Should peer-review this
 basicConstraints			= critical,CA:FALSE
 nsCertType				= client
-extendedKeyUsage			= critical,clientAuth,clientsshauth,msSmartcardlogon
+extendedKeyUsage			= critical,clientAuth,msSmartcardlogon
 keyUsage				= digitalSignature
 nsComment				= "Pocket PiAP Issued User Certificate"
 subjectKeyIdentifier			= critical,hash
@@ -882,7 +885,9 @@ issuerAltName				= issuer:copy
 #nsBaseUrl				= https://pocket.PiAP.local/ca
 #nsRevocationUrl			= https://pocket.PiAP.local/ca/crls/CA.crl
 #nsCaPolicyUrl				= https://pocket.PiAP.local/ca/policy.html
-certificatePolicies 			= @notice_smart_card_dod
+certificatePolicies 			= @polsect_all,@polsect_secure
+policyConstraints 			= requireExplicitPolicy:3
+inhibitAnyPolicy 			= 2
 
 ####################################################################
 [ server_cert ]
@@ -891,7 +896,7 @@ certificatePolicies 			= @notice_smart_card_dod
 basicConstraints			= critical,CA:FALSE
 nsCertType				= server
 extendedKeyUsage			= critical,serverAuth
-keyUsage				= digitalSignature,keyEncipherment
+keyUsage				= digitalSignature,keyAgreement,keyEncipherment
 nsComment				= "Pocket PiAP Issued Server Certificate"
 subjectKeyIdentifier			= critical,hash
 authorityKeyIdentifier			= critical,keyid:always,issuer
@@ -902,6 +907,28 @@ issuerAltName				= issuer:copy
 #nsRevocationUrl			= https://pocket.PiAP.local/ca/crls/CA.crl
 #nsCaPolicyUrl				= https://pocket.PiAP.local/ca/policy.html
 #nsSslServerName			= pocket.PiAP.local
+certificatePolicies			= @polsect_server
+policyConstraints 			= requireExplicitPolicy:3
+inhibitAnyPolicy 			= 2
+
+
+####################################################################
+[ PiAP_ssh_server_cert ]
+
+# This goes against PKIX guidelines. Should peer-review this
+basicConstraints			= critical,CA:FALSE
+nsCertType				= server
+extendedKeyUsage			= critical,serverAuth,serversshauth
+keyUsage				= digitalSignature,keyAgreement,keyEncipherment
+nsComment				= "Pocket PiAP SSL Server Certificate"
+subjectKeyIdentifier			= critical,hash
+authorityKeyIdentifier			= critical,keyid:always,issuer
+subjectAltName				= @piap_srv_subj_alt_names
+issuerAltName				= issuer:copy
+certificatePolicies			= @polsect_server
+policyConstraints 			= requireExplicitPolicy:3
+inhibitAnyPolicy 			= 2
+
 
 ####################################################################
 [ PiAP_server_cert ]
@@ -909,13 +936,16 @@ issuerAltName				= issuer:copy
 # This goes against PKIX guidelines. Should peer-review this
 basicConstraints			= critical,CA:FALSE
 nsCertType				= server
-extendedKeyUsage			= critical,serverAuth,clientsshauth
-keyUsage				= digitalSignature,keyEncipherment
+extendedKeyUsage			= critical,serverAuth
+keyUsage				= digitalSignature,keyAgreement,keyEncipherment
 nsComment				= "Pocket PiAP SSL Server Certificate"
 subjectKeyIdentifier			= critical,hash
 authorityKeyIdentifier			= critical,keyid:always,issuer
 subjectAltName				= @piap_srv_subj_alt_names
 issuerAltName				= issuer:copy
+certificatePolicies			= @polsect_server
+policyConstraints 			= requireExplicitPolicy:3
+inhibitAnyPolicy 			= 2
 #nsCaRevocationUrl			= http://www.domain.dom/ca-crl.pem
 #nsCaRevocationUrl			= https://pocket.PiAP.local/ca/crls/CA.crl
 #nsBaseUrl				= https://pocket.PiAP.local/ca
@@ -949,7 +979,7 @@ issuerAltName				= issuer:copy
 #nsSslServerName			= pocket.PiAP.local
 certificatePolicies			= @polsect_root
 policyConstraints 			= requireExplicitPolicy:3
-#inhibitAnyPolicy 			= 2
+inhibitAnyPolicy 			= 2
 
 [dir_sect]
  C=US
@@ -960,11 +990,24 @@ policyConstraints 			= requireExplicitPolicy:3
 # SN=
 
 ####################################################################
+[polsect_secure]
+ policyIdentifier=2.16.840.1.101.2.1.11.19
+ userNotice.1=@notice_smart_card_dod
+
+[polsect_all]
+ policyIdentifier=1.3.6.1.5.5.7.2.2
+ userNotice.1=@notice_all
+ userNotice.2=@notice_leaf
+
+[polsect_server]
+ policyIdentifier=1.3.6.1.5.5.7.2.2
+ userNotice.1=@notice_server
+
 [polsect_root]
  policyIdentifier=2.16.840.1.101.2.1.11.19
  userNotice.1=@notice_all
  userNotice.2=@notice_root
-# userNotice.3=@notice_smart_card_dod
+ userNotice.3=@notice_smart_card_dod
 # policyIdentifier = ${DOD_POLICY_SC},${verisign_class_ev}
 #nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
 # nameConstraints=permitted;email:.somedomain.com
@@ -973,16 +1016,28 @@ policyConstraints 			= requireExplicitPolicy:3
 # use RFC2459
 [notice_all]
  explicitText="Certificates are only as good as the user's ability to use them. Trust No One."
+ organization="Pocket PiAP Project"
 
 # use RFC2459
 [notice_root]
- explicitText="This is a Root CA. Trust starts here."
+ explicitText="This is a Root Certificate Authoritie. Trust starts here."
+ organization="Pocket PiAP Project"
 
 #See document "US DoD X.509 Certificate Policy", section 1.2.
+# hint: https://iase.disa.mil/pki-pke/Documents/unclass-dod_pki_fisv3.pdf
 [notice_smart_card_dod]
  explicitText="See document 'US DoD X.509 Certificate Policy', section 1.2."
  organization="US DoD X.509 Certificate Policy"
  noticeNumbers=19
+
+[notice_server]
+ explicitText="This is a Pocket PiAP Issued Server Certificate"
+ organization="Pocket PiAP Server"
+
+[notice_leaf]
+ explicitText="This is NOT a Root Certificate. This is a Pocket PiAP Issued Certificate."
+ organization="Pocket PiAP Project"
+
 
 ####################################################################
 [root_bs_section]
