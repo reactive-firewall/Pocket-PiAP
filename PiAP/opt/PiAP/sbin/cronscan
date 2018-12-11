@@ -59,29 +59,55 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
-#
-#ulimit -t 25
+
+umask 137
 PATH="/bin/:/usr/bin/:/usr/sbin/:/sbin/:/usr/local/bin/:/usr/local/sbin/"
 export PATH="${PATH}:/opt/PiAP/bin/:/opt/PiAP/sbin/"
-umask 027
 
 HAS_POCKET_USER=$(id pocket-www 1>&2 2>/dev/null >> /dev/null && echo -n 0 || echo -n $?)
 POCKET_WEB_USER="www-data"
-if [[ ( ${HAS_POCKET_USER:-1} -lt 1 ) ]] ; then
+if [[ ( ${HAS_POCKET_USER:-1} -lt 1 ) ]] ; then 
         POCKET_WEB_USER="pocket-www"
 fi
-TEMPLIST_PATH="/dev/shm/auto_scan_list"
-head -n ${MAX_SCAN_BATCH:-500} "${TEMPLIST_PATH}" 2>/dev/null | grepip 2>/dev/null | tee -a "${TEMPLIST_PATH}_pre" 2>/dev/null > /dev/null ;
-chown ${POCKET_WEB_USER} "${TEMPLIST_PATH}_pre" 2>/dev/null || true
-echo -n "" > ${TEMPLIST_PATH} 2>/dev/null ; wait ;
-grepip -h /proc/net/xt_recent/scannerlist 2>/dev/null | tee -a "${TEMPLIST_PATH}_pre" 2>/dev/null > /dev/null ;
-sort -t . -n "${TEMPLIST_PATH}_pre" | uniq | tee -a "${TEMPLIST_PATH}" 2>/dev/null > /dev/null ;
-rm -qf "${TEMPLIST_PATH}_pre" 2>/dev/null > /dev/null || true ;
-for BAD_IP in $( head -n ${MAX_SCAN_BATCH:-500} "${TEMPLIST_PATH}" ) ; do
-# echo $BAD_IP 2>/dev/null > /dev/null ;
-if [[ ( $( df / | tail -n 1 | tr -s ' \t' ' ' | cut -d\  -f 4 ) -gt 201000 ) ]] ; then
-	/opt/PiAP/sbin/cronscan $BAD_IP ; wait ;
+
+LOCK_FILE="/tmp/PiAP_scan_mode_Throttle_lock"
+
+if [[ -f ${LOCK_FILE} ]] ; then
+	# need to add targets to a queue here
+        exit 0 ;
 fi
-done ;
-rm -qf "${TEMPLIST_PATH}" 2>/dev/null > /dev/null || true ;
+
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGKILL
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGHUP
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGTERM
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGQUIT
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGINT
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 0 ;' EXIT
+
+touch ${LOCK_FILE} 2>/dev/null || exit 0 ;
+/opt/PiAP/bin/set_LED_status_Xmas.bash || true ;
+
+/etc/init.d/fw scanmode || /etc/init.d/fw stop || exit 1 ;
+#nmap --privileged -sT -p T:80,443,43,53,22,21,20,993,25,8080,138,139,17500 -g 5353 --reason --data-length $(((${RANDOM}%100)+63)) $@
+#sleep 3s ; wait ;
+#nmap --privileged -sU -p U:80,443,53,123,67,68,995 -g 5353 --reason --data-length $(((${RANDOM}%100)+56)) $@
+#sleep 1s ; wait ;
+#nmap --privileged -PN -A -F --reason --data-length $(((${RANDOM}%100)+70)) $@
+SCAN_NAME=$(echo "$@" | grepip | sort -t \. -n | uniq | head -n 1 )
+nmap --privileged -PN -A --script='safe and discovery' -T4 --reason --data-length $(((${RANDOM}%100)+70)) /tmp/scan_${SCAN_NAME:-latest}.xml -oX /tmp/scan_${SCAN_NAME:-latest}.xml $@ 2>/dev/null|| true ;
+/etc/init.d/fw start ; wait ;
+umask 0007
+if [[ !( -d /srv/PiAP/files/scans/ ) ]] ; then mkdir -m 751 -p /srv/PiAP/files/scans 2>/dev/null ; wait ; chown -vf pocket:pocket-www /srv/PiAP/files/scans/ ; wait ; fi ;
+if [[ ( -f /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml ) ]] ; then
+head -n 999999 /tmp/scan_${SCAN_NAME:-latest}.xml 2>/dev/null | tee -a /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml 2>/dev/null ; wait ;
+else
+mv -f /tmp/scan_${SCAN_NAME:-latest}.xml /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml 2>/dev/null || true ; wait ;
+chown ${POCKET_WEB_USER:-0}:${POCKET_WEB_USER:-www-data} /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml || true ; wait ;
+chmod 640 /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml || true
+fi
+umask 137
+
+rm -f ${LOCK_FILE} 2>/dev/null || true ;
+/opt/PiAP/bin/set_LED_status_Ready.bash || true ;
+
 exit 0;
