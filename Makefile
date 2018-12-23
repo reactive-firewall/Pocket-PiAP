@@ -24,6 +24,9 @@
 #
 
 
+LC_CTYPE="en_EN.UTF-8"
+
+
 ifeq "$(ECHO)" ""
 	ECHO=echo
 endif

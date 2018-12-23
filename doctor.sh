@@ -14,7 +14,7 @@ PIAP_GROUP=${PIAP_GROUP:-0}
 PIAP_LOG_NAME=${PIAP_LOG_NAME:-PiAP_doctor_log.log}
 PIAP_LOG_PATH=${PIAP_LOG_PATH:-"/tmp/${PIAP_LOG_NAME:-PiAP_doctor_log.log}"}
 
-confirm() {
+function confirm() {
     # call with a prompt string or use a default
     read -r -p "${1:-Are you sure? [y/N]} " response
     case "$response" in
@@ -85,13 +85,13 @@ function check_link() {
 	if [[ ( -L "${THELINK}" ) ]] ; then
 		message "Found [\"${THELINK}\"]"
 	else
-		check_path "${THEPATH}"
-		message "Ensuring Links [\"${THEPATH}\"]"
+		check_path "${THEPATH}" ;
+		message "Ensuring Links [\"${THEPATH}\"]" ;
 		ln -sf "${THEPATH}" "${THELINK}" 2>/dev/null || test -L "${THELINK}" || stat "${THELINK}" || DID_WORK=1 ;
 		chown -h "${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}}" "${THELINK}" 2>/dev/null || true ;
-		message "DONE"
+		message "DONE" ;
 	fi
-	return $DID_WORK
+	return $DID_WORK ;
 }
 
 function check_backups() {
@@ -108,7 +108,7 @@ function check_backups() {
 	message "Making space for new backup up pre-upgrade version"
 	confirm && sudo rm -Rvf "${THEDEST}_OLD" 2>/dev/null || true ;
 	if [[ ( -e "${THEDEST}" ) ]] ; then
-		sudo mv -vf "${THEDEST}" "${THEDEST}_OLD" || true ;;
+		sudo mv -vf "${THEDEST}" "${THEDEST}_OLD" || true ;
 	fi
 	message "Backing up pre-upgrade version"
 	if [[ ( -e /srv/PiAP ) ]] ; then
