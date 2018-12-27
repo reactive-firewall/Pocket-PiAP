@@ -114,12 +114,12 @@ function check_backups() {
 	if [[ ( -e /srv/PiAP ) ]] ; then
 		sudo cp -vfRpub "${THESOURCE}" "${THEDEST}" || DID_WORK=0 ;
 	else
-		message "Nothing to backup! No pre-upgrade version."
+		message "Nothing to backup! No pre-upgrade version." ;
 		check_path "${THESOURCE}" || DID_WORK=0 ;
 	fi
-	message "Backing up Complete. [\"${THESOURCE}\"]"
+	message "Backing up Complete. [ ${THESOURCE} ]" ;
 	fi
-	return $DID_WORK
+	return $DID_WORK ;
 }
 
 
