@@ -40,7 +40,7 @@ function check_depends() {
 	local DOWN_RETRY=5
 	local DOWN_COUNT=0
 	if [[ ( $(dpkg --list | grep -E "^[i]{2}[[:space:]]+" | tr -s '\s' ' ' | cut -d \  -f 2 | grep -F -c "${THEDEPENDS}" ) -le 0 ) ]] ; then
-		message "Installing new dependencies. [\"${THEDEPENDS}\"]"
+		message "Installing new dependencies. [\\"${THEDEPENDS}\\"]"
 		OLDMASK=$(umask)
 		umask 0022
 		while [[ ( $DOWN_COUNT -le $DOWN_RETRY ) ]] ; do
@@ -56,7 +56,7 @@ function check_depends() {
 		umask "$OLDMASK"
 		message "DONE"
 	else
-		message "Found dependencies. [\"${THEDEPENDS}\"]"
+		message "Found dependencies. [\\"${THEDEPENDS}\\"]"
 	fi
 	return $DID_WORK
 }
@@ -67,7 +67,7 @@ function check_path() {
 	if [[ ( -d "${THEPATH}" ) ]] ; then
 		message "Found [\"${THEPATH}\"]"
 	else
-		message "Ensuring paths [\"${THEPATH}\"]"
+		message "Ensuring paths [\\"${THEPATH}\\"]"
 		OLDMASK=$(umask)
 		umask 0022
 		mkdir -p "${THEPATH}" 2>/dev/null || DID_WORK=1 ;
@@ -86,7 +86,7 @@ function check_link() {
 		message "Found [\"${THELINK}\"]"
 	else
 		check_path "${THEPATH}" ;
-		message "Ensuring Links [\"${THEPATH}\"]" ;
+		message "Ensuring Links [\\"${THEPATH}\\"]" ;
 		ln -sf "${THEPATH}" "${THELINK}" 2>/dev/null || test -L "${THELINK}" || stat "${THELINK}" || DID_WORK=1 ;
 		chown -h "${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}}" "${THELINK}" 2>/dev/null || true ;
 		message "DONE" ;
@@ -115,7 +115,7 @@ function check_backups() {
 		message "Nothing to backup! No pre-upgrade version." ;
 		check_path "${THESOURCE}" || DID_WORK=0 ;
 	fi
-	message "Backing up Complete. [\"${THESOURCE}\"]" ;
+	message "Backing up Complete. [\\"${THESOURCE}\\"]" ;
 	fi
 	return $DID_WORK ;
 }
