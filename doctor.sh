@@ -98,15 +98,13 @@ function check_backups() {
 	local THESOURCE=$"${1:-/srv/PiAP}"
 	local THEDEST=/var/opt/PiAP/backups/$(dirname $"${1:-/srv/PiAP}")
 	local DID_WORK=1
-	local DOWN_RETRY=5
-	local DOWN_COUNT=0
 	check_path /var/opt/PiAP/backups/ || DID_WORK=0 ;
 	sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/backups/ || true ;
 	sudo chown 750 /var/opt/PiAP/backups/ || true ;
 	sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/ || true ;
 	sudo chown 755 /var/opt/PiAP/ || true ;
 	message "Making space for new backup up pre-upgrade version"
-	confirm && sudo rm -Rvf "${THEDEST}_OLD" 2>/dev/null || true ;
+	confirm "Clear space from old backups? [y/n]" && sudo rm -Rvf "${THEDEST}_OLD" 2>/dev/null || true ;
 	if [[ ( -e "${THEDEST}" ) ]] ; then
 		sudo mv -vf "${THEDEST}" "${THEDEST}_OLD" || true ;
 	fi
@@ -117,7 +115,7 @@ function check_backups() {
 		message "Nothing to backup! No pre-upgrade version." ;
 		check_path "${THESOURCE}" || DID_WORK=0 ;
 	fi
-	message "Backing up Complete. [ ${THESOURCE} ]" ;
+	message "Backing up Complete. [\"${THESOURCE}\"]" ;
 	fi
 	return $DID_WORK ;
 }
