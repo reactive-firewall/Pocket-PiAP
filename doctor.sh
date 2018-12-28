@@ -237,8 +237,8 @@ message "DONE"
 
 
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
-SSH_PORT="$(echo \"${SSH_CONNECTION}\" | cut -d\  -f 4 )"
-SSH_SERVER="$(echo \"${SSH_CONNECTION}\" | cut -d\  -f 3 )"
+SSH_PORT="$(echo "${SSH_CONNECTION}" | cut -d\  -f 4 )"
+SSH_SERVER="$(echo "${SSH_CONNECTION}" | cut -d\  -f 3 )"
 ( test -x /usr/bin/raspi-config 2>/dev/null && sudo /opt/PiAP/bin/set_LED_status_Agro.bash 2>/dev/null ) || true
 message "Status: Doctor failed."
 message "Please report this issue at https://github.com/reactive-firewall/Pocket-PiAP/issues"
