@@ -120,7 +120,7 @@ function check_backups() {
 }
 
 
-message "Date:"$(date)
+message "Date:$(date)"
 
 if [[ ( -n $(which apt-get ) ) ]] ; then
 	message "updating system to latest."
@@ -202,16 +202,16 @@ fi
 for TIME_CHECKS in $( seq 30 720 ) ; do
 if [[ ( $( find /etc/ssh -iname *.pub -ctime +${TIME_CHECKS:-30} -print0 2>/dev/null | wc -l ) -ge 1 ) ]] ; then
 	message "Applying HOTFIX - SSH key rotation for Beta"
-	find /etc/ssh -iname *.pub -ctime +${TIME_CHECKS:-30} -print0 2>/dev/null | xargs -0 -L1 rm -vf ; wait ;
+	find /etc/ssh -iname "*.pub" -ctime +${TIME_CHECKS:-30} -print0 2>/dev/null | xargs -0 -L1 rm -vf ; wait ;
 	sudo ssh-keygen -A ; wait ;
 	message "DONE"
 	message "AFTER LOGGING OUT of this ssh session YOU MUST REMOVE TRUST OF THE OLD KEY by running: ssh-keygen -R ${HOSTNAME:-pocket.piap.local}"
 	message "The NEW keys you will need to verify are:"
-	find /etc/ssh -iname *.pub -print0 2>/dev/null | xargs -0 -L1 sudo ssh-keygen -l -v -f | tee -a "${PIAP_LOG_PATH}" 2>/dev/null;
+	find /etc/ssh -iname "*.pub" -print0 2>/dev/null | xargs -0 -L1 sudo ssh-keygen -l -v -f | tee -a "${PIAP_LOG_PATH}" 2>/dev/null;
 fi
 done
 
-if [[ ( $( find /lib/clamav -iname *.tmp -print0 2>/dev/null | wc -l ) -ge 1 ) ]] ; then
+if [[ ( $( find /lib/clamav -iname "*.tmp" -print0 2>/dev/null | wc -l ) -ge 1 ) ]] ; then
 	message "Applying HOTFIX - clear junk files: clamav temps"
 	sudo rm -vfR /var/lib/clamav/*.tmp || true ; 
 	wait ;
@@ -283,7 +283,7 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "[NEXT] Verify backups were restored. [This is not a sure thing]"
 	message "[NEXT] copy logs for bug report."
 	echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
-	echo " scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUGReport_logs.log"
+	echo "	scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUGReport_logs.log"
 	message "[NEXT] submit bug report."
 else
 	message "[OPTIONAL] Restart Pocket to compleate OS mantinance."
