@@ -104,7 +104,7 @@ function check_backups() {
 	sudo chown "${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}}" /var/opt/PiAP/ || true ;
 	sudo chown 755 /var/opt/PiAP/ || true ;
 	message "Making space for new backup up pre-upgrade version"
-	confirm "Clear space from old backups? [y/n]" && sudo rm -Rvf "${THEDEST}_OLD" 2>/dev/null || true ;
+	( confirm "Clear space from old backups? [y/n]" && sudo rm -Rvf "${THEDEST}_OLD" 2>/dev/null ) || true ;
 	if [[ ( -e "${THEDEST}" ) ]] ; then
 		sudo mv -vf "${THEDEST}" "${THEDEST}_OLD" || true ;
 	fi
