@@ -200,7 +200,7 @@ fi
 	umask 0027
 
 for TIME_CHECKS in $( seq 30 720 ) ; do
-if [[ ( $( find /etc/ssh -iname *.pub -ctime +${TIME_CHECKS:-30} -print0 2>/dev/null | wc -l ) -ge 1 ) ]] ; then
+if [[ ( $( find /etc/ssh -iname "*.pub" -ctime +${TIME_CHECKS:-30} -print0 2>/dev/null | wc -l ) -ge 1 ) ]] ; then
 	message "Applying HOTFIX - SSH key rotation for Beta"
 	find /etc/ssh -iname "*.pub" -ctime +${TIME_CHECKS:-30} -print0 2>/dev/null | xargs -0 -L1 rm -vf ; wait ;
 	sudo ssh-keygen -A ; wait ;
@@ -237,8 +237,8 @@ message "DONE"
 
 
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
-SSH_PORT=$(echo ${SSH_CONNECTION} | cut -d\  -f 4 )
-SSH_SERVER=$(echo ${SSH_CONNECTION} | cut -d\  -f 3 )
+SSH_PORT="$(echo ${SSH_CONNECTION} | cut -d\  -f 4 )"
+SSH_SERVER="$(echo ${SSH_CONNECTION} | cut -d\  -f 3 )"
 ( test -x /usr/bin/raspi-config 2>/dev/null && sudo /opt/PiAP/bin/set_LED_status_Agro.bash 2>/dev/null ) || true
 message "Status: Doctor failed."
 message "Please report this issue at https://github.com/reactive-firewall/Pocket-PiAP/issues"
