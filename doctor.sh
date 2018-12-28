@@ -28,7 +28,7 @@ function confirm() {
 }
 
 function message() {
-	local PIAP_MESSAGE="${@}"
+	local PIAP_MESSAGE="${@[*]}"
 	# echo ""
 	echo "${PIAP_MESSAGE}" | tee -a "${PIAP_LOG_PATH}" 2>/dev/null || true
 	return 0
@@ -160,7 +160,7 @@ sudo chown 750 /var/opt/PiAP/backups/ || true ;
 sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/ || true ;
 sudo chown 755 /var/opt/PiAP/ || true ;
 
-for SOME_SOURCE in /srv/PiAP ; do
+for SOME_SOURCE in /srv/PiAP /etc/ssl ; do
         check_backups ${SOME_SOURCE} || exit 2 ;
 done ;
 
