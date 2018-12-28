@@ -32,7 +32,7 @@ PIAP_BIN_PATH=$(dirname $0)
 # flash on and off once
 ${PIAP_BIN_PATH}/blink_LED.bash 0 ${PIAP_BLINK_COUNT:-1} ; wait ;
 ${PIAP_BIN_PATH}/blink_LED.bash 1 ${PIAP_BLINK_COUNT:-1} ; wait ;
-REG_COLON = $":"
+REG_COLON=$":"
 
 
 # heristic for wlan1 with canna-kit usb wifi chips

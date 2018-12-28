@@ -53,12 +53,12 @@ function check_depends() {
 			fi
 		done
 		sudo apt-get install -y "${THEDEPENDS}" 2>/dev/null || DID_WORK=1 ;
-		umask "$OLDMASK"
-		message "DONE"
+		umask "$OLDMASK" ;
+		message "DONE" ;
 	else
-		message "Found dependencies. [\\"${THEDEPENDS}\\"]"
+		message "Found dependencies. [\\"${THEDEPENDS}\\"]" ;
 	fi
-	return $DID_WORK
+	return $DID_WORK ;
 }
 
 function check_path() {
@@ -99,9 +99,9 @@ function check_backups() {
 	local THEDEST=/var/opt/PiAP/backups/$(dirname $"${1:-/srv/PiAP}")
 	local DID_WORK=1
 	check_path /var/opt/PiAP/backups/ || DID_WORK=0 ;
-	sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/backups/ || true ;
+	sudo chown "${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}}" /var/opt/PiAP/backups/ || true ;
 	sudo chown 750 /var/opt/PiAP/backups/ || true ;
-	sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/ || true ;
+	sudo chown "${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}}" /var/opt/PiAP/ || true ;
 	sudo chown 755 /var/opt/PiAP/ || true ;
 	message "Making space for new backup up pre-upgrade version"
 	confirm "Clear space from old backups? [y/n]" && sudo rm -Rvf "${THEDEST}_OLD" 2>/dev/null || true ;
@@ -116,7 +116,6 @@ function check_backups() {
 		check_path "${THESOURCE}" || DID_WORK=0 ;
 	fi
 	message "Backing up Complete. [\\"${THESOURCE}\\"]" ;
-	fi
 	return $DID_WORK ;
 }
 
