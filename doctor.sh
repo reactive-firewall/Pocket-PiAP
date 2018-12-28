@@ -44,7 +44,7 @@ function check_depends() {
 		OLDMASK=$(umask)
 		umask 0022
 		while [[ ( $DOWN_COUNT -le $DOWN_RETRY ) ]] ; do
-			DOWN_COUNT=$(($DOWN_COUNT+1)) ;
+			DOWN_COUNT=$((DOWN_COUNT+1)) ;
 			if [[ $DID_WORK -gt 0 ]] ; then
 				message "Retry ${DOWN_COUNT:-again}"
 				( sudo apt-get install --assume-yes --download-only "${THEDEPENDS}" 2>/dev/null && DID_WORK=0 ) || true ;
