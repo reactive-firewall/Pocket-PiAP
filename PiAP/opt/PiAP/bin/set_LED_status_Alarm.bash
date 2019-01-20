@@ -49,7 +49,7 @@ ${PIAP_BIN_PATH}/blink_LED.bash 1 ${PIAP_BLINK_COUNT:-1} || true ; wait ;
 REG_COLON=$":"
 
 
-echo "default-on" | sudo tee /sys/class/leds/led0/trigger 2>/dev/null > /dev/null || true ;
+echo "heartbeat" | sudo tee /sys/class/leds/led0/trigger 2>/dev/null > /dev/null || true ;
 echo "none" | sudo tee /sys/class/leds/led1/trigger 2>/dev/null > /dev/null || true ;
 echo 255 | sudo tee "/sys/class/leds/led0${REG_COLON}${REG_COLON}assoc/brightness" 2>/dev/null > /dev/null || true ;
 echo 0 | sudo tee "/sys/class/leds/led1${REG_COLON}${REG_COLON}assoc/brightness" 2>/dev/null > /dev/null || true ;
