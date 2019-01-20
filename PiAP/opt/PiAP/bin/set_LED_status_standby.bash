@@ -35,15 +35,15 @@ PIAP_BIN_PATH=$(dirname $0)
 REG_COLON=$":"
 
 
-echo "default-on" | sudo tee /sys/class/leds/led0/trigger 2>/dev/null > /dev/null || true ;
+echo "none" | sudo tee /sys/class/leds/led0/trigger 2>/dev/null > /dev/null || true ;
 echo "none" | sudo tee /sys/class/leds/led1/trigger 2>/dev/null > /dev/null || true ;
-echo 255 | sudo tee "/sys/class/leds/led0${REG_COLON}${REG_COLON}assoc/brightness" 2>/dev/null > /dev/null || true ;
+echo 0 | sudo tee "/sys/class/leds/led0${REG_COLON}${REG_COLON}assoc/brightness" 2>/dev/null > /dev/null || true ;
 echo 0 | sudo tee "/sys/class/leds/led1${REG_COLON}${REG_COLON}assoc/brightness" 2>/dev/null > /dev/null || true ;
 
 
 # heristic for wlan1 with canna-kit usb wifi chips
 if [[ ( $(sudo ls -1 /sys/class/leds/rt*usb-phy1${REG_COLON}${REG_COLON}assoc/brightness | wc -l | cut -d\  -f 1 2>/dev/null || echo -n 0 ) -gt 0 ) ]] ; then
 	echo "none" | sudo tee "/sys/class/leds/rt2800usb-phy1${REG_COLON}${REG_COLON}assoc/trigger" 2>/dev/null > /dev/null || true ;
-	echo 255 | sudo tee "/sys/class/leds/rt2800usb-phy1${REG_COLON}${REG_COLON}assoc/brightness" 2>/dev/null > /dev/null || true ;
+	echo 0 | sudo tee "/sys/class/leds/rt2800usb-phy1${REG_COLON}${REG_COLON}assoc/brightness" 2>/dev/null > /dev/null || true ;
 fi
 exit 0;
