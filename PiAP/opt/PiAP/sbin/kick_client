@@ -59,6 +59,8 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
+/opt/PiAP/bin/set_LED_status_Agro.bash 2>/dev/null || true
 /opt/PiAP/hostapd_actions/deauth ${1} 2>/dev/null || true
 /opt/PiAP/hostapd_actions/disassociate ${1} 2>/dev/null || true
+/opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true
 exit 0;

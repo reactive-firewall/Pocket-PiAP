@@ -67,6 +67,7 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python27 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python@2 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python26 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 $INSTALL || true ; fi
@@ -76,6 +77,7 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.4 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python35 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python@3 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.5 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py2.7 $INSTALL || true ; fi
@@ -107,7 +109,7 @@ before_install:
   - sudo mkdir -p -m 775 "/opt/PiAP/"
   - mkdir -p -m 755 "/opt/PiAP/hostapd_actions/" || true
   - chmod -v 775 "/opt/PiAP/" || true
-  - cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
+  - cp -vf ./PiAP/units/PiAP-python-tools/tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
   - rm -vf /opt/PiAP/.beta_* 2>/dev/null || true ;
   - echo "travis_fold:end:piap-setup" 2>/dev/null || true
 

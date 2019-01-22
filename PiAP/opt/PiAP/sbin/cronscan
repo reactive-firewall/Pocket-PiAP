@@ -64,11 +64,14 @@ umask 137
 PATH="/bin/:/usr/bin/:/usr/sbin/:/sbin/:/usr/local/bin/:/usr/local/sbin/"
 export PATH="${PATH}:/opt/PiAP/bin/:/opt/PiAP/sbin/"
 
+/opt/PiAP/bin/set_LED_status_Xmas.bash 2>/dev/null || true ; wait ;
+
 HAS_POCKET_USER=$(id pocket-www 1>&2 2>/dev/null >> /dev/null && echo -n 0 || echo -n $?)
 POCKET_WEB_USER="www-data"
 if [[ ( ${HAS_POCKET_USER:-1} -lt 1 ) ]] ; then 
         POCKET_WEB_USER="pocket-www"
 fi
+/opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true ; wait ;
 
 LOCK_FILE="/tmp/PiAP_scan_mode_Throttle_lock"
 
@@ -77,27 +80,31 @@ if [[ -f ${LOCK_FILE} ]] ; then
         exit 0 ;
 fi
 
-trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGKILL
-trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGHUP
-trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGTERM
-trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGQUIT
-trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGINT
-trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 0 ;' EXIT
+/opt/PiAP/bin/set_LED_status_Xmas.bash 2>/dev/null || true ; wait ;
+
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; /opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true ; exit 1 ;' SIGKILL
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; /opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true ; exit 1 ;' SIGHUP
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; /opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true ; exit 1 ;' SIGTERM
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; /opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true ; exit 1 ;' SIGQUIT
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; /opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true ; exit 1 ;' SIGINT
+trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; /opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true ; exit 0 ;' EXIT
 
 touch ${LOCK_FILE} 2>/dev/null || exit 0 ;
-/opt/PiAP/bin/set_LED_status_Xmas.bash || true ;
+
 
 /etc/init.d/fw scanmode || /etc/init.d/fw stop || exit 1 ;
+/opt/PiAP/bin/set_LED_status_Agro.bash || true ;
 #nmap --privileged -sT -p T:80,443,43,53,22,21,20,993,25,8080,138,139,17500 -g 5353 --reason --data-length $(((${RANDOM}%100)+63)) $@
 #sleep 3s ; wait ;
 #nmap --privileged -sU -p U:80,443,53,123,67,68,995 -g 5353 --reason --data-length $(((${RANDOM}%100)+56)) $@
 #sleep 1s ; wait ;
 #nmap --privileged -PN -A -F --reason --data-length $(((${RANDOM}%100)+70)) $@
 SCAN_NAME=$(echo "$@" | grepip | sort -t \. -n | uniq | head -n 1 )
-nmap --privileged -PN -A --script='safe and discovery' -T4 --reason --data-length $(((${RANDOM}%100)+70)) /tmp/scan_${SCAN_NAME:-latest}.xml -oX /tmp/scan_${SCAN_NAME:-latest}.xml $@ 2>/dev/null|| true ;
+nmap --privileged -PN -A --script='safe and discovery or vuln' -T4 --reason --data-length $(((${RANDOM}%100)+70)) -oX /tmp/scan_${SCAN_NAME:-latest}.xml $@ || true ;
 /etc/init.d/fw start ; wait ;
+/opt/PiAP/bin/set_LED_status_Xmas.bash 2>/dev/null || true ;
 umask 0007
-if [[ !( -d /srv/PiAP/files/scans/ ) ]] ; then mkdir -m 751 -p /srv/PiAP/files/scans 2>/dev/null ; wait ; chown -vf pocket:pocket-www /srv/PiAP/files/scans/ ; wait ; fi ;
+if [[ !( -d /srv/PiAP/files/scans/ ) ]] ; then mkdir -m 751 -p /srv/PiAP/files/scans 2>/dev/null ; wait ; chown -vf ${POCKET_WEB_USER:-0}:${POCKET_WEB_USER:-www-data} /srv/PiAP/files/scans/ ; wait ; fi ;
 if [[ ( -f /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml ) ]] ; then
 head -n 999999 /tmp/scan_${SCAN_NAME:-latest}.xml 2>/dev/null | tee -a /srv/PiAP/files/scans/scan_${SCAN_NAME:-latest}.xml 2>/dev/null ; wait ;
 else
@@ -108,6 +115,6 @@ fi
 umask 137
 
 rm -f ${LOCK_FILE} 2>/dev/null || true ;
-/opt/PiAP/bin/set_LED_status_Ready.bash || true ;
+/opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true ;
 
 exit 0;
