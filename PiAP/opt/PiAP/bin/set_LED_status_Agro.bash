@@ -37,7 +37,6 @@ if [[ -f ${LOCK_FILE} ]] ; then
         exit 0 ;
 fi
 
-trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGKILL
 trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGHUP
 trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGTERM
 trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGQUIT
@@ -46,8 +45,8 @@ trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 0 ;' EXIT
 
 touch ${LOCK_FILE} 2>/dev/null || exit 0 ;
 
-${PIAP_BIN_PATH}/blink_LED.bash 0 ${PIAP_BLINK_COUNT:-1} || true ; wait ;
-${PIAP_BIN_PATH}/blink_LED.bash 1 ${PIAP_BLINK_COUNT:-1} || true ; wait ;
+"${PIAP_BIN_PATH}"/blink_LED.bash 0 "${PIAP_BLINK_COUNT:-1}" || true ; wait ;
+"${PIAP_BIN_PATH}"/blink_LED.bash 1 "${PIAP_BLINK_COUNT:-1}" || true ; wait ;
 REG_COLON=$":"
 
 
@@ -62,6 +61,6 @@ if [[ ( $(sudo ls -1 "/sys/class/leds/rt*usb-phy1${REG_COLON}${REG_COLON}assoc/b
 	echo 255 | sudo tee "/sys/class/leds/rt*usb-phy1${REG_COLON}${REG_COLON}assoc/brightness" 2>/dev/null > /dev/null || true ;
 fi
 
-rm -f ${LOCK_FILE} 2>/dev/null ;
+rm -f "${LOCK_FILE}" 2>/dev/null ;
 
 exit 0;
