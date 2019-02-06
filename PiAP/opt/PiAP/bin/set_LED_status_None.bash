@@ -28,7 +28,7 @@
 # PIAP_BLINK_LED - the LED to blink (valid values = 0 - 20 default: 0)
 # PIAP_BLINK_COUNT - the count to blink (valid values = 0 - 1000 (where 0 is ongoing) default: 0)
 PIAP_BLINK_COUNT=1
-PIAP_BIN_PATH="$(dirname $0)"
+PIAP_BIN_PATH=$(dirname "${0}")
 # flash on and off once
 "${PIAP_BIN_PATH}/blink_LED.bash" 0 "${PIAP_BLINK_COUNT:-1}" ; wait ;
 "${PIAP_BIN_PATH}/blink_LED.bash" 1 "${PIAP_BLINK_COUNT:-1}" ; wait ;
