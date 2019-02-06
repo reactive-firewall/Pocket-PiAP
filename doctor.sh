@@ -96,7 +96,8 @@ function check_link() {
 
 function check_backups() {
 	local THESOURCE=$"${1:-/srv/PiAP}"
-	local THE_STUB=$(dirname $"${1:-/srv/PiAP}")
+	local THE_STUB
+	THE_STUB=$(dirname $"${1:-/srv/PiAP}")
 	local THEDEST=/var/opt/PiAP/backups/"${THE_STUB}"
 	local DID_WORK=1
 	check_path /var/opt/PiAP/backups/ || DID_WORK=0 ;
