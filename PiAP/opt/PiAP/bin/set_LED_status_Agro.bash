@@ -28,12 +28,12 @@
 # PIAP_BLINK_LED - the LED to blink (valid values = 0 - 20 default: 0)
 # PIAP_BLINK_COUNT - the count to blink (valid values = 0 - 1000 (where 0 is ongoing) default: 0)
 # PIAP_BLINK_COUNT=1
-PIAP_BIN_PATH=$(dirname $0)
+PIAP_BIN_PATH="$(dirname $0)"
 # flash on and off once
 
 LOCK_FILE="/tmp/PiAP_LED_state_lock"
 
-if [[ -f ${LOCK_FILE} ]] ; then
+if [[ -f "${LOCK_FILE}" ]] ; then
         exit 0 ;
 fi
 
@@ -43,7 +43,7 @@ trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGQUIT
 trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGINT
 trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 0 ;' EXIT
 
-touch ${LOCK_FILE} 2>/dev/null || exit 0 ;
+touch "${LOCK_FILE}" 2>/dev/null || exit 0 ;
 
 "${PIAP_BIN_PATH}"/blink_LED.bash 0 "${PIAP_BLINK_COUNT:-1}" || true ; wait ;
 "${PIAP_BIN_PATH}"/blink_LED.bash 1 "${PIAP_BLINK_COUNT:-1}" || true ; wait ;
