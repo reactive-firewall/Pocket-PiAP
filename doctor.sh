@@ -96,7 +96,8 @@ function check_link() {
 
 function check_backups() {
 	local THESOURCE=$"${1:-/srv/PiAP}"
-	local THEDEST=/var/opt/PiAP/backups/$(dirname $"${1:-/srv/PiAP}")
+	local THE_STUB=$(dirname $"${1:-/srv/PiAP}")
+	local THEDEST=/var/opt/PiAP/backups/"${THE_STUB}"
 	local DID_WORK=1
 	check_path /var/opt/PiAP/backups/ || DID_WORK=0 ;
 	sudo chown "${2:-${PIAP_USER}}:${3:-${PIAP_GROUP:-${PIAP_USER}}}" /var/opt/PiAP/backups/ || true ;
@@ -128,7 +129,7 @@ if [[ ( -n $(which apt-get ) ) ]] ; then
 	sudo apt-key update || true ;
 	sudo apt-get --only-upgrade --assume-yes dist-upgrade || sudo apt-get --only-upgrade -f --assume-yes dist-upgrade || ROLL_BACK=1 ;
 	message "about to remove stale packages"
-	confirm && sudo apt-get --purge --assume-yes autoremove || true ;
+	( confirm && sudo apt-get --purge --assume-yes autoremove ) || true ;
 	sudo apt-key update || true ;
 else
 	message "WARNING: enviroment seems wrong."
@@ -148,20 +149,20 @@ done ;
 
 check_depends php-fpm && check_depends php7.0-xsl || check_depends php5-fpm || exit 2 ;
 
-cd /tmp ;
+cd /tmp || exit 2 ;
 check_path /var/ || exit 2 ;
 check_path /srv/ || exit 2 ;
 check_path /opt/ || exit 2 ;
 check_link /var/opt/ /opt/ || check_link /var/opt/PiAP/ /opt/PiAP/ || exit 2 ;
 check_path /var/opt/PiAP/ || exit 2 ;
 check_path /var/opt/PiAP/backups/ || exit 2 ;
-sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/backups/ || true ;
+sudo chown "${PIAP_USER}":"${PIAP_GROUP}" /var/opt/PiAP/backups/ || true ;
 sudo chown 750 /var/opt/PiAP/backups/ || true ;
-sudo chown ${PIAP_USER}:${PIAP_GROUP} /var/opt/PiAP/ || true ;
+sudo chown "${PIAP_USER}":"${PIAP_GROUP}" /var/opt/PiAP/ || true ;
 sudo chown 755 /var/opt/PiAP/ || true ;
 
 for SOME_SOURCE in /srv/PiAP /etc/ssl ; do
-        check_backups ${SOME_SOURCE} || exit 2 ;
+        check_backups "${SOME_SOURCE}" || exit 2 ;
 done ;
 
 message "Disabling services to prevent inconsistent state. All sessions will be logged out."
