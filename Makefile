@@ -513,6 +513,12 @@ test-tox: cleanup test
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test-tox
 	$(QUIET)$(ECHO) "$@: Done."
 
+test-style: cleanup
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test-style
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test-style 2>/dev/null || true
+	$(QUIET)bash -c ./tests/test_*.bash || true
+	$(QUIET)$(ECHO) "$@: Done."
+
 cleanup:
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile cleanup 2>/dev/null || true
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile cleanup 2>/dev/null || true
