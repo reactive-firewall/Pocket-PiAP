@@ -14,13 +14,6 @@ PIAP_GROUP=${PIAP_GROUP:-0}
 PIAP_LOG_NAME=${PIAP_LOG_NAME:-PiAP_doctor_log.log}
 PIAP_LOG_PATH=${PIAP_LOG_PATH:-"/tmp/${PIAP_LOG_NAME:-PiAP_doctor_log.log}"}
 
-function xwhich() {
-	if [[ ( -x $(whereis which | head -n 1) ) ]] ; then
-		return $(whereis which | head -n 1 )
-	else
-		return $(which which | head -n1 )
-	fi
-}
 
 function confirm() {
     # call with a prompt string or use a default
@@ -132,7 +125,7 @@ function check_backups() {
 
 message "Date:$(date)"
 
-if [[ ( -n $(xwhich apt-get ) ) ]] ; then
+if [[ ( -n $(wheris apt-get ) ) ]] ; then
 	message "updating system to latest."
 	sudo apt-get --assume-no update || ROLL_BACK=1 ;
 	sudo apt-key update || true ;
