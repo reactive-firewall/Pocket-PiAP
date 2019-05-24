@@ -785,17 +785,21 @@ organizationalUnitName				= optional
 commonName					= supplied
 emailAddress					= optional
 UID						= optional
+postal_zipcode					= optional
+postal_address					= optional
 
 ####################################################################
 [ policy_anything ]
-countryName				= optional
-stateOrProvinceName			= optional
-localityName				= optional
-organizationName			= optional
-organizationalUnitName			= optional
-commonName				= supplied
-emailAddress				= optional
-UID					= optional
+countryName					= optional
+stateOrProvinceName				= optional
+localityName					= optional
+organizationName				= optional
+organizationalUnitName				= optional
+commonName					= supplied
+emailAddress					= optional
+UID						= optional
+postal_zipcode					= optional
+postal_address					= optional
 
 ####################################################################
 [ req ]
@@ -824,6 +828,12 @@ commonName_min				= 3
 commonName_max				= 256
 emailAddress				= Email Address
 emailAddress_max			= 256
+postal_zipcode				= Postal Code
+postal_zipcode_min			= 0
+postal_zipcode_max			= 11
+postal_address				= Postal Address
+postal_address_min			= 0
+postal_address_max			= 512
 UID					= UID (Unique Identifier)
 UID_min					= 0
 UID_max					= 32
@@ -835,7 +845,9 @@ organizationalUnitName_default		= Pocket PiAP
 localityName_default			= PiAP.local
 stateOrProvinceName_default		= $ENV::STATE
 countryName_default			= $ENV::COUNTRY
-UID_default				= 0
+UID_default				= $ENV::UID
+postal_address_default			= Unknown
+postal_zipcode_default			= 00000-0000
 
 ####################################################################
 [ req_attributes ]
@@ -920,7 +932,7 @@ basicConstraints			= critical,CA:FALSE
 nsCertType				= server
 extendedKeyUsage			= critical,serverAuth,serversshauth
 keyUsage				= digitalSignature,keyAgreement,keyEncipherment
-nsComment				= "Pocket PiAP SSL Server Certificate"
+nsComment				= "Pocket PiAP SSH Server Certificate"
 subjectKeyIdentifier			= critical,hash
 authorityKeyIdentifier			= critical,keyid:always,issuer
 subjectAltName				= @piap_srv_subj_alt_names

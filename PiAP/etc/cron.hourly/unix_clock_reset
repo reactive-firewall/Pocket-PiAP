@@ -1,0 +1,7 @@
+#! /bin/bash
+umask 027
+
+# this should not run predictably
+date $(date -R -r $(curl -fsSL --url "https://time.is/Unix_time_now" 2>/dev/null 3>/dev/null | grep -F '<div id="twd">' | grep -oE "[>]{1}[0-9]+[<]{1}" | grep -oE "[0-9]+" ) | cut -d, -f 2 )
+
+exit 0 ;

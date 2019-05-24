@@ -24,6 +24,9 @@
 #
 
 
+LC_CTYPE="en_EN.UTF-8"
+
+
 ifeq "$(ECHO)" ""
 	ECHO=echo
 endif
@@ -162,7 +165,7 @@ uninstall-optroot: /opt/PiAP/ uninstall-wpa-actions uninstall-hostapd-actions un
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_PUB_DIR_OPTS) /opt/
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-optbin: install-optroot must_be_root /opt/PiAP/bin/blink_LED.bash /opt/PiAP/bin/disable_LED.bash /opt/PiAP/bin/set_LED_status_Ready.bash /opt/PiAP/bin/set_LED_status_None.bash /opt/PiAP/bin/set_LED_status_Agro.bash /opt/PiAP/bin/pocket /opt/PiAP/bin/virus_scan.bash /opt/PiAP/bin/grepCIDR /opt/PiAP/bin/grepip /opt/PiAP/bin/grepdns
+install-optbin: install-optroot must_be_root /opt/PiAP/bin/blink_LED.bash /opt/PiAP/bin/disable_LED.bash /opt/PiAP/bin/set_LED_status_Ready.bash /opt/PiAP/bin/set_LED_status_None.bash /opt/PiAP/bin/set_LED_status_Agro.bash /opt/PiAP/bin/set_LED_status_Xmas.bash /opt/PiAP/bin/set_LED_status_Alarm.bash /opt/PiAP/bin/set_LED_status_Failsafe.bash /opt/PiAP/bin/set_LED_status_Lockdown.bash /opt/PiAP/bin/set_LED_status_Standby.bash /opt/PiAP/bin/pocket /opt/PiAP/bin/virus_scan.bash /opt/PiAP/bin/grepCIDR /opt/PiAP/bin/grepip /opt/PiAP/bin/grepdns
 	$(QUIET)$(ECHO) "$@: Done."
 
 /opt/PiAP/bin/%: ./PiAP/opt/PiAP/bin/% must_be_root /opt/PiAP/bin/
@@ -180,13 +183,18 @@ uninstall-optbin: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_Ready.bash 2>/dev/null || true
 	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_None.bash 2>/dev/null || true
 	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_Agro.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_Alarm.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_Standby.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_Failsafe.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_Lockdown.bash 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/bin/set_LED_status_Xmas.bash 2>/dev/null || true
 	$(QUIET)$(RM) /opt/PiAP/bin/grepdns 2>/dev/null || true
 	$(QUIET)$(RM) /opt/PiAP/bin/grepip 2>/dev/null || true
 	$(QUIET)$(RM) /opt/PiAP/bin/grepCIDR 2>/dev/null || true
 	$(QUIET)$(RMDIR) /opt/PiAP/bin 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-install-optsbin: install-optroot must_be_root /opt/PiAP/sbin/ /opt/PiAP/sbin/kick_client /opt/PiAP/sbin/autosign_client
+install-optsbin: install-optroot must_be_root /opt/PiAP/sbin/ /opt/PiAP/sbin/kick_client /opt/PiAP/sbin/autosign_client /opt/PiAP/sbin/autoscan /opt/PiAP/sbin/cronscan
 	$(QUIET)$(ECHO) "$@: Done."
 
 /opt/PiAP/sbin/%: ./PiAP/opt/PiAP/sbin/% must_be_root /opt/PiAP/sbin/
@@ -199,6 +207,8 @@ install-optsbin: install-optroot must_be_root /opt/PiAP/sbin/ /opt/PiAP/sbin/kic
 uninstall-optsbin: must_be_root
 	$(QUIET)$(RM) /opt/PiAP/sbin/kick_client 2>/dev/null || true
 	$(QUIET)$(RM) /opt/PiAP/sbin/autosign_client 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/sbin/cronscan 2>/dev/null || true
+	$(QUIET)$(RM) /opt/PiAP/sbin/autoscan 2>/dev/null || true
 	$(QUIET)$(RMDIR) /opt/PiAP/sbin 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 	
@@ -432,12 +442,33 @@ remove-PiAP-hostapd: must_be_root
 	$(QUIET)$(RM) /etc/hostapd/hostapd.conf.bad 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-configure-PiAP-interfaces: /etc/network must_be_root
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/network/interfaces /etc/network/interfaces
-	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPTS) ./PiAP/etc/cron.hourly/clear_zeroconf_ip.sh /etc/cron.hourly/clear_zeroconf_ip.sh
+install-cron-actions: install-optroot must_be_root /etc/cron.hourly/clear_zeroconf_ip.sh /etc/cron.hourly/ntp_opengate /etc/cron.hourly/reactive_autoscan
 	$(QUIET)$(ECHO) "$@: Done."
 
-remove-PiAP-interfaces: must_be_root
+/etc/cron.daily/%: ./PiAP/etc/cron.hourly/% must_be_root /etc/cron.daily/
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) $< $@
+	$(QUIET)$(ECHO) "$@: installed."
+
+/etc/cron.hourly/%: ./PiAP/etc/cron.hourly/% must_be_root /etc/cron.hourly/
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_OPTS) $< $@
+	$(QUIET)$(ECHO) "$@: installed."
+
+/etc/cron.daily/: install-optroot must_be_root /etc/
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_DIR_OPTS) /etc/cron.daily/
+
+/etc/cron.hourly/: install-optroot must_be_root /etc/
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_DIR_OPTS) /etc/cron.hourly
+
+uninstall-cron-actions: must_be_root
+	$(QUIET)$(RM) /etc/cron.daily/PiAP_junk 2>/dev/null || true
+	$(QUIET)$(RM) /etc/cron.hourly/ntp_opengate 2>/dev/null || true
+	$(QUIET)$(RM) /etc/cron.hourly/clear_zeroconf_ip.sh 2>/dev/null || true
+
+configure-PiAP-interfaces: /etc/network must_be_root install-cron-actions
+	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/network/interfaces /etc/network/interfaces
+	$(QUIET)$(ECHO) "$@: Done."
+
+remove-PiAP-interfaces: must_be_root uninstall-cron-actions
 	$(QUIET)$(RM) /etc/network/interfaces 2>/dev/null || true
 	$(QUIET)$(RM) /etc/cron.hourly/clear_zeroconf_ip.sh 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
@@ -480,6 +511,12 @@ test: cleanup
 test-tox: cleanup test
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test-tox
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test-tox
+	$(QUIET)$(ECHO) "$@: Done."
+
+test-style: cleanup
+	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile test-style
+	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile test-style 2>/dev/null || true
+	$(QUIET)bash -c ./tests/test_*.bash || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
