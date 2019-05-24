@@ -28,12 +28,12 @@
 # PIAP_BLINK_LED - the LED to blink (valid values = 0 - 20 default: 0)
 # PIAP_BLINK_COUNT - the count to blink (valid values = 0 - 1000 (where 0 is ongoing) default: 0)
 # PIAP_BLINK_COUNT=1
-PIAP_BIN_PATH=$(dirname "$0")
+PIAP_BIN_PATH=$(dirname "${0}")
 # flash on and off once
 
 LOCK_FILE="/tmp/PiAP_LED_state_lock"
 
-if [[ -f "${LOCK_FILE}" ]] ; then
+if [[ -f ${LOCK_FILE} ]] ; then
         exit 0 ;
 fi
 
@@ -50,14 +50,14 @@ touch "${LOCK_FILE}" 2>/dev/null || exit 0 ;
 REG_COLON=$":"
 
 
-echo "default-on" | sudo tee /sys/class/leds/led0/trigger 2>/dev/null > /dev/null || true ;
-echo "heartbeat" | sudo tee /sys/class/leds/led1/trigger 2>/dev/null > /dev/null || true ;
+echo "none" | sudo tee /sys/class/leds/led0/trigger 2>/dev/null > /dev/null || true ;
+echo "default-on" | sudo tee /sys/class/leds/led1/trigger 2>/dev/null > /dev/null || true ;
 echo 0 | sudo tee "/sys/class/leds/led0${REG_COLON}${REG_COLON}assoc/brightness" 2>/dev/null > /dev/null || true ;
 
 
 # heristic for wlan1 with canna-kit usb wifi chips
 if [[ ( $(sudo ls -1 "/sys/class/leds/rt*usb-phy1${REG_COLON}${REG_COLON}assoc/brightness" | wc -l | cut -d\  -f 1 2>/dev/null || echo -n 0 ) -gt 0 ) ]] ; then
-	echo "default-on" | sudo tee "/sys/class/leds/rt*usb-phy1${REG_COLON}${REG_COLON}assoc/trigger" 2>/dev/null > /dev/null || true ;
+	echo "none" | sudo tee "/sys/class/leds/rt*usb-phy1${REG_COLON}${REG_COLON}assoc/trigger" 2>/dev/null > /dev/null || true ;
 	echo 255 | sudo tee "/sys/class/leds/rt*usb-phy1${REG_COLON}${REG_COLON}assoc/brightness" 2>/dev/null > /dev/null || true ;
 fi
 

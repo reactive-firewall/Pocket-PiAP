@@ -60,16 +60,28 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 #
-ulimit -t 25
+#ulimit -t 25
+PATH="/bin/:/usr/bin/:/usr/sbin/:/sbin/:/usr/local/bin/:/usr/local/sbin/"
+export PATH="${PATH}:/opt/PiAP/bin/:/opt/PiAP/sbin/"
 umask 027
+
+HAS_POCKET_USER=$(id pocket-www 1>&2 2>/dev/null >> /dev/null && echo -n 0 || echo -n $?)
+POCKET_WEB_USER="www-data"
+if [[ ( ${HAS_POCKET_USER:-1} -lt 1 ) ]] ; then
+        POCKET_WEB_USER="pocket-www"
+fi
 TEMPLIST_PATH="/dev/shm/auto_scan_list"
 head -n ${MAX_SCAN_BATCH:-500} "${TEMPLIST_PATH}" 2>/dev/null | grepip 2>/dev/null | tee -a "${TEMPLIST_PATH}_pre" 2>/dev/null > /dev/null ;
+chown ${POCKET_WEB_USER} "${TEMPLIST_PATH}_pre" 2>/dev/null || true
 echo -n "" > ${TEMPLIST_PATH} 2>/dev/null ; wait ;
 grepip -h /proc/net/xt_recent/scannerlist 2>/dev/null | tee -a "${TEMPLIST_PATH}_pre" 2>/dev/null > /dev/null ;
 sort -t . -n "${TEMPLIST_PATH}_pre" | uniq | tee -a "${TEMPLIST_PATH}" 2>/dev/null > /dev/null ;
 rm -qf "${TEMPLIST_PATH}_pre" 2>/dev/null > /dev/null || true ;
 for BAD_IP in $( head -n ${MAX_SCAN_BATCH:-500} "${TEMPLIST_PATH}" ) ; do
-echo $BAD_IP 2>/dev/null > /dev/null ;
+# echo $BAD_IP 2>/dev/null > /dev/null ;
+if [[ ( $( df / | tail -n 1 | tr -s ' \t' ' ' | cut -d\  -f 4 ) -gt 201000 ) ]] ; then
+	/opt/PiAP/sbin/cronscan $BAD_IP ; wait ;
+fi
 done ;
 rm -qf "${TEMPLIST_PATH}" 2>/dev/null > /dev/null || true ;
 exit 0;
