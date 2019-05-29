@@ -153,7 +153,7 @@ jobs:
           name: "install flake8 attempt"
           command: |
             python3 -m pip install --user flake8 || true
-		  when: on_success
+          when: on_success
       - run:
           name: "install flake8 attempt"
           command: |
