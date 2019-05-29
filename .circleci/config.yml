@@ -1,15 +1,14 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/Pocket-PiAP
     docker:
       - image: circleci/buildpack-deps:latest
-        environment:
-          CI: cicleci
-          DEBIAN_FRONTEND: noninteractive
-          LANG: en_US.UTF-8
-          LC_CTYPE: en_EN.UTF-8
-          SHELL: /bin/bash
+    environment:
+      CI: cicleci
+      DEBIAN_FRONTEND: noninteractive
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_EN.UTF-8
+    working_directory: ~/Pocket-PiAP
     steps:
       - run:
           name: "update apt"
@@ -30,52 +29,170 @@ jobs:
           command: |
             ./.circleci/fetch_and_pull.bash ; wait || true
       - run:
+          shell: /bin/bash
           name: "clean apt"
           command: |
-            sudo apt-get autoclean ; wait ;
+            sudo apt-get autoclean ; wait || true ;
+      - save_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/Pocket-PiAP
+
+  install:
+    docker:
+      - image: circleci/buildpack-deps:latest
+    parallelism: 1
+    environment:
+      CI: cicleci
+      DEBIAN_FRONTEND: noninteractive
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_EN.UTF-8
+    working_directory: ~/Pocket-PiAP
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - run:
           shell: /bin/bash
           name: "clean up for test"
           command: |
-            make clean || true
+            make clean
+          when: on_success
       - run:
           name: "fetch not pull"
           command: |
             curl -fsSL --tlsv1.2 --url https://raw.githubusercontent.com/reactive-firewall/Pocket-PiAP/${CIRCLE_SHA1:-stable}/upgrade.sh -o ~/Pocket-PiAP/upgrade.sh 2>/dev/null || true
+          when: on_success
       - run:
           shell: /bin/bash
           name: "Install path Tests"
           command: |
             export PIAP_UI_BRANCH="${CIRCLE_BRANCH:-${CIRCLE_SHA1:-stable}}" && sudo bash ~/Pocket-PiAP/upgrade.sh || true
+          when: on_success
+      - save_cache:
+          key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/Pocket-PiAP
+            - /opt/PiAP
+            - /srv/PiAP
+
+  test:
+    docker:
+      - image: circleci/buildpack-deps:latest
+    parallelism: 1
+    environment:
+      CI: cicleci
+      DEBIAN_FRONTEND: noninteractive
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_EN.UTF-8
+    working_directory: ~/Pocket-PiAP
+    steps:
+      - restore_cache:
+          key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
       - run:
           shell: /bin/bash
           name: "CWE-501 into CWE-250 attempt"
           command: |
             sudo usermod -a -G pocket,pocket-admin circleci || true
+          when: on_success
       - run:
           shell: /bin/bash
           name: "Break ACL for circle to bootstrap tests"
           command: |
             sudo chmod -v 775 /opt/PiAP/ || true
+          when: on_success
       - run:
           shell: /bin/bash
           name: "Break ACL for circle to bootstrap tests part 2"
           command: |
             sudo chown -v circleci /opt/PiAP/ || true
+          when: on_success
       - run:
           shell: /bin/bash
           name: "UnBreak old tests"
           command: |
             sudo rm -vf /opt/PiAP/.beta_* 2>/dev/null || true
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "clean up for test"
+          command: |
+            make clean
+          when: always
       - run:
           shell: /bin/bash
           name: "Unit Tests"
           command: |
             make test
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "clean up from test"
+          command: |
+            make clean
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "clean up from FAIL"
+          command: |
+            make clean
+          when: on_fail
+      - run:
+          shell: /bin/bash
+          name: "clean up from FAIL"
+          command: |
+            make clean
+          when: on_fail
+
+  lint:
+    docker:
+      - image: circleci/buildpack-deps:latest
+    environment:
+      CI: cicleci
+      DEBIAN_FRONTEND: noninteractive
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_EN.UTF-8
+    working_directory: ~/Pocket-PiAP
+    steps:
+      - restore_cache:
+          key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - run:
+          name: "install flake8 attempt"
+          command: |
+            python3 -m pip install --user flake8 || true
+		  when: on_success
+      - run:
+          name: "install flake8 attempt"
+          command: |
+            python3 -m pip install --user pep8 || true
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "clean up for test"
+          command: |
+            make clean
+      - run:
+          shell: /bin/bash
+          name: "check code style and spelling"
+          command: |
+            make test-style || true
       - run:
           shell: /bin/bash
           name: "clean up when done"
           command: |
             make clean
-destination: build
- 
+
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - build
+      - install:
+          requires:
+            - build
+      - test:
+          requires:
+            - install
+      - lint:
+          requires:
+            - install
+

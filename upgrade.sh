@@ -203,6 +203,36 @@ curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" -
 		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
 	fi
 	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 157F7C20C1B17EAF 2>/dev/null || WARN_VAR=2 ; wait ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_H.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
+		message "FAILED TO import A1D551AADC439CC5"
+		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
+	fi
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key A1D551AADC439CC5 2>/dev/null || WARN_VAR=2 ; wait ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_I.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
+		message "FAILED TO import 71BEC57F7ACABE5F"
+		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
+	fi
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 71BEC57F7ACABE5F 2>/dev/null || WARN_VAR=2 ; wait ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_K.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
+		message "FAILED TO import 11D97E1BAD186C99"
+		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
+	fi
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 11D97E1BAD186C99 2>/dev/null || WARN_VAR=2 ; wait ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_J.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
+		message "FAILED TO import 8A90BD3AA562D23F"
+		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
+	fi
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 8A90BD3AA562D23F 2>/dev/null || WARN_VAR=2 ; wait ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_HIJK.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || ROLL_BACK=2 ;
+	if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
+		message "FAILED TO import B040F898E240C2E2"
+		message "THIS IS AN ERROR - UPDATE WILL FAIL!"
+	fi
+	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key B040F898E240C2E2 2>/dev/null || WARN_VAR=2 ; wait ;
 	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Codesign_CA.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n4\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 493E9F9098AAF260 2>/dev/null || WARN_VAR=2 ; wait ;
 	${GIT_GPG_CMD} --check-trustdb 2>/dev/null || WARN_VAR=2 ;
