@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
@@ -136,12 +136,6 @@ jobs:
           command: |
             make clean
           when: on_fail
-      - run:
-          shell: /bin/bash
-          name: "clean up from FAIL"
-          command: |
-            make clean
-          when: on_fail
 
   lint:
     docker:
@@ -170,20 +164,23 @@ jobs:
           name: "clean up for test"
           command: |
             make clean
+          when: always
       - run:
           shell: /bin/bash
           name: "check code style and spelling"
           command: |
             make test-style || true
+          when: on_success
       - run:
           shell: /bin/bash
           name: "clean up when done"
           command: |
             make clean
+         when: always
 
 workflows:
   version: 2
-  workflow:
+  build-install-and-test:
     jobs:
       - build
       - install:
@@ -195,4 +192,3 @@ workflows:
       - lint:
           requires:
             - install
-
