@@ -60,7 +60,7 @@ jobs:
       - run:
           name: "fetch not pull"
           command: |
-            curl -fsSL --tlsv1.2 --url https://raw.githubusercontent.com/reactive-firewall/Pocket-PiAP/${CIRCLE_SHA1:-stable}/upgrade.sh -o ~/Pocket-PiAP/upgrade.sh 2>/dev/null || true
+            curl -fsSL --tlsv1.2 --url https://raw.githubusercontent.com/reactive-firewall/Pocket-PiAP/${CIRCLE_SHA1:-${CIRCLE_BRANCH:-stable}}/upgrade.sh -o ~/Pocket-PiAP/upgrade.sh 2>/dev/null || true
           when: on_success
       - run:
           shell: /bin/bash

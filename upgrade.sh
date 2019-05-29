@@ -153,7 +153,7 @@ cd ./Pocket-PiAP || ROLL_BACK=2 ;
 message "Selecting branch ${PIAP_UI_BRANCH:-stable}"
 git fetch || ROLL_BACK=2 ;
 git pull || ROLL_BACK=2 ;
-git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
+git checkout --force origin ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
 git submodule init || ROLL_BACK=2 ;
 git submodule update --remote --checkout || ROLL_BACK=2 ;
 git config --local fetch.recursesubmodules true
