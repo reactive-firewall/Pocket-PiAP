@@ -161,7 +161,7 @@ jobs:
           when: on_success
       - run:
           shell: /bin/bash
-          name: "clean up for test"
+          name: "clean up for lint"
           command: |
             make clean
           when: always
@@ -173,10 +173,16 @@ jobs:
           when: on_success
       - run:
           shell: /bin/bash
-          name: "clean up when done"
+          name: "clean up from lint"
           command: |
             make clean
-         when: always
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "clean up from FAIL"
+          command: |
+            make clean
+          when: on_fail
 
 workflows:
   version: 2
