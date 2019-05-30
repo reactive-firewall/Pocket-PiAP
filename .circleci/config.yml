@@ -72,8 +72,15 @@ jobs:
           key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/Pocket-PiAP
-            - /opt
-            - /srv/PiAP
+          when: on_success
+      - save_cache:
+          key: v2-install-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - /opt/PiAP
+          when: on_success
+      - save_cache:
+          key: v2-config-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
             - /etc
           when: on_success
 
@@ -90,6 +97,12 @@ jobs:
     steps:
       - restore_cache:
           key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v2-install-{{ .Environment.CIRCLE_SHA1 }}
+          when: on_success
+      - restore_cache:
+          key: v2-config-{{ .Environment.CIRCLE_SHA1 }}
+          when: on_success
       - run:
           shell: /bin/bash
           name: "CWE-501 into CWE-250 attempt"
@@ -151,6 +164,12 @@ jobs:
     steps:
       - restore_cache:
           key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v2-install-{{ .Environment.CIRCLE_SHA1 }}
+          when: on_success
+      - restore_cache:
+          key: v2-config-{{ .Environment.CIRCLE_SHA1 }}
+          when: on_success
       - run:
           name: "install flake8 attempt"
           command: |
