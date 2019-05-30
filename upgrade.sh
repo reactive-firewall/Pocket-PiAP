@@ -151,12 +151,12 @@ rm -vfR ./Pocket-PiAP 2>/dev/null || true
 git clone -b ${PIAP_UI_BRANCH:-stable} https://github.com/reactive-firewall/Pocket-PiAP.git || true ;
 cd ./Pocket-PiAP || ROLL_BACK=2 ;
 message "Selecting branch ${PIAP_UI_BRANCH:-stable}"
-git fetch || ROLL_BACK=2 ;
-git pull || ROLL_BACK=2 ;
-git checkout --force origin ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
-git submodule init || ROLL_BACK=2 ;
+git fetch "${CI_REMOTE:-origin}" "${CIRCLE_BRANCH:-${CIRCLE_SHA1:-stable}}" || git fetch --all || ROLL_BACK=2 ;
+git pull || git pull --all || ROLL_BACK=2 ;
+git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
+git submodule init || true ;
 git submodule update --remote --checkout || ROLL_BACK=2 ;
-git config --local fetch.recursesubmodules true
+git config --local fetch.recursesubmodules true ;
 git fetch || ROLL_BACK=2 ;
 git pull || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
