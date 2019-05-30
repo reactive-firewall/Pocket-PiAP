@@ -72,10 +72,9 @@ jobs:
           key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/Pocket-PiAP
-            - /opt/
-            - /opt/PiAP
+            - /opt
             - /srv/PiAP
-            - /etc/
+            - /etc
           when: on_success
 
   test:
