@@ -286,7 +286,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Generated."
 
 /etc/ssl/PiAPCA/private/PiAP_CA.csr: /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
-	$(QUIET)openssl req -config /etc/ssl/PiAP_keyring.cfg -new -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_CA.csr -key /etc/ssl/PiAPCA/private/PiAP_CA.key -subj "/CN=Pocket\ PiAP\ CA/OU=PiAP\ Root/O=PiAP\ Network/UID=0/" 2>/dev/null
+	$(QUIET)openssl req -new -config /etc/ssl/PiAP_keyring.cfg -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_CA.csr -key /etc/ssl/PiAPCA/private/PiAP_CA.key -subj "/CN=Pocket\ PiAP\ CA/OU=PiAP\ Root/O=PiAP\ Network/UID=0/"
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(SYS_OWN) /etc/ssl/PiAPCA/private/PiAP_CA.key || exit 2
 	$(QUIET)$(ECHO) "$@: Requested."
@@ -310,7 +310,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)$(ECHO) "$@: Generated."
 
 /etc/ssl/PiAPCA/private/PiAP_SSL.csr: /etc/ssl/PiAPCA/private/PiAP_SSL.key must_be_root
-	$(QUIET)openssl req -new -config /etc/ssl/PiAP_keyring.cfg -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_SSL.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.piap.local/OU=PiAP\ SSL/O=PiAP\ Network/UID=0/" 2>/dev/null
+	$(QUIET)openssl req -new -config /etc/ssl/PiAP_keyring.cfg -outform PEM -out /etc/ssl/PiAPCA/private/PiAP_SSL.csr -key /etc/ssl/PiAPCA/private/PiAP_SSL.key -subj "/CN=pocket.piap.local/OU=PiAP\ SSL/O=PiAP\ Network/UID=0/"
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(WEB_OWN) /etc/ssl/PiAPCA/private/PiAP_SSL.csr || exit 2
 	$(QUIET)$(ECHO) "$@: Requested."
