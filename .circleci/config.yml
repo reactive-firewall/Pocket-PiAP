@@ -74,14 +74,17 @@ jobs:
             - ~/Pocket-PiAP
           when: on_success
       - save_cache:
+          key: v2-config-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+			- /etc/passwd
+            - /etc/group
+            - /etc/users
+            - /etc/ssl
+          when: on_success
+      - save_cache:
           key: v2-install-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - /opt/PiAP
-          when: on_success
-      - save_cache:
-          key: v2-config-{{ .Environment.CIRCLE_SHA1 }}
-          paths:
-            - /etc
           when: on_success
 
   test:
@@ -98,10 +101,10 @@ jobs:
       - restore_cache:
           key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
-          key: v2-install-{{ .Environment.CIRCLE_SHA1 }}
+          key: v2-config-{{ .Environment.CIRCLE_SHA1 }}
           when: on_success
       - restore_cache:
-          key: v2-config-{{ .Environment.CIRCLE_SHA1 }}
+          key: v2-install-{{ .Environment.CIRCLE_SHA1 }}
           when: on_success
       - run:
           shell: /bin/bash
