@@ -76,7 +76,7 @@ jobs:
       - save_cache:
           key: v2-config-{{ .Environment.CIRCLE_SHA1 }}
           paths:
-			- /etc/passwd
+            - /etc/passwd
             - /etc/group
             - /etc/users
             - /etc/ssl
