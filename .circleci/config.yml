@@ -106,7 +106,7 @@ jobs:
           shell: /bin/bash
           name: "CWE-501 into CWE-250 attempt"
           command: |
-            sudo usermod -a -G pocket,pocket-admin circleci || true
+            sudo usermod -a -G pocket,pocket-admin circleci || sudo mkdir -p /opt/PiAP/ || true
           when: on_success
       - run:
           shell: /bin/bash
