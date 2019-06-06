@@ -10,9 +10,26 @@ exclude_lines =
 
     except Exception
     # Don't complain if tests don't hit defensive assertion code:
-    raise AssertionError
-    raise NotImplementedError
-    raise ImportError
+	# Have to re-enable the standard pragma rules
+	pragma: no cover
+	from . import
+	except Exception
+	except BaseException:
+	# Don't complain if tests don't hit defensive assertion code:
+	raise AssertionError
+	raise NotImplementedError
+	raise ImportError
+	except ImportError:
+	except unittest.SkipTest
+	except subprocess.CalledProcessError
+	except IOError
+	except OSError
+	# Don't complain if non-runnable code isn't run:
+	if __name__ in u'__main__':
+	if __name__ in '__main__':
+	if __sys_path__ not in sys.path:
+	if 'piaplib' not in sys.modules:
+	os.abort()
 
     # Don't complain if non-runnable code isn't run:
 	if __name__ in u'__main__':

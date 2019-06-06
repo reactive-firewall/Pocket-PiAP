@@ -190,7 +190,7 @@ channel=8
 #chanlist=1 2-9 11
 
 # Beacon interval in kus (1.024 ms) (default: 100; range 15..65535)
-#beacon_int=100
+#beacon_int=300
 
 # DTIM (delivery traffic information message) period (range 1..255):
 # number of beacons between DTIMs (1 = every beacon includes DTIM element)
@@ -431,7 +431,7 @@ wmm_ac_vo_acm=0
 # disassociation frame is not sent immediately without first polling
 # the STA with a data frame.
 # default: 300 (i.e., 5 minutes)
-#ap_max_inactivity=300
+ap_max_inactivity=3600
 #
 # The inactivity polling can be disabled to disconnect stations based on
 # inactivity timeout so that idle stations are more likely to be disconnected
@@ -442,7 +442,7 @@ wmm_ac_vo_acm=0
 # Disassociate stations based on excessive transmission failures or other
 # indications of connection loss. This depends on the driver capabilities and
 # may not be available with all drivers.
-#disassoc_low_ack=1
+disassoc_low_ack=1
 
 # Maximum allowed Listen Interval (how many Beacon periods STAs are allowed to
 # remain asleep). Default: 65535 (no limit apart from field size)
@@ -912,7 +912,7 @@ ieee80211n=1
 ##### IEEE 802.11f - Inter-Access Point Protocol (IAPP) #######################
 
 # Interface to be used for IAPP broadcast packets
-#iapp_interface=eth0
+#iapp_interface=lan0
 
 
 ##### RADIUS client configuration #############################################
