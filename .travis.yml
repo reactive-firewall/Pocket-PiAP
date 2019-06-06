@@ -39,9 +39,6 @@ matrix:
     language: python
   - os: linux
     language: php7
-  - os: linux
-    dist: xenial
-    language: generic
   - os: osx
     osx_image: xcode8.3
     language: generic
@@ -57,7 +54,7 @@ addons:
   - pocket.PiAP.local
 
 before_install:
-  - echo "travis_fold:start:piap-setup" 2>/dev/null || true
+  - echo "travis_fold:start:piap_setup" 2>/dev/null || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait git -C "$(brew --repo homebrew/core)" fetch --unshallow || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew tap homebrew/versions || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew upgrade || travis_retry brew upgrade || true ; fi
@@ -111,7 +108,11 @@ before_install:
   - chmod -v 775 "/opt/PiAP/" || true
   - cp -vf ./PiAP/units/PiAP-python-tools/tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
   - rm -vf /opt/PiAP/.beta_* 2>/dev/null || true ;
-  - echo "travis_fold:end:piap-setup" 2>/dev/null || true
+  - sync || true ;
+  - echo "travis_fold:end:piap_setup" 2>/dev/null || true
+
+install:
+  - make clean || true
 
 before_script:
   - make clean ;
@@ -119,20 +120,23 @@ before_script:
   - chmod +x ./cc-test-reporter 2>/dev/null || true
   - ./cc-test-reporter before-build 2>/dev/null || true
 
-install:
-  - make clean || true
-
 script:
-  - echo "travis_fold:start:piap-test" 2>/dev/null || true
+  - echo "travis_fold:start:piap_test" 2>/dev/null || true
   - make test || export TRAVIS_TEST_RESULT=$? ;
-  - echo "travis_fold:end:piap-test" 2>/dev/null || true
-  - echo "travis_fold:start:piap-codecov" 2>/dev/null || true
+  - echo "travis_fold:end:piap_test" 2>/dev/null || true
+  - echo "travis_fold:start:piap_codecov" 2>/dev/null || true
   - codecov || true
   - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT 2>/dev/null || true ; fi
-  - echo "travis_fold:end:piap-codecov" 2>/dev/null || true
+  - echo "travis_fold:end:piap_codecov" 2>/dev/null || true
   - make clean || exit $? ;
   - if [ $TRAVIS_OS_NAME != osx ] ; then travis_retry make test-tox ; fi
   - make clean 2>/dev/null || true ;
 
 after_success:
   - codecov 2>/dev/null || true
+  - python3 -m piaplib.pocket book version --verbose --all 2>/dev/null || python -m piaplib.pocket book version --verbose --all 2>/dev/null
+  - uname
+
+after_failure:
+  - python3 -m piaplib.pocket book version --verbose --all 2>/dev/null || python -m piaplib.pocket book version --verbose --all 2>/dev/null || true
+  - uname

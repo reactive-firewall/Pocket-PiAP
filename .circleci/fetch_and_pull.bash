@@ -2,7 +2,7 @@
 
 EXIT_CODE=0 ;
 git checkout --force "${CIRCLE_BRANCH:-${CIRCLE_SHA1:-stable}}" 2>/dev/null || true ;
-git fetch "${CIRCLE_BRANCH:-${CIRCLE_SHA1:-stable}}" || git fetch --all || EXIT_CODE=1 ; 
+git fetch "${CI_REMOTE:-origin}" "${CIRCLE_BRANCH:-${CIRCLE_SHA1:-stable}}" || git fetch --all || EXIT_CODE=1 ; 
 git pull || git pull --all || EXIT_CODE=1 ;
 (git submodule init || true ) && git submodule update --remote --checkout && git submodule foreach git fetch --all || EXIT_CODE=1 ;
 
