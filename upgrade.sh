@@ -1,6 +1,10 @@
 #! /bin/bash
 
 CI="${CI:-false}"
+LANG="${LANG:-en_US.UTF-8}"
+LANGUAGE="${LANGUAGE:-${LANG}}"
+LC_ALL="${LC_ALL:-en_EN}"
+
 ROLL_BACK=0
 
 WARN_VAR=0
