@@ -1,5 +1,5 @@
 language: generic
-sudo: false
+
 env:
   global:
     - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
@@ -19,35 +19,49 @@ matrix:
   - os: linux
     dist: xenial
     language: generic
-  - os: osx
-    osx_image: xcode8.3
-    language: generic
-  - os: osx
-    osx_image: xcode9
-    language: generic
-  - os: osx
-    osx_image: xcode9.4
+  - os: linux
+    dist: bionic
     language: generic
   - os: osx
     osx_image: xcode10
-    language: generic
+    language: shell
   - os: osx
-    osx_image: xcode10.1
-    language: generic
+    osx_image: xcode11.1
+    language: shell
+  - os: osx
+    osx_image: xcode11.2
+    language: shell
+  - os: osx
+    osx_image: xcode11.3
+    language: shell
   allow_failures:
   - os: linux
     language: python
   - os: linux
     language: php7
+  - os: linux
+    dist: trusty
   - os: osx
     osx_image: xcode8.3
-    language: generic
   - os: osx
     osx_image: xcode7.3
-    language: generic
   - os: osx
     osx_image: xcode8
-    language: generic
+  - os: osx
+    osx_image: xcode8.3
+  - os: osx
+    osx_image: xcode9
+  - os: osx
+    osx_image: xcode9.4
+  - os: osx
+    osx_image: xcode10
+  - os: osx
+    osx_image: xcode10.1
+  - os: osx
+    osx_image: xcode11
+  - os: osx
+    osx_image: xcode11.1
+
 
 addons:
   hosts:
@@ -82,14 +96,14 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.7 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install coverage $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install codecov || true ; fi
-  - travis_retry pip install tox || pip install tox || true ;
+  - travis_retry pip install tox || pip3 install tox || true ;
   - travis_retry pip install coverage || true ;
   - travis_retry pip install codecov || true ;
   - travis_retry python -m pip install coverage || python -m pip install coverage || true ;
   - travis_retry python -m pip install codecov || python -m pip install codecov || true ;
-  - travis_retry python3 -m pip install tox || python3 -m pip install tox || true ;
-  - travis_retry python3 -m pip install coverage || python3 -m pip install coverage || true ;
-  - travis_retry python3 -m pip install codecov || python3 -m pip install codecov || true ;
+  - travis_retry python3 -m pip3 install tox || python3 -m pip install tox || true ;
+  - travis_retry python3 -m pip3 install coverage || python3 -m pip install coverage || true ;
+  - travis_retry python3 -m pip3 install codecov || python3 -m pip install codecov || true ;
   - travis_retry ln -s -f ./units/PiAP-python-tools/requirements.txt ./requirements.txt || true ;
   - travis_retry python3 -m pip install -r requirements.txt || python3 -m pip install -r requirements.txt || true ;
   - echo "Dependencies should be sane now."
@@ -98,9 +112,9 @@ before_install:
   - travis_retry python -m pip install tox || python -m pip install tox || travis_retry python -m pip install --user tox || python -m pip install --upgrade --user tox || true ;
   - if [ $TRAVIS_OS_NAME != osx ] ; then curl --tlsv1.2 -s -o archive.tar.bz2 https://s3.amazonaws.com/travis-php-archives/binaries/ubuntu/14.04/x86_64/php-7.2.tar.bz2 && tar xjf archive.tar.bz2 --directory / || true ; fi
   - pip install tox || pip install --upgrade tox || true ;
-  - travis_retry python3 -m pip install coverage || python3 -m pip install coverage || travis_retry python3 -m pip install --user coverage || python3 -m pip install --upgrade --user coverage || true ;
-  - travis_retry python3 -m pip install codecov || python3 -m pip install codecov || true ;
-  - travis_retry pip install flake8 || travis_retry python3 -m pip install flake8 || travis_retry python3 -m pip install --user flake8 || true ;
+  - travis_retry python3 -m pip3 install coverage || python3 -m pip3 install coverage || travis_retry python3 -m pip3 install --user coverage || python3 -m pip3 install --upgrade --user coverage || true ;
+  - travis_retry python3 -m pip3 install codecov || python3 -m pip3 install codecov || true ;
+  - travis_retry pip install flake8 || travis_retry python3 -m pip3 install flake8 || travis_retry python3 -m pip3 install --user flake8 || true ;
   - travis_retry pip install flake || true ;
   - travis_retry pip install codecov || true ;
   - sudo mkdir -p -m 775 "/opt/PiAP/"
@@ -128,7 +142,7 @@ script:
   - codecov || true
   - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT 2>/dev/null || true ; fi
   - echo "travis_fold:end:piap_codecov" 2>/dev/null || true
-  - make clean || exit $? ;
+  - make clean || export TRAVIS_TEST_RESULT=$? ;
   - if [ $TRAVIS_OS_NAME != osx ] ; then travis_retry make test-tox ; fi
   - make clean 2>/dev/null || true ;
 
