@@ -107,7 +107,7 @@ for SOME_DEPENDS in build-essential make logrotate git gnupg2 nginx nginx-full d
 	check_depends ${SOME_DEPENDS} || exit 2 ;
 done ;
 
-check_depends php-fpm && check_depends php7.0-xsl || check_depends php5-fpm || exit 2 ;
+check_depends php-fpm && ( check_depends php7.0-xsl || check_depends php7.2-xsl ) || check_depends php5-fpm || exit 2 ;
 
 cd /tmp ;
 check_path /var/ || exit 2 ;
