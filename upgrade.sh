@@ -344,7 +344,7 @@ if [[ ${CI} ]] ; then
 fi
 sudo service nginx start || sudo rm -vf /etc/nginx/sites-enabled/default 2>/dev/null || true && sudo service nginx start || ROLL_BACK=1 ;
 sudo service nginx status || sudo systemctl status nginx.service || true ;
-sudo service php5-fpm restart 2>/dev/null || sudo service php7.0-fpm restart 2>/dev/null || || sudo service php-fpm restart 2>/dev/null || ROLL_BACK=1 ;
+sudo service php5-fpm restart 2>/dev/null || sudo service php7.0-fpm restart 2>/dev/null|| sudo service php-fpm restart 2>/dev/null || ROLL_BACK=1 ;
 message "DONE"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 SSH_PORT=$(echo ${SSH_CONNECTION} | cut -d\  -f 4 )

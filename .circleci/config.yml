@@ -177,23 +177,13 @@ jobs:
       - run:
           name: "install flake8 attempt"
           command: |
-            python3 -m pip install --user flake8
+            python3 -m pip install --user flake8 || python3 -m pip3 install --user flake8 || true
           when: on_success
-      - run:
-          name: "install flake8 attempt via pip3"
-          command: |
-            python3 -m pip3 install --user flake8 || true
-          when: on_fail
       - run:
           name: "install pep8 attempt"
           command: |
-            python3 -m pip install --user pep8
+            python3 -m pip install --user pep8 || python3 -m pip3 install --user pep8 || true
           when: on_success
-      - run:
-          name: "install pep8 attempt via pip3"
-          command: |
-            python3 -m pip3 install --user pep8 || true
-          when: on_fail
       - run:
           shell: /bin/bash
           name: "clean up for lint"
