@@ -366,9 +366,9 @@ if [[ $CI ]] ; then
 	message "[BETA] PIAP_LOG_NAME=${PIAP_LOG_NAME}"
 	message "[BETA] PIAP_LOG_PATH=${PIAP_LOG_PATH}"
 	message "[BETA] GIT_GPG_CMD=${GIT_GPG_CMD}"
-	message "[BETA] GIT ENV"
 	${GIT_GPG_CMD} --list-sigs
 	sudo git show --show-signature | grep -F ": " || true
+	message "[BETA] GIT ENV"
 	git config --list
 	message "[BETA] PYTHON ENV"
 	python3 --version
@@ -378,6 +378,8 @@ if [[ $CI ]] ; then
 	head -n 4000 /etc/nginx/sites-available/PiAP || message "Missing /etc/nginx/sites-available/PiAP"
 	head -n 4000 /etc/nginx/sites-available/default || message "Missing /etc/nginx/sites-available/default"
 	sudo nginx -t -c /etc/nginx/nginx.conf || true
+	message "[BETA] PHP-FPM paths:"
+	sudo ls -lap /var/run/php*-fpm* || true
 fi
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
