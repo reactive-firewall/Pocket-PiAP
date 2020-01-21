@@ -149,6 +149,7 @@ sudo service nginx stop || true ;
 sudo service nginx status || true ;
 sudo service php5-fpm stop 2>/dev/null || true ;
 sudo service php7.0-fpm stop 2>/dev/null || true ;
+sudo service php-fpm stop 2>/dev/null || true ;
 message "Fetching upgrade files..."
 # data
 rm -vfR ./Pocket-PiAP 2>/dev/null || true
