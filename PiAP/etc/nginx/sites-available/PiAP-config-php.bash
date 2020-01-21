@@ -2,7 +2,7 @@
 
 # License
 #
-# Copyright (c) 2017-2018 Mr. Walls
+# Copyright (c) 2017-2020 Mr. Walls
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,7 +30,7 @@ if [[ ( $(php --version | grep -oF "PHP 7" | wc -l ) -gt 0 ) ]] ; then
 		echo "Reconfigure for PHP ${PIAP_PHP_VERSION}" ;
 		mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp ;
 		# might checnge to use php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3]{3}"
-		sed -E -e 's/php5/php${PIAP_PHP_VERSION}/g' /etc/nginx/sites-available/PiAP.tmp 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
+		sed -E -e 's/php5/php'$PIAP_PHP_VERSION'/g' /etc/nginx/sites-available/PiAP.tmp 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 		sed -E -e 's/0 default_server;/0 http2 default_server;/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 		sed -E -e 's/3 default_server;/3 http2 default_server;/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 		sed -E -e 's/server_name;/ssl_server_name;/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
