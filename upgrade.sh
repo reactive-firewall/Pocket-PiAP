@@ -108,7 +108,7 @@ for SOME_DEPENDS in build-essential make logrotate git gnupg2 nginx nginx-full d
 done ;
 
 check_depends php-fpm && ( check_depends php7.0-xsl || check_depends php-xsl ) || check_depends php5-fpm || exit 2 ;
-PIAP_PHP_VERSION=$((php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3]{3}" 2>/dev/null || echo 5 ) | grep -oE "\d+[.\d]*" | head -n 1);
+PIAP_PHP_VERSION=$( (php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3]{3}" 2>/dev/null || echo 5 ) | grep -oE "\d+[.\d]*" | head -n 1 );
 cd /tmp ;
 check_path /var/ || exit 2 ;
 check_path /srv/ || exit 2 ;
@@ -342,9 +342,9 @@ if [[ ${CI} ]] ; then
 	rm -vf /etc/nginx/sites-available/PiAP.tmp || ROLL_BACK=1 ;
 fi
 sudo service nginx start || sudo rm -vf /etc/nginx/sites-enabled/default 2>/dev/null || true && sudo service nginx start || ROLL_BACK=1 ;
-sudo service nginx status || sudo systemctl status nginx.service || true ;
+sudo service nginx status || sudo systemctl --no-pager status nginx.service || true ;
 sudo service php${PIAP_PHP_VERSION:-""}-fpm start 2>/dev/null || sudo service php${PIAP_PHP_VERSION:-""}-fpm restart 2>/dev/null || ROLL_BACK=1 ;
-sudo service php${PIAP_PHP_VERSION:-""}-fpm status 2>/dev/null || sudo systemctl status php${PIAP_PHP_VERSION:-""}-fpm.service 2>/dev/null || true ;
+sudo service php${PIAP_PHP_VERSION:-""}-fpm status 2>/dev/null || sudo systemctl --no-pager status php*.service 2>/dev/null || true ;
 message "DONE"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 SSH_PORT=$(echo ${SSH_CONNECTION} | cut -d\  -f 4 )
@@ -379,7 +379,7 @@ if [[ $CI ]] ; then
 	head -n 4000 /etc/nginx/sites-available/default || message "Missing /etc/nginx/sites-available/default"
 	sudo nginx -t -c /etc/nginx/nginx.conf || true
 	message "[BETA] PHP-FPM paths:"
-	sudo ls -lap /var/run/php* || true
+	( sudo ls -1 /var/run/ | fgrep "php" 2>/dev/null ) || true
 fi
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
