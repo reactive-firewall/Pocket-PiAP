@@ -108,7 +108,7 @@ for SOME_DEPENDS in build-essential make logrotate git gnupg2 nginx nginx-full d
 done ;
 
 check_depends php-fpm && ( check_depends php7.0-xsl || check_depends php-xsl ) || check_depends php5-fpm || exit 2 ;
-PIAP_PHP_VERSION=$( (php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3]{3}" 2>/dev/null || echo 5 ) | grep -oE "\d+[.\d]*" | head -n 1 );
+PIAP_PHP_VERSION=$( (php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3|7.4]{3}" 2>/dev/null || echo 5 ) | grep -oE "\d+[.\d]*" | head -n 1 );
 cd /tmp ;
 check_path /var/ || exit 2 ;
 check_path /srv/ || exit 2 ;
@@ -354,6 +354,8 @@ message "Status: Upgrade failed."
 message "Please report this issue at https://github.com/reactive-firewall/Pocket-PiAP/issues"
 message "[BETA] Please include the contents of this log \"${PIAP_LOG_PATH}\""
 if [[ $CI ]] ; then
+	message "[BETA] CI SERVICES"
+	sudo service --status-all 2>/dev/null || sudo systemctl --no-pager --type=service status 2>/dev/null || true
 	message "[BETA] Environment details:"
 	env
 	pwd
@@ -379,7 +381,8 @@ if [[ $CI ]] ; then
 	head -n 4000 /etc/nginx/sites-available/default || message "Missing /etc/nginx/sites-available/default"
 	sudo nginx -t -c /etc/nginx/nginx.conf || true
 	message "[BETA] PHP-FPM paths:"
-	( sudo ls -1 /var/run/ | fgrep "php" 2>/dev/null ) || true
+	( sudo ls -1 /var/run/ 2>/dev/null | fgrep "php" 2>/dev/null ) || true
+	sudo ls -1 /run/php 2>/dev/null || true
 fi
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
