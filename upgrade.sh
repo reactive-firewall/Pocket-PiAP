@@ -147,8 +147,8 @@ message "Backing up Complete"
 message "Disabling web-server to prevent inconsistent state. All sessions will be logged out."
 sudo service nginx stop || true ;
 sudo service nginx status || true ;
-sudo service php${PIAP_PHP_VERSION:-""}-fpm stop 2>/dev/null || true ;
-sudo service php${PIAP_PHP_VERSION:-""}-fpm status || true ;
+sudo service php${PIAP_PHP_VERSION:-""}-fpm stop 2>/dev/null || sudo systemctl stop php${PIAP_PHP_VERSION:-""}-fpm 2>/dev/null || true
+sudo service php${PIAP_PHP_VERSION:-""}-fpm status 2>/dev/null || sudo systemctl --no-pager --type=service status php${PIAP_PHP_VERSION:-""}-fpm 2>/dev/null || true
 message "Fetching upgrade files..."
 # data
 rm -vfR ./Pocket-PiAP 2>/dev/null || true
@@ -335,7 +335,7 @@ else
 	message "SSH keys seem fine."
 fi
 message "Restarting web-server."
-sudo service php${PIAP_PHP_VERSION:-""}-fpm start 2>/dev/null || ROLL_BACK=1 ;
+sudo service php${PIAP_PHP_VERSION:-""}-fpm start 2>/dev/null || true ;
 if [[ ${CI} ]] ; then
 	mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp 2>/dev/null || ROLL_BACK=1 ;
 	sed -E -e 's/10.0.40.1://g' /etc/nginx/sites-available/PiAP.tmp 2>/dev/null | tee /etc/nginx/sites-available/PiAP || ROLL_BACK=3 ;
@@ -343,7 +343,7 @@ if [[ ${CI} ]] ; then
 fi
 sudo service nginx start || sudo rm -vf /etc/nginx/sites-enabled/default 2>/dev/null || true && sudo service nginx start || ROLL_BACK=1 ;
 sudo service nginx status || sudo systemctl --no-pager status nginx.service || true ;
-sudo service php${PIAP_PHP_VERSION:-""}-fpm start 2>/dev/null || sudo service php${PIAP_PHP_VERSION:-""}-fpm restart 2>/dev/null || ROLL_BACK=1 ;
+sudo service php${PIAP_PHP_VERSION:-""}-fpm start 2>/dev/null || sudo service php${PIAP_PHP_VERSION:-""}-fpm restart 2>/dev/null || sudo systemctl start php${PIAP_PHP_VERSION:-""}-fpm.service 2>/dev/null || sudo systemctl restart php${PIAP_PHP_VERSION:-""}-fpm.service 2>/dev/null || ROLL_BACK=1 ;
 sudo service php${PIAP_PHP_VERSION:-""}-fpm status 2>/dev/null || sudo systemctl --no-pager status php*.service 2>/dev/null || true ;
 message "DONE"
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
@@ -356,6 +356,7 @@ message "[BETA] Please include the contents of this log \"${PIAP_LOG_PATH}\""
 if [[ $CI ]] ; then
 	message "[BETA] CI SERVICES"
 	sudo service --status-all 2>/dev/null || sudo systemctl --no-pager --type=service status 2>/dev/null || true
+	sudo service php${PIAP_PHP_VERSION:-""}-fpm status 2>/dev/null || sudo systemctl --no-pager --type=service status php${PIAP_PHP_VERSION:-""}-fpm 2>/dev/null || true
 	message "[BETA] Environment details:"
 	env
 	pwd
@@ -382,7 +383,7 @@ if [[ $CI ]] ; then
 	sudo nginx -t -c /etc/nginx/nginx.conf || true
 	message "[BETA] PHP-FPM paths:"
 	( sudo ls -1 /var/run/ 2>/dev/null | fgrep "php" 2>/dev/null ) || true
-	sudo ls -1 /run/php 2>/dev/null || true
+	sudo ls -1 /run/php/ 2>/dev/null || true
 fi
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
