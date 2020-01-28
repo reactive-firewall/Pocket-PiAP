@@ -346,8 +346,8 @@ if [[ ${CI} ]] ; then
 fi
 sudo service nginx start || sudo rm -vf /etc/nginx/sites-enabled/default 2>/dev/null || true && sudo service nginx start || ROLL_BACK=1 ;
 sudo service nginx status || sudo systemctl --no-pager status nginx.service || true ;
-sudo service php${PIAP_PHP_VERSION:-""}-fpm start 2>/dev/null || sudo service php${PIAP_PHP_VERSION:-""}-fpm restart 2>/dev/null || sudo systemctl restart php${PIAP_PHP_VERSION:-""}-fpm.service 2>/dev/null || sudo systemctl try-restart php${PIAP_PHP_VERSION:-""}-fpm.service 2>/dev/null || ROLL_BACK=1 ;
-sudo service php${PIAP_PHP_VERSION:-""}-fpm status 2>/dev/null || sudo systemctl --no-pager status php${PIAP_PHP_VERSION:-""}-fpm.service 2>/dev/null || true ;
+sudo service php${PIAP_PHP_VERSION:-""}-fpm start || sudo service php${PIAP_PHP_VERSION:-""}-fpm restart || sudo systemctl start php${PIAP_PHP_VERSION:-""}-fpm.service || sudo systemctl restart php${PIAP_PHP_VERSION:-""}-fpm.service || ROLL_BACK=1 ;
+sudo service php${PIAP_PHP_VERSION:-""}-fpm status || sudo systemctl --no-pager status php${PIAP_PHP_VERSION:-""}-fpm.service || true ;
 if [[ ( ${ROLL_BACK:-1} -eq 1 ) ]] ; then
 	message "RESTART FAILED!"
 else
