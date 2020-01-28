@@ -57,7 +57,7 @@ jobs:
           shell: /bin/bash
           name: "Hack for docker policy-rc.d"
           command: |
-            sudo rm -vf /usr/sbin/policy-rc.d && sudo printf "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d ;
+            sudo rm -vf /usr/sbin/policy-rc.d && ( printf "#!/bin/sh\nexit 0" | sudo tee /usr/sbin/policy-rc.d ) ;
           when: on_success
       - run:
           shell: /bin/bash
