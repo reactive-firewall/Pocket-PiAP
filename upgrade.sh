@@ -334,6 +334,9 @@ if [[ ( $( find /etc/ssh -iname *.pub -ctime +30 -print0 2>/dev/null | wc -l ) -
 else
 	message "SSH keys seem fine."
 fi
+if [[ ( ${ROLL_BACK:-3} -le 0 ) ]] ; then
+message "Upgrade seems fine ... SKIPPING BACKUP RESTORE!"
+fi
 message "Restarting web-server."
 sudo service php${PIAP_PHP_VERSION:-""}-fpm start 2>/dev/null || true ;
 if [[ ${CI} ]] ; then
@@ -356,7 +359,7 @@ message "[BETA] Please include the contents of this log \"${PIAP_LOG_PATH}\""
 if [[ $CI ]] ; then
 	message "[BETA] CI SERVICES"
 	sudo service --status-all 2>/dev/null || sudo systemctl --no-pager --type=service status 2>/dev/null || true
-	sudo service php${PIAP_PHP_VERSION:-""}-fpm status 2>/dev/null || sudo systemctl --no-pager --type=service status php${PIAP_PHP_VERSION:-""}-fpm 2>/dev/null || true
+	sudo service php${PIAP_PHP_VERSION:-""}-fpm status 2>/dev/null || sudo systemctl --no-pager status php* 2>/dev/null || true
 	message "[BETA] Environment details:"
 	env
 	pwd
@@ -383,7 +386,7 @@ if [[ $CI ]] ; then
 	sudo nginx -t -c /etc/nginx/nginx.conf || true
 	message "[BETA] PHP-FPM paths:"
 	( sudo ls -1 /var/run/ 2>/dev/null | fgrep "php" 2>/dev/null ) || true
-	sudo ls -1 /run/php/ 2>/dev/null || true
+	sudo ls -1 /var/run/php/ 2>/dev/null || true
 fi
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
