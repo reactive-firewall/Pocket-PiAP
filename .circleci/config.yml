@@ -58,6 +58,7 @@ jobs:
           name: "Hack for docker policy-rc.d"
           command: |
             sudo rm -vf /usr/sbin/policy-rc.d && ( printf "#!/bin/sh\nexit 0" | sudo tee /usr/sbin/policy-rc.d ) ;
+            sudo chmod 755 /usr/sbin/policy-rc.d ;
           when: on_success
       - run:
           shell: /bin/bash
