@@ -107,7 +107,7 @@ for SOME_DEPENDS in build-essential make logrotate git gnupg2 nginx nginx-full d
 done ;
 
 check_depends php-fpm && ( check_depends php7.0-xsl || check_depends php-xsl ) || check_depends php5-fpm || exit 2 ;
-PIAP_PHP_VERSION=$( (php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3|7.4]{3}" 2>/dev/null || echo 5 ) | grep -oE "\d+[.\d]*" | head -n 1 );
+export PIAP_PHP_VERSION=$( (php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3|7.4]{3}" 2>/dev/null || echo 5 ) | grep -oE "\d+[.\d]*" | head -n 1 );
 cd /tmp ;
 check_path /var/ || exit 2 ;
 check_path /srv/ || exit 2 ;
@@ -337,7 +337,7 @@ if [[ ( ${ROLL_BACK:-3} -le 0 ) ]] ; then
 message "Upgrade seems fine ... SKIPPING BACKUP RESTORE!"
 fi
 message "Restarting web-server."
-sudo service "php${PIAP_PHP_VERSION}-fpm" start 2>/dev/null || true ;
+sudo service "php${PIAP_PHP_VERSION}-fpm" start 2>/dev/null || ROLL_BACK=1 ;
 if [[ ${CI} ]] ; then
 	mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp 2>/dev/null || ROLL_BACK=2 ;
 	sed -E -e 's/10.0.40.1://g' /etc/nginx/sites-available/PiAP.tmp 2>/dev/null | tee /etc/nginx/sites-available/PiAP || ROLL_BACK=3 ;
@@ -345,7 +345,7 @@ if [[ ${CI} ]] ; then
 fi
 sudo service nginx start || sudo rm -vf /etc/nginx/sites-enabled/default 2>/dev/null || true && sudo service nginx start || ROLL_BACK=1 ;
 sudo service nginx status || sudo systemctl --no-pager status nginx.service || true ;
-sudo service "php${PIAP_PHP_VERSION}-fpm" start 2>/dev/null || sudo service "php${PIAP_PHP_VERSION}-fpm" restart 2>/dev/null ||sudo systemctl start "php${PIAP_PHP_VERSION}-fpm.service" 2>/dev/null || sudo systemctl restart "php${PIAP_PHP_VERSION}-fpm.service" 2>/dev/null || ROLL_BACK=1 ;
+sudo service "php${PIAP_PHP_VERSION}-fpm" start 2>/dev/null || sudo service "php${PIAP_PHP_VERSION}-fpm" restart 2>/dev/null ||sudo systemctl start "php${PIAP_PHP_VERSION}-fpm.service" 2>/dev/null || sudo systemctl restart "php${PIAP_PHP_VERSION}-fpm.service" 2>/dev/null || true ;
 sudo service "php${PIAP_PHP_VERSION}-fpm" status || sudo systemctl --no-pager status "php${PIAP_PHP_VERSION}-fpm.service" || true ;
 if [[ ( ${ROLL_BACK:-1} -eq 1 ) ]] ; then
 	message "RESTART FAILED!"
