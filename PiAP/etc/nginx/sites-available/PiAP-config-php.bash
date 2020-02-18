@@ -24,8 +24,8 @@
 #
 umask 0027
 if [[ ( $(php --version | grep -oF "PHP 7" | wc -l ) -gt 0 ) ]] ; then
-	echo "detected" $(php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3]{3}" 2>/dev/null | head -n 1);
-	PIAP_PHP_VERSION=${PIAP_PHP_VERSION:-$(php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3]{3}" 2>/dev/null | grep -oE "[0-9]{1}[.]{1}[0-9]{1}"| head -n 1)}
+	echo "Detected" $(php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3|7.4|7.5]{3}" 2>/dev/null | head -n 1);
+	PIAP_PHP_VERSION=${PIAP_PHP_VERSION:-$(php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3|7.4|7.5]{3}" 2>/dev/null | grep -oE "[0-9]{1}[.]{1}[0-9]{1}"| head -n 1)}
 	if [[ ( $(grep -oF "php5" /etc/nginx/sites-available/PiAP | wc -l ) -gt 0 ) ]] ; then
 		echo "Reconfigure for PHP ${PIAP_PHP_VERSION}" ;
 		mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp ;
@@ -35,7 +35,6 @@ if [[ ( $(php --version | grep -oF "PHP 7" | wc -l ) -gt 0 ) ]] ; then
 		sed -E -e 's/3 default_server;/3 http2 default_server;/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 		sed -E -e 's/server_name;/ssl_server_name;/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 	fi
-	ls -1 /var/run/php* 2>/dev/null || true ; # REMOVE AFTER DEBUGGING CI
 fi
 
 exit 0;
