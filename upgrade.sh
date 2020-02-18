@@ -389,6 +389,8 @@ if [[ $CI ]] ; then
 	message "[BETA] PHP-FPM paths:"
 	( sudo ls -1 /var/run/ 2>/dev/null | grep -F "php" 2>/dev/null ) || true
 	sudo ls -1 /var/run/php/ 2>/dev/null || true
+	message "[BETA] PHP config uses:"
+	find /etc/ -ipath "*/php*" -a -iname "*.conf*" 2>/dev/null | xargs -L1 -I{} sudo grep -F "listen" {} | grep -oE "^\s*listen\s*=\s*.*" | cut -d\= -f 2- | head -n 1 | sed -E -e 's/^([[:space:]]+){1}//g' || true
 fi
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
