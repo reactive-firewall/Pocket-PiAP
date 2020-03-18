@@ -107,7 +107,8 @@ for SOME_DEPENDS in build-essential make logrotate git gnupg2 nginx nginx-full d
 done ;
 
 check_depends php-fpm && ( check_depends php7.0-xsl || check_depends php-xsl ) || check_depends php5-fpm || exit 2 ;
-export PIAP_PHP_VERSION=$( (php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3|7.4]{3}" 2>/dev/null || echo 5 ) | grep -oE "\d+[.\d]*" | head -n 1 );
+PIAP_PHP_V_STUB=$(php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3|7.4]{3}" 2>/dev/null || echo 5 )
+export PIAP_PHP_VERSION=$( echo "$PIAP_PHP_V_STUB" | grep -oE "\d+[.\d]*" | head -n 1 );
 cd /tmp ;
 check_path /var/ || exit 2 ;
 check_path /srv/ || exit 2 ;
@@ -163,20 +164,21 @@ git config --local fetch.recursesubmodules true ;
 git fetch || ROLL_BACK=2 ;
 git pull || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
+
+if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
+	message "FAILED TO UPGRADE FROM REPO"
+	message "THIS IS AN ERROR - UPDATE WILL FAIL!"
+fi
+
 # keys
 GIT_GPG_CMD=$(git config --get gpg.program)
 GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
 git config --local gpg.program ${GIT_GPG_CMD}
 
-if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then
-	message "FAILED TO Update"
-	message "THIS IS AN ERROR - UPDATE WILL FAIL!"
-fi
-
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
 	message "Enabled TRUST CHECK. [BETA TEST]"
 
-curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
+	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_A.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n3\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key CF76FC3B8CD0B15F 2>/dev/null || true ; wait ;
 	curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" --url "https://sites.google.com/site/piappki/Pocket_PiAP_Verification_B.asc?attredirects=0&d=1" 2>/dev/null 3>/dev/null | ${GIT_GPG_CMD} --import 2>/dev/null || true ;
 	printf 'trust 1\n3\nsave\n' | ${GIT_GPG_CMD} --command-fd 0 --edit-key 2FDAFC993A61112D 2>/dev/null || true ; wait ;
@@ -233,7 +235,7 @@ curl -fsSL --tlsv1.2 --header "Dnt: 1" --header "Accept: application/pgp-keys" -
 
 	if [[ ( ${WARN_VAR:-2} -gt 0 ) ]] ; then
 		message "FAILED TO VERIFY CODESIGN TRUST ANCHORS"
-		message "[MISSING BETA KEY ISSUE] need to download keys A1D551AADC439CC5, 71BEC57F7ACABE5F, 11D97E1BAD186C99, 8A90BD3AA562D23F, B040F898E240C2E2 and the current beta key. Probably 6B54E81C992370B6... [FIX ME]"
+		message "[MISSING BETA KEY ISSUE] need to download keys A1D551AADC439CC5, 71BEC57F7ACABE5F, 11D97E1BAD186C99, 8A90BD3AA562D23F, B040F898E240C2E2 and the current beta key. Probably 3C6DFFB3AC3BE369... [FIX ME]"
 		# FIX THIS
 		message "[BETA] RE-DISABLED TRUST CHECK."
 		message "BETA: Attempting upgrading..."
@@ -245,7 +247,7 @@ fi
 sudo git show --show-signature | grep -F ": " | grep -F "Pocket PiAP Codesign CA" | grep -F "Good signature" || (sudo git show --show-signature | grep -F ": " | grep -F "Signature made" && sudo git show --show-signature | grep -F ": " | grep -F "Invalid public key algorithm" || true ) || ROLL_BACK=1 ;
 if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	message "FAILED TO VERIFY A CODESIGN TRUST"
-	message "[MISSING BETA KEY ISSUE] need to download keys A1D551AADC439CC5, 71BEC57F7ACABE5F, 11D97E1BAD186C99, 8A90BD3AA562D23F, B040F898E240C2E2 and the current beta key. Probably 6B54E81C992370B6... [FIX ME]"
+	message "[MISSING BETA KEY ISSUE] need to download keys A1D551AADC439CC5, 71BEC57F7ACABE5F, 11D97E1BAD186C99, 8A90BD3AA562D23F, B040F898E240C2E2 and the current beta key. Probably 3C6DFFB3AC3BE369... [FIX ME]"
 #fi # temp roll back [CAUTION for BETA]
 #	message "NOT Attempting upgrading..."
 else
@@ -271,7 +273,7 @@ if [[ ( ${ROLL_BACK:-3} -gt 0 ) ]] ; then
 	sudo cp -vfRpub /var/opt/PiAP/backups/PiAP /srv/PiAP || message "FATAL error: device will need full reset. Please report this issue at \"https://github.com/reactive-firewall/Pocket-PiAP/issues\" (include as much detail as possible) and might need to reconfigure your device (OS re-install + PiAP fresh install). You found a bug. [BUGS] [FIX ME]"
 	sudo cp -vfRpub /var/opt/PiAP/backups/SSL /etc/ssl || message "FATAL error: device will need SSL reset. You found a bug. [BUGS] [FIX ME]"
 fi
-message "Checking TLS Beta cert dates."
+message "Checking TLS Beta cert links."
 if [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ssl/certs/ssl-cert-nginx.pem 2>/dev/null | grep -cF OK ) -le 0 ) ]] ; then
 	message "Rebuilding cert links"
 	# sudo unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
@@ -281,6 +283,7 @@ elif [[ ( $( openssl verify -CAfile /etc/ssl/certs/ssl-cert-CA-nginx.pem /etc/ss
 	# sudo unlink /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
 	sudo ln -sf /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/certs/ssl-cert-CA-nginx.pem || true
 fi
+message "Checking TLS Beta cert dates."
 if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -F -c OK ) -le 0 ) ]] ; then
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
 	sudo rm -vf /etc/ssl/PiAPCA/certs/PiAP_SSL.pem
@@ -299,6 +302,7 @@ elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/
 else
 	message "SSL Cert seems fine."
 fi
+message "Checking TLS Beta CA cert dates."
 if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -F -c OK ) -le 0 ) ]] ; then
 	message "Applying HOTFIX - TLS CA Cert rotation for Beta"
 	sudo rm -vf /etc/ssl/PiAPCA/PiAP_CA.pem
@@ -321,8 +325,9 @@ elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/
 else
 	message "CA Cert seems fine."
 fi
-	umask 0027
-if [[ ( $( find /etc/ssh -iname "*.pub" -ctime +30 -print0 2>/dev/null | wc -l ) -ge 1 ) ]] ; then
+umask 0027
+message "Checking SSH dates."
+if [[ ( $( find /etc/ssh -iname "*.pub" -ctime +30 -print0 2>/dev/null | xargs -0 -L1 -I{} echo "{}" | wc -l ) -ge 1 ) ]] ; then
 	message "Applying HOTFIX - SSH key rotation for Beta"
 	find /etc/ssh -iname "*.pub" -ctime +30 -print0 2>/dev/null | xargs -0 -L1 rm -vf ; wait ;
 	sudo ssh-keygen -A ; wait ;
@@ -333,9 +338,11 @@ if [[ ( $( find /etc/ssh -iname "*.pub" -ctime +30 -print0 2>/dev/null | wc -l )
 else
 	message "SSH keys seem fine."
 fi
+
 if [[ ( ${ROLL_BACK:-3} -le 0 ) ]] ; then
-message "Upgrade seems fine ... SKIPPING BACKUP RESTORE!"
+	message "Upgrade seems fine ... SKIPPING BACKUP RESTORE!"
 fi
+
 message "Restarting web-server."
 sudo service "php${PIAP_PHP_VERSION}-fpm" start 2>/dev/null || true ;
 if [[ ${CI} ]] ; then
