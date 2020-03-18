@@ -258,9 +258,9 @@ message "DO NOT INTERRUPT OR POWER OFF. [CAUTION for BETA]"
 
 # set LED flashing here
 
-( sudo make uninstall || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null ;
+( sudo make uninstall || export ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null ;
 umask 0002
-( sudo make install || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null ;
+( sudo make install || export ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null ;
 umask 0027
 make clean
 fi
