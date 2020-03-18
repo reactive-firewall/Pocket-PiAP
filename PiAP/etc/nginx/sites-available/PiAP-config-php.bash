@@ -23,9 +23,9 @@
 # copies or substantial portions of the Software.
 #
 umask 0027
+PIAP_PHP_VERSION="${PIAP_PHP_VERSION:-5}"
 if [[ ( $(php --version | grep -oF "PHP 7" | wc -l ) -gt 0 ) ]] ; then
-	echo "Detected " $(php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3|7.4|7.5]{3}" 2>/dev/null | head -n 1);
-	PIAP_PHP_VERSION=${PIAP_PHP_VERSION:-$(php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3|7.4|7.5]{3}" 2>/dev/null | grep -oE "[0-9]{1}[.]{1}[0-9]{1}"| head -n 1)}
+	echo "Detected ${PIAP_PHP_VERSION:-5}";
 	if [[ ( $(grep -oF "php5" /etc/nginx/sites-available/PiAP | wc -l ) -gt 0 ) ]] ; then
 		echo "Reconfigure for PHP ${PIAP_PHP_VERSION}" ;
 		mv -vf /etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP.tmp ;

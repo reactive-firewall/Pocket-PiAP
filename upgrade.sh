@@ -107,8 +107,8 @@ for SOME_DEPENDS in build-essential make logrotate git gnupg2 nginx nginx-full d
 done ;
 
 check_depends php-fpm && ( check_depends php7.0-xsl || check_depends php-xsl ) || check_depends php5-fpm || exit 2 ;
-PIAP_PHP_V_STUB=$(php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3|7.4]{3}" 2>/dev/null || echo 5 )
-export PIAP_PHP_VERSION=$( echo "$PIAP_PHP_V_STUB" | grep -oE "\d+[.\d]*" | head -n 1 );
+export PIAP_PHP_V_STUB=$(php --version | grep -oE "^[PH]{3}\s+[7.0|7.1|7.2|7.3|7.4]{3}" 2>/dev/null | head -n 1 );
+export PIAP_PHP_VERSION=$( echo "${PIAP_PHP_V_STUB:-5}" | grep -oE "\d+[.\d]*" | head -n 1 );
 cd /tmp ;
 check_path /var/ || exit 2 ;
 check_path /srv/ || exit 2 ;
@@ -172,8 +172,8 @@ fi
 
 # keys
 GIT_GPG_CMD=$(git config --get gpg.program)
-GIT_GPG_CMD=${GIT_GPG_CMD:-$(which gpg2)}
-git config --local gpg.program ${GIT_GPG_CMD}
+GIT_GPG_CMD=${GIT_GPG_CMD:-$(command -v gpg2)}
+git config --local gpg.program "${GIT_GPG_CMD}"
 
 if [[ ( $(${GIT_GPG_CMD} --gpgconf-test 2>/dev/null ; echo -n "$?" ) -eq 0 ) ]] ; then
 	message "Enabled TRUST CHECK. [BETA TEST]"
