@@ -258,9 +258,9 @@ message "DO NOT INTERRUPT OR POWER OFF. [CAUTION for BETA]"
 
 # set LED flashing here
 
-( sudo make uninstall || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
+( sudo make uninstall || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null ;
 umask 0002
-( sudo make install || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
+( sudo make install || ROLL_BACK=2 ) | tee -a "${PIAP_LOG_PATH}" 2>/dev/null ;
 umask 0027
 make clean
 fi
@@ -340,7 +340,7 @@ else
 	message "SSH keys seem fine."
 fi
 
-if [[ ( ${ROLL_BACK:-3} -le 0 ) ]] ; then
+if [[ ( 0 -ge ${ROLL_BACK:-3} ) ]] ; then
 	message "Upgrade seems fine ... SKIPPING BACKUP RESTORE!"
 fi
 
@@ -398,7 +398,7 @@ if [[ $CI ]] ; then
 	( sudo ls -1 /var/run/ 2>/dev/null | grep -F "php" 2>/dev/null ) || true
 	sudo ls -1 /var/run/php/ 2>/dev/null || true
 	message "[BETA] PHP config uses:"
-	find /etc/ -ipath "*/php*" -a -iname "*.conf*" 2>/dev/null | xargs -L1 -I{} sudo grep -F "listen" {} | grep -oE "^\s*listen\s*=\s*.*" | cut -d\= -f 2- || true
+	find /etc/ -ipath "*/php*" -a -iname "*.conf*" 2>/dev/null | xargs -L1 -I{} sudo grep -F "listen" {} | grep -oE "^\s*listen\s*=\s*.*" | cut -d \= -f 2- || true
 fi
 echo "[BETA] To copy logs localy without logging out you can open another Terminal and run:"
 echo "     scp -2 -P ${SSH_PORT:-22} -r ${LOGNAME:-youruser}@${SSH_SERVER:-$HOSTNAME}:${PIAP_LOG_PATH} ~/Desktop/PiAP_BUG_Report_logs.log"
