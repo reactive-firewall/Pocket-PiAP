@@ -36,7 +36,7 @@ if [[ ( $(php --version | grep -oF "PHP 7" | wc -l ) -gt 0 ) ]] ; then
 		sed -E -e 's/server_name;/ssl_server_name;/g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 	fi
 	# can find real socket by 
-	PIAP_PHP_SOCK=$(find /etc/ -ipath "*/php*" -a -iname "*.conf*" -print0 2>/dev/null | xargs -0 -L1 -I{} grep -F "listen" {} | grep -oE "^\s*listen\s*=\s*.*" | cut -d\= -f 2- | head -n 1 | sed -E -e 's/^([[:space:]]+){1}//g') ;
+	PIAP_PHP_SOCK=$(find /etc/ -ipath "*/php*" -a -iname "*.conf*" -print0 2>/dev/null | xargs -0 -L1 -I{} grep -F "listen" {} | grep -oE "^\s*listen\s*=\s*.*" | cut -d = -f 2- | head -n 1 | sed -E -e 's/^([[:space:]]+){1}//g') ;
 	if [[ ( $(echo "${PIAP_PHP_SOCK}" | grep -oF ".sock" | wc -l ) -gt 0 ) ]] ; then
 		sed -E -e 's/fastcgi_pass unix:/fastcgi_pass unix:'"${PIAP_PHP_SOCK}"'; # /g' /etc/nginx/sites-available/PiAP 2>/dev/null | tee /etc/nginx/sites-available/PiAP ;
 	else

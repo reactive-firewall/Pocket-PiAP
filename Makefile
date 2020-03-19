@@ -2,7 +2,7 @@
 
 # License
 #
-# Copyright (c) 2017-2018 Mr. Walls
+# Copyright (c) 2017-2020 Mr. Walls
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,7 +36,7 @@ ifeq "$(LINK)" ""
 endif
 
 ifeq "$(MAKE)" ""
-	MAKE=`which make`
+	MAKE=`command -v make`
 endif
 
 ifeq "$(GIT)" ""
@@ -56,7 +56,7 @@ ifeq "$(CPDIR)" ""
 endif
 
 ifeq "$(CHOWN)" ""
-	CHOWN=`which chown` -vf
+	CHOWN=`command -v chown` -vf
 	ifeq "$(FILE_OWN)" ""
 		FILE_OWN=pocket-admin:pocket
 	endif
@@ -77,7 +77,7 @@ ifeq "$(RMDIR)" ""
 endif
 
 ifeq "$(INSTALL)" ""
-	INSTALL=`which install`
+	INSTALL=`command -v install`
 	ifeq "$(INST_OWN)" ""
 		INST_OWN=-C -o pocket-admin -g pocket
 	endif
@@ -282,7 +282,7 @@ uninstall-pifi: must_be_root
 	$(QUIET)openssl genrsa -rand /tmp/.rand_seed.data -out /etc/ssl/PiAPCA/private/PiAP_CA.key 4096 2>/dev/null || openssl genrsa -out /etc/ssl/PiAPCA/private/PiAP_CA.key 4096 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUITE)$(CHOWN) $(SYS_OWN) /etc/ssl/PiAPCA/private/PiAP_CA.key || exit 2
-	$(QUIET)rm -f /tmp/.rand_seed.data 2>/dev/null || true
+	$(QUIET)$(RM) /tmp/.rand_seed.data 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Generated."
 
 /etc/ssl/PiAPCA/private/PiAP_CA.csr: /etc/ssl/PiAPCA/private/PiAP_CA.key must_be_root
@@ -335,7 +335,7 @@ configure-httpd: install-optroot /etc/nginx /etc/ssl/certs/ssl-cert-nginx.pem mu
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/snippets/fastcgi-php.conf /etc/nginx/snippets/fastcgi-php.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/snippets/pocket_ssl.conf /etc/nginx/snippets/pocket_ssl.conf 2>/dev/null
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_WEB_OPTS) ./PiAP/etc/nginx/sites-available/PiAP /etc/nginx/sites-available/PiAP 2>/dev/null
-	$(QUIET)bash ./PiAP/etc/nginx/sites-available/PiAP-config-php.bash || true
+	$(QUIET)bash -c ./PiAP/etc/nginx/sites-available/PiAP-config-php.bash || true
 	$(QUIET)ln -sf /etc/nginx/sites-available/PiAP /etc/nginx/sites-enabled/PiAP 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
@@ -414,7 +414,7 @@ purge-PiAP-keyring: remove-PiAP-keyring must_be_root
 configure-PiAP-sudoers: /etc/ must_be_root
 	$(QUIET)if [[ ( -n $$( grep -F "PiAP" /etc/sudoers ) ) ]] ; then $(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPS) ./PiAP/etc/sudoers.failsafe /etc/sudoers || exit 2 ; fi
 	$(QUIET)if [[ ( -n $$( grep -F "PIAPS" /etc/sudoers ) ) ]] ; then $(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPS) ./PiAP/etc/sudoers.failsafe /etc/sudoers || exit 2 ; fi
-	$(QUIET)if [[ ( -z $$( grep -F "#includedir /etc/sudoers.d" /etc/sudoers ) ) ]] ; then echo "#includedir /etc/sudoers.d" | tee -a /etc/sudoers || exit 2 ; fi
+	$(QUIET)if [[ ( -z $$( grep -F "#includedir /etc/sudoers.d" /etc/sudoers ) ) ]] ; then $(ECHO) "#includedir /etc/sudoers.d" | tee -a /etc/sudoers || exit 2 ; fi
 	$(QUIET)$(INSTALL) $(INST_ROOT_OWN) $(INST_FILE_OPTS) ./PiAP/etc/sudoers /etc/sudoers.d/001_PiAP || exit 2
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -475,15 +475,15 @@ remove-PiAP-interfaces: must_be_root uninstall-cron-actions
 	$(QUIET)$(ECHO) "$@: Done."
 
 install-webroot: install-dsauth configure-httpd /etc/nginx/
-	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile install
+	$(QUIET)$(MAKE) -j1 -C ./units/PiAP-Webroot/ -f Makefile install
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall-webroot: remove-httpd uninstall-wpa-actions
-	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile uninstall
+	$(QUIET)$(MAKE) -j1 -C ./units/PiAP-Webroot/ -f Makefile uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall: uninstall-optroot uninstall-dsauth remove-PiAP-sudoers remove-PiAP-dnsmasq uninstall-pifi
-	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile uninstall
+	$(QUIET)$(MAKE) -j1 -C ./units/PiAP-python-tools/ -f Makefile uninstall
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -523,30 +523,30 @@ test-style: cleanup
 cleanup:
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile cleanup 2>/dev/null || true
 	$(QUIET)$(MAKE) -C ./units/PiAP-Webroot/ -f Makefile cleanup 2>/dev/null || true
-	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
-	$(QUIET)rm -Rf tests/__pycache__ 2>/dev/null || true
-	$(QUIET)rm -f PiAP/*.pyc 2>/dev/null || true
-	$(QUIET)rm -f PiAP/*/*.pyc 2>/dev/null || true
-	$(QUIET)rm -f PiAP/*/*~ 2>/dev/null || true
-	$(QUIET)rm -f PiAP/*/*/*.pyc 2>/dev/null || true
-	$(QUIET)rm -f PiAP/*/*/*~ 2>/dev/null || true
-	$(QUIET)rm -Rf PiAP/__pycache__ 2>/dev/null || true
-	$(QUIET)rm -Rf PiAP/*/__pycache__ 2>/dev/null || true
-	$(QUIET)rm -f PiAP/*~ 2>/dev/null || true
-	$(QUIET)rm -f *.pyc 2>/dev/null || true
-	$(QUIET)rm -f PiAP/*/*.pyc 2>/dev/null || true
-	$(QUIET)rm -f PiAP/*/*~ 2>/dev/null || true
-	$(QUIET)rm -f *.DS_Store 2>/dev/null || true
-	$(QUIET)rm -f ./.coverage 2>/dev/null || true
-	$(QUIET)rm -f ./.coverage.xml 2>/dev/null || true
+	$(QUIET)$(RM) tests/*.pyc 2>/dev/null || true
+	$(QUIET)$(RMDIR) tests/__pycache__ 2>/dev/null || true
+	$(QUIET)$(RM) PiAP/*.pyc 2>/dev/null || true
+	$(QUIET)$(RM) PiAP/*/*.pyc 2>/dev/null || true
+	$(QUIET)$(RM) PiAP/*/*~ 2>/dev/null || true
+	$(QUIET)$(RM) PiAP/*/*/*.pyc 2>/dev/null || true
+	$(QUIET)$(RM) PiAP/*/*/*~ 2>/dev/null || true
+	$(QUIET)$(RMDIR) PiAP/__pycache__ 2>/dev/null || true
+	$(QUIET)$(RMDIR) PiAP/*/__pycache__ 2>/dev/null || true
+	$(QUIET)$(RM) PiAP/*~ 2>/dev/null || true
+	$(QUIET)$(RM) *.pyc 2>/dev/null || true
+	$(QUIET)$(RM) PiAP/*/*.pyc 2>/dev/null || true
+	$(QUIET)$(RM) PiAP/*/*~ 2>/dev/null || true
+	$(QUIET)$(RM) *.DS_Store 2>/dev/null || true
+	$(QUIET)$(RM) ./.coverage 2>/dev/null || true
+	$(QUIET)$(RM) ./.coverage.xml 2>/dev/null || true
 	$(QUIET)coverage erase 2>/dev/null || true
-	$(QUIET)rm -f PiAP/*.DS_Store 2>/dev/null || true
-	$(QUIET)rm -f PiAP/*/*.DS_Store 2>/dev/null || true
-	$(QUIET)rm -f ./*/*~ 2>/dev/null || true
-	$(QUIET)rm -f ./*~ 2>/dev/null || true
-	$(QUIET)rm -f ./.travis.yml~ 2>/dev/null || true
-	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
-	$(QUIET)rm -f ./the_test_file.txt 2>/dev/null || true
+	$(QUIET)$(RM) PiAP/*.DS_Store 2>/dev/null || true
+	$(QUIET)$(RM) PiAP/*/*.DS_Store 2>/dev/null || true
+	$(QUIET)$(RM) ./*/*~ 2>/dev/null || true
+	$(QUIET)$(RM) ./*~ 2>/dev/null || true
+	$(QUIET)$(RM) ./.travis.yml~ 2>/dev/null || true
+	$(QUIET)$(RMDIR) ./.tox/ 2>/dev/null || true
+	$(QUIET)$(RM) ./the_test_file.txt 2>/dev/null || true
 
 clean: cleanup
 	$(QUIET)$(MAKE) -C ./units/PiAP-python-tools/ -f Makefile clean 2>/dev/null || true
@@ -556,7 +556,7 @@ clean: cleanup
 
 must_be_root:
 	$(QUIET)runner=`whoami` ; \
-	if test $$runner != "root" ; then echo "You are not root." ; exit 1 ; fi
+	if test $$runner != "root" ; then $(ECHO) "You are not root." ; exit 1 ; fi
 
 /etc/ssl/PiAPCA/%: ./PiAP/etc/ssl/PiAPCA/% /etc/ssl/PiAPCA/
 	$(QUIET)$(ECHO) "Auto Rule Found For $@" ; $(WAIT) ;
