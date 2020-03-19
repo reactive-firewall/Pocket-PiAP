@@ -122,8 +122,8 @@ before_install:
   - mkdir -p -m 755 "/opt/PiAP/hostapd_actions/" || true
   - chmod -v 775 "/opt/PiAP/" || true
   - cp -vf ./units/PiAP-python-tools/tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
-  - cp -vf ./units/PiAP-python-tools/tests/mock/dnsmasq.leases /var/lib/misc/dnsmasq.leases || true
-  - make -C ./units/PiAP-python-tools/ -f Makefile Makefile mock-config || true
+  - sudo cp -vf ./units/PiAP-python-tools/tests/mock/dnsmasq.leases /var/lib/misc/dnsmasq.leases || true ;
+  - make -C ./units/PiAP-python-tools/ -f Makefile mock-config || true
   - rm -vf /opt/PiAP/.beta_* 2>/dev/null || true ;
   - sync || true ;
   - echo "travis_fold:end:piap_setup" 2>/dev/null || true
