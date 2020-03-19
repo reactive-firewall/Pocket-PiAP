@@ -15,13 +15,13 @@ matrix:
   include:
   - os: linux
     dist: trusty
-    language: generic
+    language: shell
   - os: linux
     dist: xenial
-    language: generic
+    language: shell
   - os: linux
     dist: bionic
-    language: generic
+    language: shell
   - os: osx
     osx_image: xcode10
     language: shell
@@ -72,29 +72,29 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait git -C "$(brew --repo homebrew/core)" fetch --unshallow || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew tap homebrew/versions || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew upgrade || travis_retry brew upgrade || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install php7 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install pip $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install tox $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python27 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python@2 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python26 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.3 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python34 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.4 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python35 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python@3 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.5 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py2.7 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.7 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install coverage $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install php7 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install pip || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install tox || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python27 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python@2 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python26 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.3 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python34 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.4 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python35 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python@3 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.5 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py2.7 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.7 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install coverage || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install codecov || true ; fi
   - travis_retry pip install tox || pip3 install tox || true ;
   - travis_retry pip install coverage || true ;
@@ -123,6 +123,10 @@ before_install:
   - chmod -v 775 "/opt/PiAP/" || true
   - cp -vf ./units/PiAP-python-tools/tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
   - sudo cp -vf ./units/PiAP-python-tools/tests/mock/dnsmasq.leases /var/lib/misc/dnsmasq.leases || true ;
+  - sudo chmod -v a+rx "/var/" || echo "TEST WILL FAIL DUE TO PERMISSIONS" ;
+  - sudo chmod -v a+rx "/var/lib/" || echo "TEST WILL FAIL DUE TO PERMISSIONS" ;
+  - sudo chmod -v a+rx "/var/lib/misc/" || echo "TEST WILL FAIL DUE TO PERMISSIONS" ;
+  - sudo chown -v $USER "/var/lib/misc/dnsmasq.leases" || echo "TEST WILL FAIL DUE TO PERMISSIONS" ;
   - make -C ./units/PiAP-python-tools/ -f Makefile mock-config || true
   - rm -vf /opt/PiAP/.beta_* 2>/dev/null || true ;
   - sync || true ;
@@ -132,10 +136,10 @@ install:
   - make clean || true
 
 before_script:
-  - make clean ;
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter 2>/dev/null || true
   - chmod +x ./cc-test-reporter 2>/dev/null || true
   - ./cc-test-reporter before-build 2>/dev/null || true
+  - make clean || true ;
 
 script:
   - echo "travis_fold:start:piap_test" 2>/dev/null || true
