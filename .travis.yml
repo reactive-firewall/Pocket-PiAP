@@ -4,69 +4,62 @@ env:
   global:
     - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
 
+dist:
+
+
 branches:
   only:
     - stable
     - staging
     - master
 
+addons:
+  hosts:
+  - pocket.PiAP.local
+
 matrix:
   include:
   - os: linux
     dist: trusty
-    language: shell
     env: TRAVIS_PYTHON_VERSION="3.6" TRAVIS_PHP_VERSION="14.04" TRAVIS_DIST_VERSION="14.04"
   - os: linux
     dist: xenial
-    language: shell
     env: TRAVIS_PYTHON_VERSION="2.7" TRAVIS_PHP_VERSION="5.6" TRAVIS_DIST_VERSION="16.04"
   - os: linux
     dist: xenial
-    language: shell
     env: TRAVIS_PYTHON_VERSION="2.7" TRAVIS_PHP_VERSION="7.2" TRAVIS_DIST_VERSION="16.04"
   - os: linux
     dist: xenial
-    language: shell
     env: TRAVIS_PYTHON_VERSION="3.6" TRAVIS_PHP_VERSION="5.6" TRAVIS_DIST_VERSION="16.04"
   - os: linux
     dist: xenial
-    language: shell
     env: TRAVIS_PYTHON_VERSION="3.6" TRAVIS_PHP_VERSION="7.2" TRAVIS_DIST_VERSION="16.04"
   - os: linux
     dist: xenial
-    language: shell
     env: TRAVIS_PYTHON_VERSION="3.7" TRAVIS_PHP_VERSION="5.6" TRAVIS_DIST_VERSION="16.04"
   - os: linux
     dist: xenial
-    language: shell
     env: TRAVIS_PYTHON_VERSION="3.7" TRAVIS_PHP_VERSION="7.2" TRAVIS_DIST_VERSION="16.04"
   - os: linux
     dist: bionic
-    language: shell
     env: TRAVIS_PYTHON_VERSION="2.7" TRAVIS_PHP_VERSION="5.6" TRAVIS_DIST_VERSION="18.04"
   - os: linux
     dist: bionic
-    language: shell
     env: TRAVIS_PYTHON_VERSION="2.7" TRAVIS_PHP_VERSION="7.2" TRAVIS_DIST_VERSION="18.04"
   - os: linux
     dist: bionic
-    language: shell
     env: TRAVIS_PYTHON_VERSION="3.6" TRAVIS_PHP_VERSION="5.6" TRAVIS_DIST_VERSION="18.04"
   - os: linux
     dist: bionic
-    language: shell
     env: TRAVIS_PYTHON_VERSION="3.6" TRAVIS_PHP_VERSION="7.2" TRAVIS_DIST_VERSION="18.04"
   - os: linux
     dist: bionic
-    language: shell
     env: TRAVIS_PYTHON_VERSION="3.7" TRAVIS_PHP_VERSION="5.6" TRAVIS_DIST_VERSION="18.04"
   - os: linux
     dist: bionic
-    language: shell
     env: TRAVIS_PYTHON_VERSION="3.7" TRAVIS_PHP_VERSION="7.2" TRAVIS_DIST_VERSION="18.04"
   - os: linux
     dist: bionic
-    language: shell
     env: TRAVIS_PYTHON_VERSION="3.7" TRAVIS_PHP_VERSION="7.4" TRAVIS_DIST_VERSION="18.04"
   - os: osx
     osx_image: xcode10
@@ -91,6 +84,8 @@ matrix:
     dist: xenial
   - os: linux
     env: TRAVIS_PYTHON_VERSION="3.7" TRAVIS_PHP_VERSION="7.4" TRAVIS_DIST_VERSION="18.04"
+  - os: linux
+    env: TRAVIS_PYTHON_VERSION="2.7" TRAVIS_PHP_VERSION="5.6" TRAVIS_DIST_VERSION="18.04"
   - os: osx
     osx_image: xcode8.3
   - os: osx
@@ -114,10 +109,6 @@ matrix:
   - os: osx
     osx_image: xcode11.2
 
-
-addons:
-  hosts:
-  - pocket.PiAP.local
 
 before_install:
   - echo "travis_fold:start:piap_setup" 2>/dev/null || true
