@@ -36,7 +36,7 @@ function check_depends() {
 		umask 0022
 		while [[ ( $DOWN_COUNT -le $DOWN_RETRY ) ]] ; do
 			DOWN_COUNT=$(($DOWN_COUNT+1)) ;
-			if [[ ( $DID_WORK -gt 0 ) ]] ; then
+			if [[ ( "$DID_WORK" -gt 0 ) ]] ; then
 				message "Retry ${DOWN_COUNT:-again}"
 				{ sudo apt-get install --assume-yes --download-only "${THEDEPENDS}" 2>/dev/null && DID_WORK=0 ; } || true ;
 			elif [[ ( $DOWN_COUNT -le 1 ) ]] ; then
@@ -262,9 +262,11 @@ else
 
 	# set LED flashing here
 
-	{ sudo make uninstall || ROLL_BACK=2 ; } | tee -a "${PIAP_LOG_PATH}" 2>/dev/null ;
+	tee -a "${PIAP_LOG_PATH}" < <( sudo make uninstall ; echo $? >/tmp/result.tmp ) 2>/dev/null ; wait ;
+	[[ $( head -n 1 </tmp/result.tmp ) -le 0 ]] || ROLL_BACK=2 ; rm -f /tmp/result.tmp ; wait ;
 	umask 0002
-	{ sudo make install || ROLL_BACK=2 ; } | tee -a "${PIAP_LOG_PATH}" 2>/dev/null ;
+	tee -a "${PIAP_LOG_PATH}" < <( sudo make install ; echo $? >/tmp/result.tmp ) 2>/dev/null ; wait ;
+	[[ $( head -n 1 </tmp/result.tmp ) -le 0 ]] || ROLL_BACK=2 ; rm -f /tmp/result.tmp ; wait ;
 	umask 0027
 	make clean
 fi
@@ -293,13 +295,15 @@ if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/ce
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
 	sudo rm -vf /etc/ssl/PiAPCA/certs/PiAP_SSL.pem
 	umask 0002
-	{ sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || ROLL_BACK=2 ; } | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
+	tee -a "${PIAP_LOG_PATH}" < <( sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem ; echo $? >/tmp/result.tmp ) 2>/dev/null ; wait ;
+	[[ $( head -n 1 </tmp/result.tmp ) -le 0 ]] || ROLL_BACK=2 ; rm -f /tmp/result.tmp ; wait ;
 	message "DONE"
 elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -cF 'certificate has expired' ) -gt 0 ) ]] ; then
 	message "Applying HOTFIX - TLS Cert rotation for Beta"
 	sudo rm -vf /etc/ssl/PiAPCA/certs/PiAP_SSL.pem
 	umask 0002
-	{ sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || ROLL_BACK=2 ; } | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
+	tee -a "${PIAP_LOG_PATH}" < <( sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem ; echo $? >/tmp/result.tmp ) 2>/dev/null ; wait ;
+	[[ $( head -n 1 </tmp/result.tmp ) -le 0 ]] || ROLL_BACK=2 ; rm -f /tmp/result.tmp ; wait ;
 	message "DONE"
 	message "Cert should be fine now."
 	message "You will probably have a browser warning about the new certificate, the next time you visit the web interface."
@@ -313,16 +317,20 @@ if [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/ce
 	sudo rm -vf /etc/ssl/PiAPCA/PiAP_CA.pem
 	sudo rm -vf /etc/ssl/PiAPCA/certs/PiAP_SSL.pem
 	umask 0002
-	{ sudo make /etc/ssl/PiAPCA/PiAP_CA.pem || ROLL_BACK=2 ; } | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
-	{ sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || ROLL_BACK=2 ; } | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
+	tee -a "${PIAP_LOG_PATH}" < <( sudo make /etc/ssl/PiAPCA/PiAP_CA.pem ; echo $? >/tmp/result.tmp ) 2>/dev/null ; wait ;
+	[[ $( head -n 1 </tmp/result.tmp ) -le 0 ]] || ROLL_BACK=2 ; rm -f /tmp/result.tmp ; wait ;
+	tee -a "${PIAP_LOG_PATH}" < <( sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem ; echo $? >/tmp/result.tmp ) 2>/dev/null ; wait ;
+	[[ $( head -n 1 </tmp/result.tmp ) -le 0 ]] || ROLL_BACK=2 ; rm -f /tmp/result.tmp ; wait ;
 	message "DONE"
 elif [[ ( $( openssl verify -CAfile /etc/ssl/PiAPCA/PiAP_CA.pem /etc/ssl/PiAPCA/certs/PiAP_SSL.pem 2>/dev/null | grep -F -c 'certificate has expired' ) -gt 0 ) ]] ; then
 	message "Applying HOTFIX - TLS CA Cert rotation for Beta"
 	sudo rm -vf /etc/ssl/PiAPCA/PiAP_CA.pem
 	sudo rm -vf /etc/ssl/PiAPCA/certs/PiAP_SSL.pem
 	umask 0002
-	{ sudo make /etc/ssl/PiAPCA/PiAP_CA.pem || ROLL_BACK=2 ; } | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
-	{ sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem || ROLL_BACK=2 ; } | tee -a "${PIAP_LOG_PATH}" 2>/dev/null
+	tee -a "${PIAP_LOG_PATH}" < <( sudo make /etc/ssl/PiAPCA/PiAP_CA.pem ; echo $? >/tmp/result.tmp ) 2>/dev/null ; wait ;
+	[[ $( head -n 1 </tmp/result.tmp ) -le 0 ]] || ROLL_BACK=2 ; rm -f /tmp/result.tmp ; wait ;
+	tee -a "${PIAP_LOG_PATH}" < <( sudo make /etc/ssl/PiAPCA/certs/PiAP_SSL.pem ; echo $? >/tmp/result.tmp ) 2>/dev/null ; wait ;
+	[[ $( head -n 1 </tmp/result.tmp ) -le 0 ]] || ROLL_BACK=2 ; rm -f /tmp/result.tmp ; wait ;
 	message "DONE"
 	message "Cert should be fine now."
 	message "You will probably have a browser warning about the new certificate, the next time you visit the web interface."
