@@ -36,7 +36,7 @@ ifeq "$(LINK)" ""
 endif
 
 ifeq "$(MAKE)" ""
-	MAKE=`command -v make`
+	MAKE=`command -v make` -j 1 -f Makefile
 endif
 
 ifeq "$(GIT)" ""
