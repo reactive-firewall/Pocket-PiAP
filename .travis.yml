@@ -21,7 +21,7 @@ matrix:
   include:
   - os: linux
     dist: trusty
-    env: TRAVIS_PYTHON_VERSION="3.6" TRAVIS_PHP_VERSION="14.04" TRAVIS_DIST_VERSION="14.04"
+    env: TRAVIS_PYTHON_VERSION="3.6" TRAVIS_PHP_VERSION="5.6" TRAVIS_DIST_VERSION="14.04"
   - os: linux
     dist: xenial
     env: TRAVIS_PYTHON_VERSION="2.7" TRAVIS_PHP_VERSION="5.6" TRAVIS_DIST_VERSION="16.04"
@@ -116,8 +116,6 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew tap homebrew/versions || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew upgrade || travis_retry brew upgrade || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install php7 || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install pip || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install tox || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python27 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 || true ; fi
@@ -137,6 +135,8 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py2.7 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.7 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install pip || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install tox || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install coverage || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install codecov || true ; fi
   - travis_retry pip install tox || pip3 install tox || true ;
