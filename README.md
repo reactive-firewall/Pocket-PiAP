@@ -4,7 +4,7 @@
 
 ![Pocket-PiAP](https://img.shields.io/badge/Pocket-PiAP-fc22be.svg)
 
-[![Build Status](https://travis-ci.org/reactive-firewall/Pocket-PiAP.svg?branch=master)](https://travis-ci.org/reactive-firewall/Pocket-PiAP)
+[![Build Status](https://travis-ci.com/reactive-firewall/Pocket-PiAP.svg?branch=master)](https://travis-ci.com/reactive-firewall/Pocket-PiAP)
 [![Code Coverage](https://codecov.io/gh/reactive-firewall/Pocket-PiAP/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/Pocket-PiAP)
 
 
@@ -15,21 +15,21 @@
 
 #### Python Tools
 
-[![Build Status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
+[![Build Status](https://travis-ci.com/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.com/reactive-firewall/PiAP-python-tools)
 [![Code Coverage](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/stable/)
 
 #### Web UI
 
-[![Build Status](https://travis-ci.org/reactive-firewall/PiAP-Webroot.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-Webroot)
+[![Build Status](https://travis-ci.com/reactive-firewall/PiAP-Webroot.svg?branch=stable)](https://travis-ci.com/reactive-firewall/PiAP-Webroot)
 
-# Pocket PiAP is still in private beta. FOSS under heavy development, No production support at this time. USE AT OWN RISK. See the CONTRIBUTING guide.
+### _Pocket PiAP is still in private beta. FOSS under heavy development, No production support at this time. USE AT OWN RISK. See the CONTRIBUTING guide._
 
 ![issues](https://img.shields.io/github/issues-raw/reactive-firewall/Pocket-PiAP.svg)
 ![pr](https://img.shields.io/github/issues-pr-raw/reactive-firewall/Pocket-PiAP.svg)
 
 ### License
 
-Copyright (c) 2017-2018 Mr. Walls
+Copyright (c) 2017-2020 Mr. Walls
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -74,13 +74,11 @@ Additionally:
    - Rare objections are usually due to introduction of security flaws or code style flaws.
    - rejected code may be posted under you're own fork as a workaround if desired.
 
- - bugs may be reported to reactive.firewall+bug@gmail.com
-
 #### Reporting practical exploits and vulnerabilities
 
 Be ethical, and be patient. `Pocket PiAP` IS STILL IN A PRIVATE BETA. If the security flaw is not fixed before the public beta more instructions are intended to be added here (at an indeterminate later time) to allow responsible discloser of such flaws.
 
- - due to lack of funding reporting rewards are limited only to placement on the ongoing hall of fame bug hunter list. (after at least a two week lead time)
+ - due to lack of funding reporting rewards are not possible at this time. If you wish credit for finding a flaw, please include a note that you wish a byline with your disclosure.
 
  - security flaws may be reported to reactive.firewall+security@gmail.com
 

@@ -7,6 +7,7 @@ jobs:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
+      LANGUAGE: en_US
       LC_CTYPE: en_EN.UTF-8
     working_directory: ~/Pocket-PiAP
     steps:
@@ -21,7 +22,7 @@ jobs:
       - run:
           name: "install dependencies"
           command: |
-            sudo apt-get -y install build-essential make git gnupg2 nginx nginx-full php-fpm php7.0-xsl dnsmasq hostapd python3 python3-pip ; wait ;
+            sudo apt-get -y install build-essential make git gnupg2 nginx nginx-full php-fpm php-xsl dnsmasq hostapd python3 python3-pip ; wait ;
       - checkout
       - run:
           shell: /bin/bash
@@ -46,11 +47,19 @@ jobs:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
+      LANGUAGE: en_US
       LC_CTYPE: en_EN.UTF-8
     working_directory: ~/Pocket-PiAP
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - run:
+          shell: /bin/bash
+          name: "Hack for docker policy-rc.d"
+          command: |
+            sudo rm -vf /usr/sbin/policy-rc.d && ( printf "#!/bin/sh\nexit 0" | sudo tee /usr/sbin/policy-rc.d ) ;
+            sudo chmod 755 /usr/sbin/policy-rc.d ;
+          when: on_success
       - run:
           shell: /bin/bash
           name: "clean up for test"
@@ -60,7 +69,7 @@ jobs:
       - run:
           name: "fetch not pull"
           command: |
-            curl -fsSL --tlsv1.2 --url https://raw.githubusercontent.com/reactive-firewall/Pocket-PiAP/${CIRCLE_SHA1:-${CIRCLE_BRANCH:-stable}}/upgrade.sh -o ~/Pocket-PiAP/upgrade.sh 2>/dev/null || true
+            curl -fL --tlsv1.2 -s -S --url https://raw.githubusercontent.com/reactive-firewall/Pocket-PiAP/${CIRCLE_SHA1:-${CIRCLE_BRANCH:-stable}}/upgrade.sh -o ~/Pocket-PiAP/upgrade.sh 2>/dev/null || true
           when: on_success
       - run:
           shell: /bin/bash
@@ -100,7 +109,7 @@ jobs:
       - run:
           name: "reinstall dependencies"
           command: |
-            sudo apt-get -y install build-essential make git gnupg2 nginx nginx-full php-fpm php7.0-xsl dnsmasq hostapd python3 python3-pip ; wait ;
+            sudo apt-get -y install build-essential make git gnupg2 nginx nginx-full php-fpm php-xsl dnsmasq hostapd python3 python3-pip ; wait ;
       - restore_cache:
           key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
           when: on_success
@@ -177,12 +186,12 @@ jobs:
       - run:
           name: "install flake8 attempt"
           command: |
-            python3 -m pip install --user flake8 || true
+            python3 -m pip install --user flake8 || python3 -m pip3 install --user flake8 || true
           when: on_success
       - run:
-          name: "install flake8 attempt"
+          name: "install pep8 attempt"
           command: |
-            python3 -m pip install --user pep8 || true
+            python3 -m pip install --user pep8 || python3 -m pip3 install --user pep8 || true
           when: on_success
       - run:
           shell: /bin/bash

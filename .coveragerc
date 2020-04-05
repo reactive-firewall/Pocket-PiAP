@@ -7,11 +7,6 @@ include = piaplib*
 exclude_lines =
     # Have to re-enable the standard pragma
     pragma: no cover
-
-    except Exception
-    # Don't complain if tests don't hit defensive assertion code:
-	# Have to re-enable the standard pragma rules
-	pragma: no cover
 	from . import
 	except Exception
 	except BaseException:
@@ -33,6 +28,11 @@ exclude_lines =
 
     # Don't complain if non-runnable code isn't run:
 	if __name__ in u'__main__':
+
+partial_branches =
+	# Have to re-enable the standard pragma rules
+	pragma: no branch
+	not in sys.modules:
 
 ignore_errors = True
 
