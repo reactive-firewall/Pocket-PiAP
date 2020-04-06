@@ -163,11 +163,18 @@ message "Selecting branch ${PIAP_UI_BRANCH:-stable}"
 git fetch "${CI_REMOTE:-origin}" "${CIRCLE_BRANCH:-${CIRCLE_SHA1:-stable}}" || git fetch --all || ROLL_BACK=2 ;
 git pull || git pull --all || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
-git submodule init || true ;
+for SUBMOD in PiAP-python-tools PiAP-Firewall PiAP-Webroot ; do
+	git clone -b ${PIAP_UI_BRANCH:-stable} "https://github.com/reactive-firewall/${SUBMOD}.git" "./units/${SUBMOD}" || ROLL_BACK=2 ;
+done ;
+git submodule init || ROLL_BACK=2 ;
+git submodule foreach git fetch "${CI_REMOTE:-origin}" --all || true ;
+git submodule foreach git checkout ${PIAP_UI_BRANCH:-stable} || true ;
+git submodule foreach git pull --all || true ;
+git submodule foreach git checkout --force ${PIAP_UI_BRANCH:-stable} || true ;
 git submodule update --remote --checkout || ROLL_BACK=2 ;
 git config --local fetch.recursesubmodules true ;
 git fetch || ROLL_BACK=2 ;
-git pull || ROLL_BACK=2 ;
+git pull || git pull --all || ROLL_BACK=2 ;
 git checkout --force ${PIAP_UI_BRANCH:-stable} || ROLL_BACK=2 ;
 
 if [[ ( ${ROLL_BACK:-2} -gt 0 ) ]] ; then

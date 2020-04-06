@@ -51,28 +51,17 @@ copies or substantial portions of the Software.
 
 #### Known Issues and Possible Improvements
 
-For Details on current issues:
+For Details on current known issues:
 - see [Issues](https://github.com/reactive-firewall/Pocket-PiAP/issues)
 
 To suggest or help fund a bug bounty:
 - see [Suggest a Bounty](https://www.bountysource.com/teams/piap-bug-hunting/issue_suggestions/new)
+- funding is a work in porgress (donations welcome)
 
 #### Reporting Issues and Bugs
 
 Please open an [Issue](https://github.com/reactive-firewall/Pocket-PiAP/issues) if one does not
 exist.
-
-When opening an issue at a minimum please include details on
- - how to reproduce the problem (if practical)
- - any possible workarounds (if known)
-
-Additionally:
- - patches are welcome (please patch against latest `stable` branch)
- - test cases are helpful
- - please note submitted code should have a author's by-line if not intended to be released under `Pocket PiAP`'s license (a pen name can be used to remain anonymous if so desired)
- - submitted code is not guaranteed to be accepted.
-   - Rare objections are usually due to introduction of security flaws or code style flaws.
-   - rejected code may be posted under you're own fork as a workaround if desired.
 
 #### Reporting practical exploits and vulnerabilities
 
@@ -92,11 +81,15 @@ Be ethical, and be patient. `Pocket PiAP` IS STILL IN A PRIVATE BETA. If the sec
  
 #### Joining the Private Beta
 
-Please send an email to reactive.firewall+jointhebeta@gmail.com and request to join the private Beta.
+_Please send an email to reactive.firewall+jointhebeta@gmail.com and request to join the private Beta._
+
+**OR** ...
+
+[Offer to help](https://github.com/reactive-firewall/Pocket-PiAP/issues)
 
 _What you can expect_:
  - Currently instructions to assemble a prototype system to run `Pocket AP` are constantly changing and thus are still a TO-DO item.
  - parts vary in cost depending on how you order them.
- - cost is usually around $118 (USD) (for the basic prototype)
+ - cost of parts is usually around $118 (USD) (for the basic prototype)
 
 

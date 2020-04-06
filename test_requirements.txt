@@ -1,0 +1,14 @@
+argparse>=1.4.0
+setuptools>38.0.0
+# virtualenv - MIT
+virtualenv>=15.0.0
+# six - MIT
+six>=1.0.0
+tox>=3.0.0
+pip>=18.1
+requests>=2.21
+urllib3>=1.20.0
+# netifaces - MIT
+netifaces>=0.10.9
+# PiAPLib
+-e git+https://github.com/reactive-firewall/PiAP-python-tools.git@stable#egg=piaplib

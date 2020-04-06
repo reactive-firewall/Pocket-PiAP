@@ -22,4 +22,4 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 #
-sudo -u pocket-admin python3 -m piaplib.pocket $@
+sudo -E -u pocket-admin python3 -m piaplib.pocket $@
